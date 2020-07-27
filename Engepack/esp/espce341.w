@@ -461,9 +461,10 @@ procedure pi-cria-lote:
     def var h_api_ccusto as handle no-undo.
     def var v_log_utz_ccusto as logical no-undo.
     def var v_ccusto as char no-undo.
+    def buffer b-it-requisicao for it-requisicao.
     RUN prgint/utb/utb742za.py PERSISTENT SET h_api_ccusto.
 
-
+  
 
   find last tt-digita where tt-digita.marca = "*" 
                       and   tt-digita.cod-estabel = p-estab no-error.
@@ -494,6 +495,14 @@ procedure pi-cria-lote:
                                break by tt-digita.cod-estabel:
 
 
+
+    find first b-it-requisicao where b-it-requisicao.it-codigo = tt-digita.it-codigo
+                               and   b-it-requisicao.cod-estabel = tt-digita.cod-estabel
+                               and   b-it-requisicao.situacao  <> 4
+                               and   b-it-requisicao.situacao  <> 2
+                               no-error.
+
+                               if avail b-it-requisicao then next.
 
     assign tt-digita.numero-ordem = p-req
            tt-digita.l-criado     = yes.
