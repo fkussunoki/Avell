@@ -12,7 +12,7 @@
 ** parcial ou total por qualquer meio, so podera ser feita mediante
 ** autorizacao expressa.
 *******************************************************************************/
-{include/i-prgvrs.i espce341 1.00.00.001}
+{include/i-prgvrs.i esce341 1.00.00.027}
 
 /* Chamada a include do gerenciador de licen‡as. Necessario alterar os parametros */
 /*                                                                                */
@@ -474,6 +474,7 @@ procedure pi-executar:
       find first it-requisicao where   it-requisicao.it-codigo = tt-digita.it-codigo
                                  and   it-requisicao.cod-estabel = tt-digita.cod-estabel
                                  and   it-requisicao.situacao  <> 2
+                                 and   it-requisicao.tp-requis = 2
                                  no-error.
 
                                  if  avail it-requisicao then do:
@@ -786,7 +787,7 @@ DO:
 
     ASSIGN w-livre:SENSITIVE = NO.
 
-      run esp/espce341a.w (INPUT-OUTPUT TABLE tt-filtro, OUTPUT c-acao). 
+      run esp/esce341a.w (INPUT-OUTPUT TABLE tt-filtro, OUTPUT c-acao). 
 
     ASSIGN w-livre:SENSITIVE = YES.
 
@@ -1078,7 +1079,7 @@ PROCEDURE local-initialize :
 
   {include/win-size.i}
 
-  {utp/ut9000.i "espce341" "1.00.00.001"}
+  {utp/ut9000.i "esce341" "1.00.00.001"}
 
   /* Dispatch standard ADM method.                             */
   RUN dispatch IN THIS-PROCEDURE ( INPUT 'initialize':U ) .
