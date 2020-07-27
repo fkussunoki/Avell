@@ -12,7 +12,7 @@
 ** parcial ou total por qualquer meio, so podera ser feita mediante
 ** autorizacao expressa.
 *******************************************************************************/
-{include/i-prgvrs.i esce341 1.00.00.001}
+{include/i-prgvrs.i espce341 1.00.00.001}
 
 /* Chamada a include do gerenciador de licen‡as. Necessario alterar os parametros */
 /*                                                                                */
@@ -52,6 +52,8 @@ def temp-table tt-digita
     field rw-nec        as rowid
     field l-criado      as logical initial no
     field concatena     as char
+    FIELD c-erro        AS INTEGER INITIAL 0
+    FIELD c-alerta      AS CHAR
     index codigo marca
                  cod-estabel
                  it-codigo
@@ -102,6 +104,7 @@ def var v-cta-fixa as char. //conta fixada conforme email enviado por Marta 16.0
 
 def var v-init as datetime.
 def var v-fim as datetime.
+
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
@@ -123,7 +126,7 @@ def var v-fim as datetime.
 &Scoped-define INTERNAL-TABLES tt-digita
 
 /* Definitions for BROWSE br-digita                                     */
-&Scoped-define FIELDS-IN-QUERY-br-digita tt-digita.marca tt-digita.it-codigo tt-digita.cod-estabel tt-digita.c-geracao tt-digita.data-geracao tt-digita.data-entrega tt-digita.qt-ordem tt-digita.qt-orig tt-digita.qt-pendente tt-digita.estoque-dispo tt-digita.vlr-un tt-digita.vlr-total   
+&Scoped-define FIELDS-IN-QUERY-br-digita tt-digita.marca tt-digita.it-codigo tt-digita.cod-estabel tt-digita.c-geracao tt-digita.data-geracao tt-digita.data-entrega tt-digita.qt-ordem tt-digita.qt-orig tt-digita.qt-pendente tt-digita.estoque-dispo tt-digita.vlr-un tt-digita.vlr-total tt-digita.c-alerta   
 &Scoped-define ENABLED-FIELDS-IN-QUERY-br-digita tt-digita.qt-ordem ~
 tt-digita.data-entrega   
 &Scoped-define ENABLED-TABLES-IN-QUERY-br-digita tt-digita
@@ -227,6 +230,7 @@ DEFINE BROWSE br-digita
       tt-digita.estoque-dispo
       tt-digita.vlr-un
       tt-digita.vlr-total
+      tt-digita.c-alerta COLUMN-LABEL "Alerta" FORMAT "x(120)"
 ENABLE
       tt-digita.qt-ordem
       tt-digita.data-entrega
@@ -380,6 +384,52 @@ END.
 &ANALYZE-RESUME
 
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL br-digita w-livre
+ON ROW-DISPLAY OF br-digita IN FRAME f-cad
+DO:
+  CASE tt-digita.c-erro:
+
+      WHEN 1 THEN DO:
+ ASSIGN
+          tt-digita.marca:BGCOLOR           IN BROWSE br-digita = 12
+          tt-digita.it-codigo:BGCOLOR       IN BROWSE br-digita = 12     
+          tt-digita.cod-estabel:BGCOLOR     IN BROWSE br-digita = 12 
+          tt-digita.c-geracao:BGCOLOR       IN BROWSE br-digita = 12  
+          tt-digita.data-geracao:BGCOLOR    IN BROWSE br-digita = 12
+          tt-digita.data-entrega:BGCOLOR    IN BROWSE br-digita = 12
+          tt-digita.qt-ordem:BGCOLOR        IN BROWSE br-digita = 12
+          tt-digita.qt-orig:BGCOLOR         IN BROWSE br-digita = 12             
+          tt-digita.qt-pendente:BGCOLOR     IN BROWSE br-digita = 12   
+          tt-digita.estoque-dispo:BGCOLOR   IN BROWSE br-digita = 12
+          tt-digita.vlr-un:BGCOLOR          IN BROWSE br-digita = 12
+          tt-digita.vlr-total:BGCOLOR       IN BROWSE br-digita = 12.
+
+      END.
+
+      WHEN 2 THEN DO:
+          ASSIGN
+                   tt-digita.marca:BGCOLOR           IN BROWSE br-digita = 10
+                   tt-digita.it-codigo:BGCOLOR       IN BROWSE br-digita = 10     
+                   tt-digita.cod-estabel:BGCOLOR     IN BROWSE br-digita = 10 
+                   tt-digita.c-geracao:BGCOLOR       IN BROWSE br-digita = 10  
+                   tt-digita.data-geracao:BGCOLOR    IN BROWSE br-digita = 10
+                   tt-digita.data-entrega:BGCOLOR    IN BROWSE br-digita = 10
+                   tt-digita.qt-ordem:BGCOLOR        IN BROWSE br-digita = 10
+                   tt-digita.qt-orig:BGCOLOR         IN BROWSE br-digita = 10             
+                   tt-digita.qt-pendente:BGCOLOR     IN BROWSE br-digita = 10   
+                   tt-digita.estoque-dispo:BGCOLOR   IN BROWSE br-digita = 10
+                   tt-digita.vlr-un:BGCOLOR          IN BROWSE br-digita = 10
+                   tt-digita.vlr-total:BGCOLOR       IN BROWSE br-digita = 10.
+
+      END.
+
+  END CASE.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &Scoped-define SELF-NAME bt-executar
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL bt-executar w-livre
 ON CHOOSE OF bt-executar IN FRAME f-cad /* Executar */
@@ -398,8 +448,10 @@ procedure pi-executar:
 
   def var v_cod_estab as char no-undo.
   def var v_nr_req    as integer no-undo.
+  DEF VAR i AS INTEGER NO-UNDO.
   ASSIGN i-seq = 1.
   assign i-itens = 0.
+  ASSIGN i = 0.
 
   assign v-init = now.
   run utp\ut-acomp.p persistent set h-acomp.
@@ -416,7 +468,6 @@ procedure pi-executar:
 //alteracao conforme solicitacao de email 22.07
    if first-of(tt-digita.concatena) then do:
       ASSIGN i-seq = 1.
-      assign i-itens = 0.
     
       assign v_cod_estab = tt-digita.cod-estabel.
 
@@ -426,12 +477,16 @@ procedure pi-executar:
                                  no-error.
 
                                  if  avail it-requisicao then do:
-                                  assign tt-digita.l-criado = no
-                                         tt-digita.marca    = "".
+                                  assign tt-digita.l-criado   = no
+                                         tt-digita.marca      = ""
+                                         tt-digita.c-erro     = 1
+                                         tt-digita.c-alerta   = "Existe solicitacao em aberto. Verifique " +
+                                      " " + string(it-requisicao.nr-requisicao).
                                   NEXT gera_itens.
                                  end.
 
 
+                                 ASSIGN i-itens = i-itens + 1.
 
     RUN pi-nr-solicita(OUTPUT nr-req).
 
@@ -450,8 +505,11 @@ procedure pi-executar:
         
 
    END.
+
   end.
 RUN pi-finalizar IN h-acomp.
+
+IF i-itens > 0 THEN
 
 run pi-apaga-query.
 end procedure.
@@ -489,7 +547,8 @@ procedure pi-cria-lote:
     RUN prgint/utb/utb742za.py PERSISTENT SET h_api_ccusto.
 
 
-  ASSIGN tt-digita.numero-ordem = p-req.
+  ASSIGN tt-digita.numero-ordem = p-req
+         tt-digita.c-erro       = 2.
 
   run pi-acompanhar in h-acomp(input "Estab " + tt-digita.cod-estabel + " Item " + tt-digita.it-codigo + " Seq " + string(i-seq) + " SC " + string(tt-digita.numero-ordem)).
 
@@ -727,7 +786,7 @@ DO:
 
     ASSIGN w-livre:SENSITIVE = NO.
 
-      run esp/esce341a.w (INPUT-OUTPUT TABLE tt-filtro, OUTPUT c-acao). 
+      run esp/espce341a.w (INPUT-OUTPUT TABLE tt-filtro, OUTPUT c-acao). 
 
     ASSIGN w-livre:SENSITIVE = YES.
 
