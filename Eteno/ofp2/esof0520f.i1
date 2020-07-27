@@ -1,0 +1,75 @@
+/******************************************************************************
+**  Include...: esof0520F.I1
+**  Objetivo..: Agrupamento por conta contabil
+******************************************************************************/
+
+ASSIGN c-cfop = &IF "{&bf_dis_versao_ems}" >= "2.05" &THEN
+                    doc-fiscal.cod-cfop.
+                &else
+                    trim(substr(doc-fiscal.char-1,1,10)).
+                &ENDIF
+
+assign c-conta = if l-conta-contabil 
+                 then  it-doc-fisc.ct-codigo             /*substr(it-doc-fisc.char-2,1,15)*/
+                 else "".
+
+if  it-doc-fisc.vl-bicms-it > 0
+or  it-doc-fisc.vl-icms-it > 0 
+or  (    (it-doc-fisc.vl-icms-it = 0 or it-doc-fisc.vl-bicms-it = 0)
+      and it-doc-fisc.cd-trib-icm = 1
+      and (    it-doc-fisc.quantidade <> 0
+           OR (    it-doc-fisc.quantidade = 0 
+               AND doc-fiscal.vl-cont-doc = 0)))
+then do:
+    find first tt-conta
+        where tt-conta.cod-tributacao = 1
+        and   tt-conta.aliquota-icms  = it-doc-fisc.aliquota-icm /*it-doc-fisc.dec-1*/
+        and   tt-conta.conta-contabil = c-conta 
+        and   tt-conta.cfop           = c-cfop no-lock no-error. 
+    if  not avail tt-conta then do:
+        create tt-conta.
+        assign tt-conta.cod-tributacao = 1
+               tt-conta.conta-contabil = c-conta
+               tt-conta.aliquota-icms  = it-doc-fisc.aliquota-icm /*it-doc-fisc.dec-1*/
+               tt-conta.cfop           = c-cfop  
+               i-num-linhas            = i-num-linhas + 1.
+    end.
+end.
+if  it-doc-fisc.vl-icmsnt-it > 0 
+or (it-doc-fisc.vl-icmsnt-it = 0 and it-doc-fisc.cd-trib-icm = 2)
+then do:
+    find first tt-conta
+        where tt-conta.cod-tributacao = 2
+        and   tt-conta.aliquota-icms  = it-doc-fisc.aliquota-icm /*it-doc-fisc.dec-1*/
+        and   tt-conta.conta-contabil = c-conta  
+        and   tt-conta.cfop           = c-cfop no-lock no-error. 
+    if  not avail tt-conta then do:
+        create tt-conta.
+        assign tt-conta.cod-tributacao = 2
+               tt-conta.conta-contabil = c-conta
+               tt-conta.aliquota-icms  = it-doc-fisc.aliquota-icm /*it-doc-fisc.dec-1*/ 
+               tt-conta.cfop           = c-cfop 
+               i-num-linhas            = i-num-linhas + 1.
+    end.
+end.
+if  it-doc-fisc.vl-icmsou-it > 0 
+or (it-doc-fisc.vl-icmsou-it = 0 and it-doc-fisc.cd-trib-icm = 3 and doc-fiscal.cod-observa <> 2)
+then do:
+    find first tt-conta
+        where tt-conta.cod-tributacao = 3
+        and   tt-conta.aliquota-icms  = it-doc-fisc.aliquota-icm /*it-doc-fisc.dec-1*/
+        and   tt-conta.conta-contabil = c-conta 
+        and   tt-conta.cfop           = c-cfop no-lock no-error. 
+    if  not avail tt-conta then do:
+        create tt-conta.
+        assign tt-conta.cod-tributacao = 3
+               tt-conta.conta-contabil = c-conta
+               tt-conta.aliquota-icms  = it-doc-fisc.aliquota-icm /*it-doc-fisc.dec-1*/ 
+               tt-conta.cfop           = c-cfop 
+               i-num-linhas            = i-num-linhas + 1.
+    end.
+end.
+
+
+/* esof0520f.i1 */
+

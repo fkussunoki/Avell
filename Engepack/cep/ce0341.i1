@@ -1,0 +1,63 @@
+/****************************************************************************
+**
+**   CE0341.I1 - Cria ordem compra 
+**
+****************************************************************************/
+
+assign l-resposta = no
+       l-primeira = yes.
+do  while l-resposta = no:
+    if  tt-param.l-multip and i-seq1 > 1 then 
+        find ordem-compra where 
+             ordem-compra.numero-ordem = (i-ordem * 100 + i-seq1) no-lock no-error.
+    else
+        find first ordem-compra where 
+             ordem-compra.numero-ordem = i-ordem no-lock no-error.
+    if  avail ordem-compra then do:
+        if  tt-param.l-multip and (i-seq1 > 1 or i-seq1 = 0) then 
+            assign i-seq1 = i-seq1 + 1.
+
+        if  not tt-param.l-multip or i-seq1 > 99 or i-seq1 = 1 then do:
+            assign i-seq1  = if tt-param.l-multip then 1 else 0
+                   i-ordem = i-ordem + 1.
+            if  i-ordem > 99999999 then do:
+                if  not l-primeira then do:
+                    run utp/ut-msgs.p (input "msg", input 2169, input "").
+                    assign c-mensagem = return-value.
+                    disp c-mensagem with frame f-aviso no-label stream-io centered.
+                    leave.
+                end.
+                assign i-ordem    = param-compra.ult-ord-man + 1
+                       l-primeira = no.
+            end.
+        end.
+    end.
+    else
+        assign l-resposta = yes.
+end.
+assign i-ord-aux = i-ordem.
+if avail param-global
+     and param-global.modulo-bh then do:
+    find last his-ord-compra no-lock where
+          his-ord-compra.numero-ordem <= param-compra.ult-ord-man * 100 no-error.
+    if avail his-ord-compra
+         and his-ord-compra.numero-ordem > i-ordem then
+        assign i-ord-aux = truncate(his-ord-compra.numero-ordem / 100,0) + 1.
+    /* Usado para bancos historicos */
+    /* Valida o ultimo numero da ordem de compra */
+    if i-ord-aux >= i-ordem then   
+        assign i-ordem = (if i-ord-aux > param-compra.ult-ord-man
+                          or i-ord-aux < param-compra.prim-ord-man
+                               then param-compra.prox-ord-aut 
+                               else i-ord-aux).
+end.
+
+find first param-compra exclusive-lock no-error.
+assign param-compra.prox-ord-aut = i-ordem + 1.
+create tt-ordem-compra.
+
+assign tt-ordem-compra.numero-ordem = if not tt-param.l-multip then i-ordem else (i-ordem * 100) + i-seq1
+       tt-ordem-compra.l-gerou      = no. 
+/* Indica se foi gerada uma OM para o registro da temp-table */
+
+/* Fim da Include */

@@ -1,0 +1,46 @@
+{include/i_dbvers.i}
+esof0520rp#10#destino#Integer#9#Destino#2#Destino de Impressão do Relatório (1-Impressora 2-Arquivo 3-Terminal)#yes#no#0
+esof0520rp#20#arquivo#Character#x(30)#Arquivo#esof0520.lst#Nome do Arquivo Destino do Relatório#yes#no#0
+esof0520rp#30#usuario#Character#x(20)#Usuário##Nome do Usuário Logado no Sistema#yes#no#0
+esof0520rp#40#data-exec#Date#99/99/9999#Data Execução#/  /#Data de Execução do Programa#yes#no#0
+esof0520rp#50#hora-exec#Integer#999999#Hora Execução#000000#Hora de Execução do Programa#yes#no#0
+&IF "{&mguni_version}" >= "2.071" &THEN
+esof0520rp#70#cod-estabel-ini#Character#x(05)#Estabelecimento Inicial##Código do Estabelecimento Inicial#yes#no#0
+&ELSE
+esof0520rp#70#cod-estabel-ini#Character#x(3)#Estabelecimento Inicial##Código do Estabelecimento Inicial#yes#no#0
+&ENDIF
+&IF "{&mguni_version}" >= "2.071" &THEN
+esof0520rp#80#cod-estabel-fim#Character#x(05)#Estabelecimento Final##Código do Estabelecimento Final#yes#no#0
+&ELSE
+esof0520rp#80#cod-estabel-fim#Character#x(3)#Estabelecimento Final##Código do Estabelecimento Final#yes#no#0
+&ENDIF
+esof0520rp#90#dt-docto-ini#Date#99/99/9999#Data Documento Inicial#/  /#Data do Documento Inicial#yes#no#0
+esof0520rp#100#dt-docto-fim#Date#99/99/9999#Data Documento Final#/  /#Data do Documento Final#yes#no#0
+esof0520rp#110#resumo#Logical#yes/no#Imprime Resumo do Período#no#Imprime Resumo do Período?#yes#no#0
+esof0520rp#120#resumo-mes#Logical#yes/no#Imprime Resumo Mensal#no#Imprime Resumo Mensal?#yes#no#0
+esof0520rp#130#tot-icms#Logical#yes/no#Totaliza ICMS#no#Totaliza ICMS?#yes#no#0
+esof0520rp#140#imp-for#Logical#yes/no#Fornecedores#no#Imprime Fornecedores?#yes#no#0
+esof0520rp#150#periodo-ant#Logical#yes/no#Impr Tot Períodos Ant#no#Imprime Totais de Períodos Anteriores?#yes#no#0
+esof0520rp#160#imp-ins#Logical#yes/no#Inscrição Estadual#no#Imprime Inscrição Estadual?#yes#no#0
+esof0520rp#170#conta-contabil#Logical#yes/no#Impr Cod Conta Contábil#no#Imprime Código da Conta Contábil?#yes#no#0
+esof0520rp#180#at-perm#Logical#yes/no#Demonst Ativo Permanente#no#Imprime Demonst Ativo Permanente?#yes#no#0
+esof0520rp#190#separadores#Logical#yes/no#Imprime Separadores#no#Imprime Separadores?#yes#no#0
+esof0520rp#200#previa#Character#x(20)#Tipo de Emissão##Tipo de Emissão: Previa / Emissão#yes#no#0
+esof0520rp#210#documentos#Character#x(30)#Resumo por UF Imprime##Resumo por UF Imprime: ICMS Subst / Todos os Documentos#yes#no#0
+esof0520rp#220#da-icms-ini#Date#99/99/9999#Data Inicial ICMS#/  /#Data Inicial ICMS#yes#no#0
+esof0520rp#230#da-icms-fim#Date#99/99/9999#Data Final ICMS#31/12/2999#Data Final ICMS#yes#no#0
+esof0520rp#250#incentivado#Logical#yes/no#Produtos Incentivados#no#Imprime Produtos Incentivados?#yes#no#0
+esof0520rp#260#relat#Character#x(30)####yes#no#0
+esof0520rp#270#eliqui#Logical#yes/no##no##yes#no#0
+esof0520rp#280#c-nomest#Character#x(30)####yes#no#0
+esof0520rp#290#c-estado#Character#x(4)####yes#no#0
+esof0520rp#300#c-cgc#Character#x(20)####yes#no#0
+esof0520rp#310#c-insestad#Character#x(30)####yes#no#0
+esof0520rp#320#c-cgc-1#Character#x(20)#CGC##Não Informar#yes#no#0
+esof0520rp#330#c-fornecedor#Character#x(20)####yes#no#0
+esof0520rp#340#c-ins-est#Character#x(30)####yes#no#0
+esof0520rp#350#c-titulo#Character#x(30)####yes#no#0
+esof0520rp#360#imp-cnpj#Logical#yes/no#CNPJ#no#CNPJ#yes#no#0
+esof0520rp#370#considera-icms-st#Logical#yes/no#Consid ICMS-ST Valor Cont#yes#Considera ICMS Substituto no Valor Contábil?#yes#no#0
+esof0520rp#380#imp-cab#Character#x(06)#1 - Folha / 2 - Pagina##1 - Folha / 2 - Pagina#yes#no#0
+esof0520rp#390#l-cfop-serv#Logical#yes/no#Considera CFOP's de servico#no#Considera CFOP's de servico#yes#no#0

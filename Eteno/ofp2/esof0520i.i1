@@ -1,0 +1,17 @@
+/*****************************************************************************
+**  INCLUDE: esof0520I.I1
+**  OBJETIVO: ACUMULA O VALOR DE CREDIDO DE ICMS COMPLEMENTAR
+**  {1} -> Consistencia do where
+**  {2} -> Tipo de resumo
+******************************************************************************/
+
+if  c-estado = "MG" then do: 
+    assign de-cred-com = 0.
+    
+    for each  tt-cred-com 
+        {1} "{2}"
+        no-lock:
+        assign de-cred-com =  de-cred-com 
+                            + tt-cred-com.vl-icms-com.
+    end.
+end.           

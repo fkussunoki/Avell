@@ -1,0 +1,1302 @@
+ADD TABLE "bdg3000"
+  AREA "Schema Area"
+  LABEL "Entidades"
+  DUMP-NAME "bdg3000"
+
+ADD FIELD "Entidade" OF "bdg3000" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 16
+  ORDER 10
+
+ADD FIELD "Ccusto" OF "bdg3000" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 3
+  MAX-WIDTH 16
+  ORDER 20
+
+ADD FIELD "Nome" OF "bdg3000" AS character 
+  FORMAT "x(80)"
+  INITIAL ""
+  POSITION 4
+  MAX-WIDTH 160
+  ORDER 30
+
+ADD FIELD "Mnemonico" OF "bdg3000" AS character 
+  FORMAT "x(6)"
+  INITIAL ""
+  POSITION 5
+  MAX-WIDTH 12
+  ORDER 40
+
+ADD TABLE "compos_rubrica"
+  AREA "Schema Area"
+  DUMP-NAME "compos_rubrica"
+
+ADD FIELD "cod_pcte_cta_ctbl" OF "compos_rubrica" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 16
+  ORDER 10
+
+ADD FIELD "cod_rubrica" OF "compos_rubrica" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 3
+  MAX-WIDTH 16
+  ORDER 20
+
+ADD FIELD "cod_cta_ctbl" OF "compos_rubrica" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 4
+  MAX-WIDTH 40
+  ORDER 30
+
+ADD FIELD "tipo" OF "compos_rubrica" AS integer 
+  DESCRIPTION "Determina se trata-se de um campo Despesa (0) ou Receita (1)"
+  FORMAT "99"
+  INITIAL "0"
+  LABEL "Receita/Despesa"
+  POSITION 5
+  MAX-WIDTH 4
+  ORDER 40
+
+ADD FIELD "devolucao" OF "compos_rubrica" AS logical 
+  DESCRIPTION "Determina se trata-se de uma devolucao de produtos em relacao a receita"
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 6
+  MAX-WIDTH 1
+  ORDER 50
+
+ADD TABLE "ext_coluna_demonst"
+  AREA "Schema Area"
+  LABEL "Tabela de Extensao"
+  DUMP-NAME "ext_coluna_demonst"
+
+ADD FIELD "cod_usuario" OF "ext_coluna_demonst" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 40
+  ORDER 10
+
+ADD FIELD "cod_demonst_ctbl" OF "ext_coluna_demonst" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 3
+  MAX-WIDTH 40
+  ORDER 20
+
+ADD FIELD "padr_col_demonst_ctbl" OF "ext_coluna_demonst" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 4
+  MAX-WIDTH 40
+  ORDER 30
+
+ADD FIELD "exercicio" OF "ext_coluna_demonst" AS integer 
+  FORMAT ">>>>"
+  INITIAL "0"
+  POSITION 5
+  MAX-WIDTH 4
+  ORDER 40
+
+ADD TABLE "ext_col_demonst_ctbl"
+  AREA "Schema Area"
+  LABEL "Coluna Demonstrativo Cont bil"
+  DESCRIPTION "Coluna Demonstrativo Cont bil"
+  DUMP-NAME "fin355"
+  TABLE-TRIGGER "Delete" OVERRIDE PROCEDURE "database/tgfin/tdp/tdfin355.p" CRC "?" 
+  TABLE-TRIGGER "Write" OVERRIDE PROCEDURE "database/tgfin/twp/twfin355.p" CRC "?" 
+
+ADD FIELD "cod_padr_ext_col_demonst_ctbl" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "C¢digo Coluna Demonstrativo"
+  FORMAT "x(8)"
+  INITIAL ""
+  LABEL "PadrÆo Colunas"
+  POSITION 2
+  MAX-WIDTH 16
+  COLUMN-LABEL "Coluna Demonstrativo"
+  HELP "C¢digo Coluna Demonstrativo"
+  ORDER 10
+  MANDATORY
+
+ADD FIELD "des_tit_ctbl" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "Descri‡Æo T¡tulo Cont bil"
+  FORMAT "x(40)"
+  INITIAL ""
+  LABEL "T¡tulo Cont bil"
+  POSITION 3
+  MAX-WIDTH 80
+  COLUMN-LABEL "T¡tulo Cont bil"
+  HELP "Descri‡Æo T¡tulo Cont bil"
+  ORDER 20
+  MANDATORY
+
+ADD FIELD "cod_ext_col_demonst_ctbl" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "C¢digo Coluna Demonstrativo Cont bil"
+  FORMAT "x(2)"
+  INITIAL ""
+  LABEL "Coluna"
+  POSITION 4
+  MAX-WIDTH 4
+  COLUMN-LABEL "Coluna"
+  HELP "C¢digo Coluna Demonstrativo Cont bil"
+  ORDER 30
+  MANDATORY
+
+ADD FIELD "qtd_period_relac_base" OF "ext_col_demonst_ctbl" AS decimal 
+  DESCRIPTION "Quantidade Per¡odos Rela‡Æo Base"
+  FORMAT ">9"
+  INITIAL "0"
+  LABEL "Per¡odos da Base"
+  POSITION 5
+  MAX-WIDTH 15
+  COLUMN-LABEL "Per¡odo da Base"
+  HELP "Quantidade Per¡odos Rela‡Æo Base"
+  DECIMALS 0
+  ORDER 40
+  MANDATORY
+
+ADD FIELD "qtd_exerc_relac_base" OF "ext_col_demonst_ctbl" AS decimal 
+  DESCRIPTION "Quantidade Exerc¡cios Rela‡Æo Base"
+  FORMAT ">9"
+  INITIAL "0"
+  LABEL "Exerc¡cios da Base"
+  POSITION 6
+  MAX-WIDTH 15
+  COLUMN-LABEL "Exerc¡cios da Base"
+  HELP "Quantidade Exerc¡cios Rela‡Æo Base"
+  DECIMALS 0
+  ORDER 50
+  MANDATORY
+
+ADD FIELD "ind_tip_relac_base" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "Indicador Tipo Rela‡Æo"
+  FORMAT "X(20)"
+  INITIAL ""
+  LABEL "Tipo Rela‡Æo"
+  POSITION 7
+  MAX-WIDTH 40
+  VIEW-AS "view-as radio-set Vertical
+radio-buttons ""Antes da Referˆncia"", ""Antes da Referˆncia"", ""Depois da Referˆncia"", ""Depois da Referˆncia""
+ /*l_antes_da_referencia*/ /*l_antes_da_referencia*/ /*l_depois_da_referencia*/ /*l_depois_da_referencia*/
+ 
+"
+  COLUMN-LABEL "Tipo Rela‡Æo"
+  VALEXP "can-do(""Antes da Referˆncia,Depois da Referˆncia"", ext_col_demonst_ctbl.ind_tip_relac_base)"
+  VALMSG "FV: Valor nÆo contido na lista de valores poss¡veis !"
+  HELP "Indicador Tipo Rela‡Æo"
+  ORDER 60
+  MANDATORY
+
+ADD FIELD "ind_tip_val_sdo_ctbl" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "Indicador Tipo Valor"
+  FORMAT "X(13)"
+  INITIAL "Saldo"
+  LABEL "Tipo Valor"
+  POSITION 8
+  MAX-WIDTH 26
+  COLUMN-LABEL "Tipo Valor"
+  VALMSG "FV: Valor nÆo contido na lista de valores poss¡veis !"
+  HELP "Indicador Tipo Valor"
+  ORDER 70
+  MANDATORY
+
+ADD FIELD "ind_orig_val_col_demonst" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "Indicador Origem Valores Coluna Demonstrativo"
+  FORMAT "X(12)"
+  INITIAL "T¡tulo"
+  LABEL "Origem Valores"
+  POSITION 9
+  MAX-WIDTH 24
+  VIEW-AS "view-as combo-box
+list-items ""T¡tulo"",""F¢rmula"",""Cont bil"",""Or‡amento"",""Concorrente"",""Consolida‡Æo""
+ /*l_titulo*/ /*l_formula*/ /*l_contabil*/ /*l_orcamento*/ /*l_concorrente*/ /*l_consolidacao*/
+inner-lines 7
+ 
+"
+  COLUMN-LABEL "Origem Valores"
+  VALEXP "can-do(""T¡tulo,F¢rmula,Cont bil,Or‡amento,Concorrente,Consolida‡Æo"", ext_col_demonst_ctbl.ind_orig_val_col_demonst)"
+  VALMSG "FV: Valor nÆo contido na lista de valores poss¡veis !"
+  HELP "Indicador Origem Valores Coluna Demonstrativo"
+  ORDER 80
+  MANDATORY
+
+ADD FIELD "des_formul_ctbl" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "Descri‡Æo F¢rmula Cont bil"
+  FORMAT "x(2000)"
+  INITIAL ""
+  LABEL "F¢rmula Cont bil"
+  POSITION 10
+  MAX-WIDTH 4000
+  VIEW-AS "view-as editor max-chars 2000 scrollbar-vertical
+size 60 by 2
+ 
+"
+  COLUMN-LABEL "F¢rmula Cont bil"
+  HELP "Descri‡Æo F¢rmula Cont bil"
+  ORDER 90
+  MANDATORY
+
+ADD FIELD "des_anot_tab" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "Descri‡Æo Anota‡Æo Tabela"
+  FORMAT "x(2000)"
+  INITIAL ""
+  LABEL "Anota‡Æo Tabela"
+  POSITION 11
+  MAX-WIDTH 4000
+  VIEW-AS "view-as editor max-chars 2000 scrollbar-vertical
+size 50 by 4
+ 
+"
+  COLUMN-LABEL "Anota‡Æo Tabela"
+  HELP "Descri‡Æo Anota‡Æo Tabela"
+  ORDER 100
+  MANDATORY
+
+ADD FIELD "ind_funcao_ext_col_demonst_ctbl" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "Indicador Fun‡Æo Coluna Demonstrativo Cont bil"
+  FORMAT "X(12)"
+  INITIAL "ImpressÆo"
+  LABEL "Fun‡Æo Coluna"
+  POSITION 12
+  MAX-WIDTH 24
+  VIEW-AS "view-as combo-box
+list-items ""ImpressÆo"",""Base C lculo""
+ /*l_impressao*/ /*l_base_calculo*/
+inner-lines 3
+ 
+"
+  COLUMN-LABEL "Fun‡Æo Coluna"
+  VALEXP "can-do(""ImpressÆo,Base C lculo"", ext_col_demonst_ctbl.ind_funcao_ext_col_demonst_ctbl)"
+  VALMSG "FV: Valor nÆo contido na lista de valores poss¡veis !"
+  HELP "Indicador Fun‡Æo Coluna Demonstrativo Cont bil"
+  ORDER 110
+  MANDATORY
+
+ADD FIELD "num_conjto_param_ctbl" OF "ext_col_demonst_ctbl" AS integer 
+  DESCRIPTION "N£mero Conjunto Parƒmetros Cont beis"
+  FORMAT ">9"
+  INITIAL "1"
+  LABEL "Conjunto Parƒmetros"
+  POSITION 13
+  MAX-WIDTH 4
+  COLUMN-LABEL "Conjunto Parƒmetros"
+  HELP "N£mero Conjunto Parƒmetros Cont beis"
+  ORDER 120
+  MANDATORY
+
+ADD FIELD "cod_col_base_analis_vert" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "C¢digo Coluna Base An lise Vertical"
+  FORMAT "!"
+  INITIAL ""
+  LABEL "Coluna Base AV"
+  POSITION 14
+  MAX-WIDTH 2
+  COLUMN-LABEL "Coluna Base AV"
+  HELP "C¢digo Coluna Base An lise Vertical"
+  ORDER 130
+  MANDATORY
+
+ADD FIELD "cod_format_ext_col_demonst_ctbl" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "C¢digo Formato Coluna Demonstrativo Cont bil"
+  FORMAT "x(40)"
+  INITIAL ""
+  LABEL "Formato Coluna"
+  POSITION 15
+  MAX-WIDTH 80
+  COLUMN-LABEL "Formato Coluna"
+  HELP "C¢digo Formato Coluna Demonstrativo Cont bil"
+  ORDER 140
+  MANDATORY
+
+ADD FIELD "ind_mostra_cod_ctbl" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "Indicador Mostra C¢digo Cont bil"
+  FORMAT "X(13)"
+  INITIAL "Sim"
+  LABEL "Mostra C¢digo"
+  POSITION 16
+  MAX-WIDTH 26
+  VIEW-AS "view-as combo-box
+list-items ""Sim"",""NÆo"",""Internacional""
+ /*l_sim*/ /*l_nao*/ /*l_internacional*/
+inner-lines 4
+ 
+"
+  COLUMN-LABEL "Mostra C¢digo"
+  VALEXP "can-do(""Sim,NÆo,Internacional"", ext_col_demonst_ctbl.ind_mostra_cod_ctbl)"
+  VALMSG "FV: Valor nÆo contido na lista de valores poss¡veis !"
+  HELP "Indicador Mostra C¢digo Cont bil"
+  ORDER 150
+  MANDATORY
+
+ADD FIELD "ind_qualific_col_ctbl" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "Indicador Qualifica‡Æo Coluna Cont bil"
+  FORMAT "X(10)"
+  INITIAL "Valor"
+  LABEL "Qualifica‡Æo Coluna"
+  POSITION 17
+  MAX-WIDTH 20
+  VIEW-AS "view-as combo-box
+list-items ""Valor"",""Quantidade""
+ /*l_valor*/ /*l_quantidade*/
+inner-lines 3
+ 
+"
+  COLUMN-LABEL "Qualifica‡Æo Coluna"
+  VALEXP "can-do(""Valor,Quantidade"", ext_col_demonst_ctbl.ind_qualific_col_ctbl)"
+  VALMSG "FV: Valor nÆo contido na lista de valores poss¡veis !"
+  HELP "Indicador Qualifica‡Æo Coluna Cont bil"
+  ORDER 160
+  MANDATORY
+
+ADD FIELD "ind_tip_val_consolid" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "Indicador Tipo Valor Consolida‡Æo"
+  FORMAT "X(18)"
+  INITIAL "Total"
+  LABEL "Tipo Valor Consolid"
+  POSITION 18
+  MAX-WIDTH 36
+  VIEW-AS "view-as combo-box
+list-items ""Consolidado"",""Combinado"",""Elimina‡äes""
+ /*l_consolidado*/ /*l_combinado*/ /*l_eliminacoes*/
+inner-lines 4
+ 
+"
+  COLUMN-LABEL "Tipo Valor Consolid"
+  VALEXP "can-do(""Consolidado,Combinado,Elimina‡äes"", ext_col_demonst_ctbl.ind_tip_val_consolid)"
+  VALMSG "FV: Valor nÆo contido na lista de valores poss¡veis !"
+  HELP "Indicador Tipo Valor Consolida‡Æo"
+  ORDER 170
+  MANDATORY
+
+ADD FIELD "num_soma_ascii_cod_col" OF "ext_col_demonst_ctbl" AS integer 
+  DESCRIPTION "Somat¢ria ASCII C¢digo Coluna"
+  FORMAT ">>9"
+  INITIAL "0"
+  LABEL "Soma ASCII Colunas"
+  POSITION 19
+  MAX-WIDTH 4
+  COLUMN-LABEL "Soma ASCII Colunas"
+  HELP "Somat¢ria ASCII C¢digo Coluna"
+  ORDER 180
+  MANDATORY
+
+ADD FIELD "cod_livre_1" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "Atributo livre para uso interno"
+  FORMAT "x(100)"
+  INITIAL ""
+  LABEL "Livre 1"
+  POSITION 20
+  MAX-WIDTH 200
+  COLUMN-LABEL "Livre 1"
+  HELP "Atributo livre para uso interno"
+  ORDER 190
+
+ADD FIELD "log_livre_1" OF "ext_col_demonst_ctbl" AS logical 
+  DESCRIPTION "Atributo livre para uso interno"
+  FORMAT "Sim/NÆo"
+  INITIAL "no"
+  LABEL "Livre 1"
+  POSITION 21
+  MAX-WIDTH 1
+  VIEW-AS "view-as toggle-box
+"
+  COLUMN-LABEL "Livre 1"
+  HELP "Atributo livre para uso interno"
+  ORDER 200
+
+ADD FIELD "num_livre_1" OF "ext_col_demonst_ctbl" AS integer 
+  DESCRIPTION "Atributo livre para uso interno"
+  FORMAT ">>>>>9"
+  INITIAL "0"
+  LABEL "Livre 1"
+  POSITION 22
+  MAX-WIDTH 4
+  COLUMN-LABEL "Livre 1"
+  HELP "Atributo livre para uso interno"
+  ORDER 210
+
+ADD FIELD "val_livre_1" OF "ext_col_demonst_ctbl" AS decimal 
+  DESCRIPTION "Atributo livre para uso interno"
+  FORMAT ">>>,>>>,>>9.9999"
+  INITIAL "0"
+  LABEL "Livre 1"
+  POSITION 23
+  MAX-WIDTH 19
+  COLUMN-LABEL "Livre 1"
+  HELP "Atributo livre para uso interno"
+  DECIMALS 4
+  ORDER 220
+
+ADD FIELD "dat_livre_1" OF "ext_col_demonst_ctbl" AS date 
+  DESCRIPTION "Atributo livre para uso interno"
+  FORMAT "99/99/9999"
+  INITIAL "today"
+  LABEL "Livre 1"
+  POSITION 24
+  MAX-WIDTH 4
+  COLUMN-LABEL "Livre 1"
+  HELP "Atributo livre para uso interno"
+  ORDER 230
+
+ADD FIELD "cod_livre_2" OF "ext_col_demonst_ctbl" AS character 
+  DESCRIPTION "Atributo livre para uso interno"
+  FORMAT "x(100)"
+  INITIAL ""
+  LABEL "Livre 2"
+  POSITION 25
+  MAX-WIDTH 200
+  COLUMN-LABEL "Livre 2"
+  HELP "Atributo livre para uso interno"
+  ORDER 240
+
+ADD FIELD "dat_livre_2" OF "ext_col_demonst_ctbl" AS date 
+  DESCRIPTION "Atributo livre para uso interno"
+  FORMAT "99/99/9999"
+  INITIAL ?
+  LABEL "Livre 2"
+  POSITION 26
+  MAX-WIDTH 4
+  COLUMN-LABEL "Livre 2"
+  HELP "Atributo livre para uso interno"
+  ORDER 250
+
+ADD FIELD "log_livre_2" OF "ext_col_demonst_ctbl" AS logical 
+  DESCRIPTION "Atributo livre para uso interno"
+  FORMAT "Sim/NÆo"
+  INITIAL "no"
+  LABEL "Livre 2"
+  POSITION 27
+  MAX-WIDTH 1
+  VIEW-AS "view-as toggle-box
+"
+  COLUMN-LABEL "Livre 2"
+  HELP "Atributo livre para uso interno"
+  ORDER 260
+
+ADD FIELD "num_livre_2" OF "ext_col_demonst_ctbl" AS integer 
+  DESCRIPTION "Atributo livre para uso interno"
+  FORMAT ">>>>>9"
+  INITIAL "0"
+  LABEL "Livre 2"
+  POSITION 28
+  MAX-WIDTH 4
+  COLUMN-LABEL "Livre 2"
+  HELP "Atributo livre para uso interno"
+  ORDER 270
+
+ADD FIELD "val_livre_2" OF "ext_col_demonst_ctbl" AS decimal 
+  DESCRIPTION "Atributo livre para uso interno"
+  FORMAT ">>>,>>>,>>9.9999"
+  INITIAL "0"
+  LABEL "Livre 2"
+  POSITION 29
+  MAX-WIDTH 19
+  COLUMN-LABEL "Livre 2"
+  HELP "Atributo livre para uso interno"
+  DECIMALS 4
+  ORDER 280
+
+ADD INDEX "cldmnstc_id" ON "ext_col_demonst_ctbl" 
+  AREA "Schema Area"
+  UNIQUE
+  PRIMARY
+  INDEX-FIELD "cod_padr_ext_col_demonst_ctbl" ASCENDING 
+  INDEX-FIELD "cod_ext_col_demonst_ctbl" ASCENDING 
+
+ADD INDEX "cldmnstc_cldmnstc" ON "ext_col_demonst_ctbl" 
+  AREA "Schema Area"
+  INDEX-FIELD "cod_padr_ext_col_demonst_ctbl" ASCENDING 
+  INDEX-FIELD "cod_col_base_analis_vert" ASCENDING 
+
+ADD INDEX "cldmnstc_des" ON "ext_col_demonst_ctbl" 
+  AREA "Schema Area"
+  WORD
+  INDEX-FIELD "des_tit_ctbl" ASCENDING 
+
+ADD INDEX "cldmnstc_soma" ON "ext_col_demonst_ctbl" 
+  AREA "Schema Area"
+  INDEX-FIELD "cod_padr_ext_col_demonst_ctbl" ASCENDING 
+  INDEX-FIELD "num_soma_ascii_cod_col" ASCENDING 
+
+ADD TABLE "ext_exc_justificativas"
+  AREA "Schema Area"
+  DUMP-NAME "ext_exc_justificativas"
+
+ADD FIELD "cod_padr_coluna" OF "ext_exc_justificativas" AS character 
+  FORMAT "x(30)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 60
+  ORDER 10
+
+ADD FIELD "cod_palavra" OF "ext_exc_justificativas" AS character 
+  FORMAT "x(100)"
+  INITIAL ""
+  POSITION 3
+  MAX-WIDTH 200
+  ORDER 20
+
+ADD TABLE "ext_justificativa"
+  AREA "Schema Area"
+  DUMP-NAME "ext_justificativa"
+
+ADD FIELD "Rubrica" OF "ext_justificativa" AS character 
+  FORMAT "x(60)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 120
+  ORDER 10
+
+ADD FIELD "Entidade" OF "ext_justificativa" AS character 
+  FORMAT "x(60)"
+  INITIAL ""
+  POSITION 3
+  MAX-WIDTH 120
+  ORDER 20
+
+ADD FIELD "Periodo" OF "ext_justificativa" AS integer 
+  FORMAT "99"
+  INITIAL "0"
+  POSITION 4
+  MAX-WIDTH 4
+  ORDER 30
+
+ADD FIELD "Ano" OF "ext_justificativa" AS integer 
+  FORMAT "9999"
+  INITIAL "0"
+  POSITION 5
+  MAX-WIDTH 4
+  ORDER 40
+
+ADD FIELD "Cod_demonst" OF "ext_justificativa" AS character 
+  FORMAT "x(60)"
+  INITIAL ""
+  POSITION 6
+  MAX-WIDTH 120
+  ORDER 50
+
+ADD FIELD "Cod_padr_col" OF "ext_justificativa" AS character 
+  FORMAT "x(60)"
+  INITIAL ""
+  POSITION 7
+  MAX-WIDTH 120
+  ORDER 60
+
+ADD FIELD "cod_usuario" OF "ext_justificativa" AS character 
+  FORMAT "x(60)"
+  INITIAL ""
+  POSITION 8
+  MAX-WIDTH 120
+  ORDER 70
+
+ADD FIELD "log_justif" OF "ext_justificativa" AS logical 
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 9
+  MAX-WIDTH 1
+  ORDER 80
+
+ADD FIELD "dt_justifi" OF "ext_justificativa" AS date 
+  FORMAT "99/99/9999"
+  INITIAL ?
+  POSITION 10
+  MAX-WIDTH 4
+  ORDER 90
+
+ADD FIELD "dt_ult_altera" OF "ext_justificativa" AS date 
+  FORMAT "99/99/9999"
+  INITIAL ?
+  POSITION 11
+  MAX-WIDTH 4
+  ORDER 100
+
+ADD FIELD "percentual" OF "ext_justificativa" AS decimal 
+  FORMAT "->>>,>>>,>>>,>>>,>>>.99"
+  INITIAL "0"
+  POSITION 12
+  MAX-WIDTH 17
+  DECIMALS 2
+  ORDER 110
+
+ADD FIELD "observacao" OF "ext_justificativa" AS character 
+  FORMAT "x(2000)"
+  INITIAL ""
+  POSITION 13
+  MAX-WIDTH 4000
+  ORDER 120
+
+ADD TABLE "ext_lim_justif"
+  AREA "Schema Area"
+  DUMP-NAME "ext_lim_justif"
+
+ADD FIELD "cod_empresa" OF "ext_lim_justif" AS character 
+  FORMAT "x(3)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 6
+  ORDER 10
+
+ADD FIELD "cod_exercicio" OF "ext_lim_justif" AS integer 
+  FORMAT "9999"
+  INITIAL "0"
+  POSITION 3
+  MAX-WIDTH 4
+  ORDER 20
+
+ADD FIELD "num_periodo_ctbl" OF "ext_lim_justif" AS integer 
+  FORMAT ">99"
+  INITIAL "0"
+  POSITION 4
+  MAX-WIDTH 4
+  ORDER 30
+
+ADD FIELD "cod_niv_usuario" OF "ext_lim_justif" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 5
+  MAX-WIDTH 40
+  ORDER 40
+
+ADD FIELD "dat_lim_justif" OF "ext_lim_justif" AS datetime 
+  FORMAT "99/99/9999 HH:MM:SS.SSS"
+  INITIAL ?
+  POSITION 6
+  MAX-WIDTH 8
+  ORDER 50
+
+ADD FIELD "dat_inicio_justif" OF "ext_lim_justif" AS datetime 
+  FORMAT "99/99/9999 HH:MM:SS.SSS"
+  INITIAL ?
+  POSITION 7
+  MAX-WIDTH 8
+  ORDER 60
+
+ADD FIELD "valor_minimo" OF "ext_lim_justif" AS decimal 
+  FORMAT "->>,>>9.99"
+  INITIAL "0"
+  POSITION 8
+  MAX-WIDTH 17
+  DECIMALS 2
+  ORDER 70
+
+ADD FIELD "var_perc_positiva" OF "ext_lim_justif" AS decimal 
+  FORMAT "->>>.99"
+  INITIAL "0"
+  POSITION 9
+  MAX-WIDTH 17
+  DECIMALS 2
+  ORDER 80
+
+ADD FIELD "val_perc_negativa" OF "ext_lim_justif" AS decimal 
+  FORMAT "->>>.99"
+  INITIAL "0"
+  POSITION 10
+  MAX-WIDTH 17
+  DECIMALS 2
+  ORDER 90
+
+ADD TABLE "ext_orcto_resumo"
+  AREA "Schema Area"
+  DESCRIPTION "resumo do or‡amento por area"
+  DUMP-NAME "ext_orcto_resumo"
+
+ADD FIELD "divisao" OF "ext_orcto_resumo" AS integer 
+  FORMAT ">9"
+  INITIAL "0"
+  LABEL "Divisao"
+  POSITION 3
+  MAX-WIDTH 6
+  ORDER 10
+
+ADD FIELD "descricao" OF "ext_orcto_resumo" AS character 
+  FORMAT "x(60)"
+  INITIAL ""
+  POSITION 4
+  MAX-WIDTH 516
+  ORDER 20
+
+ADD FIELD "mes" OF "ext_orcto_resumo" AS integer 
+  FORMAT "99"
+  INITIAL "0"
+  LABEL "Mes"
+  POSITION 6
+  MAX-WIDTH 2
+  ORDER 40
+
+ADD FIELD "vl_orcado" OF "ext_orcto_resumo" AS decimal 
+  FORMAT "->>,>>>,>>9.99"
+  INITIAL "0"
+  LABEL "Valor Or‡ado"
+  POSITION 7
+  MAX-WIDTH 360
+  DECIMALS 2
+  ORDER 60
+
+ADD FIELD "vl_realizado" OF "ext_orcto_resumo" AS decimal 
+  FORMAT ">>>,>>>,>>9.99"
+  INITIAL "0"
+  POSITION 8
+  MAX-WIDTH 360
+  DECIMALS 2
+  ORDER 80
+
+ADD FIELD "cod_ccusto" OF "ext_orcto_resumo" AS character 
+  DESCRIPTION "C¢d.Centro Custo"
+  FORMAT "x(11)"
+  INITIAL ""
+  LABEL "C¢d.Centro Custo"
+  POSITION 9
+  MAX-WIDTH 22
+  COLUMN-LABEL "C¢d.Centro Custo"
+  HELP "C¢d.Centro Custo"
+  ORDER 70
+  MANDATORY
+
+ADD FIELD "ano" OF "ext_orcto_resumo" AS integer 
+  FORMAT "9999"
+  INITIAL "0"
+  LABEL "Ano"
+  POSITION 10
+  MAX-WIDTH 4
+  ORDER 30
+
+ADD FIELD "area" OF "ext_orcto_resumo" AS integer 
+  FORMAT ">>9"
+  INITIAL "0"
+  POSITION 11
+  MAX-WIDTH 4
+  ORDER 90
+
+ADD FIELD "soma" OF "ext_orcto_resumo" AS logical 
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 12
+  MAX-WIDTH 1
+  HELP "Considera na soma dos resumos"
+  ORDER 100
+
+ADD FIELD "cod_estabel" OF "ext_orcto_resumo" AS character 
+  FORMAT "x(3)"
+  INITIAL ""
+  POSITION 13
+  MAX-WIDTH 6
+  ORDER 110
+
+ADD INDEX "idx2" ON "ext_orcto_resumo" 
+  AREA "Schema Area"
+  UNIQUE
+  PRIMARY
+  INDEX-FIELD "cod_estabel" ASCENDING 
+  INDEX-FIELD "ano" ASCENDING 
+  INDEX-FIELD "divisao" ASCENDING 
+  INDEX-FIELD "mes" ASCENDING 
+  INDEX-FIELD "cod_ccusto" ASCENDING 
+  INDEX-FIELD "area" ASCENDING 
+
+ADD INDEX "ch-prin" ON "ext_orcto_resumo" 
+  AREA "Schema Area"
+  UNIQUE
+  INDEX-FIELD "ano" ASCENDING 
+  INDEX-FIELD "divisao" ASCENDING 
+  INDEX-FIELD "mes" ASCENDING 
+  INDEX-FIELD "cod_ccusto" ASCENDING 
+  INDEX-FIELD "area" ASCENDING 
+
+ADD TABLE "ext_pacote"
+  AREA "Schema Area"
+  DUMP-NAME "ext_pacote"
+
+ADD FIELD "cod_pacote" OF "ext_pacote" AS character 
+  FORMAT "x(100)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 200
+  ORDER 10
+
+ADD FIELD "cod_rubricas" OF "ext_pacote" AS character 
+  FORMAT "x(100)"
+  INITIAL ""
+  POSITION 3
+  MAX-WIDTH 200
+  ORDER 20
+
+ADD TABLE "ext_palavras_excecao"
+  AREA "Schema Area"
+  DUMP-NAME "ext_palavras_excecao"
+
+ADD FIELD "cod_palavras" OF "ext_palavras_excecao" AS character 
+  FORMAT "x(100)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 200
+  ORDER 10
+
+ADD FIELD "cod_padr_col_demonst_ctbl" OF "ext_palavras_excecao" AS character 
+  DESCRIPTION "C¢digo Coluna Demonstrativo"
+  FORMAT "x(8)"
+  INITIAL ""
+  LABEL "PadrÆo Colunas"
+  POSITION 3
+  MAX-WIDTH 16
+  COLUMN-LABEL "Coluna Demonstrativo"
+  HELP "C¢digo Coluna Demonstrativo"
+  ORDER 20
+  MANDATORY
+
+ADD TABLE "ext_pend_sdo_bgc"
+  AREA "Schema Area"
+  DUMP-NAME "ext_pend_sdo_bgc"
+
+ADD FIELD "tipo_movto" OF "ext_pend_sdo_bgc" AS character 
+  FORMAT "x(1)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 2
+  ORDER 10
+
+ADD FIELD "cod_unid_orctaria" OF "ext_pend_sdo_bgc" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 3
+  MAX-WIDTH 16
+  ORDER 20
+
+ADD FIELD "cod_cta_ctbl" OF "ext_pend_sdo_bgc" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 4
+  MAX-WIDTH 16
+  ORDER 30
+
+ADD FIELD "cod_ccusto" OF "ext_pend_sdo_bgc" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 5
+  MAX-WIDTH 16
+  ORDER 40
+
+ADD FIELD "periodo" OF "ext_pend_sdo_bgc" AS integer 
+  FORMAT "->,>>>,>>9"
+  INITIAL "0"
+  POSITION 6
+  MAX-WIDTH 4
+  ORDER 50
+
+ADD FIELD "ano" OF "ext_pend_sdo_bgc" AS integer 
+  FORMAT "->,>>>,>>9"
+  INITIAL "0"
+  POSITION 7
+  MAX-WIDTH 4
+  ORDER 60
+
+ADD FIELD "vlr" OF "ext_pend_sdo_bgc" AS decimal 
+  FORMAT "->>>,>>>,>>>,>>>,>>>,>>>.99"
+  INITIAL "0"
+  POSITION 8
+  MAX-WIDTH 17
+  DECIMALS 2
+  ORDER 70
+
+ADD FIELD "concatena" OF "ext_pend_sdo_bgc" AS character 
+  FORMAT "x(80)"
+  INITIAL ""
+  POSITION 9
+  MAX-WIDTH 160
+  ORDER 80
+
+ADD FIELD "cod_cta_ctbl_dest" OF "ext_pend_sdo_bgc" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 10
+  MAX-WIDTH 16
+  ORDER 90
+
+ADD FIELD "cod_ccusto_dest" OF "ext_pend_sdo_bgc" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 11
+  MAX-WIDTH 16
+  ORDER 100
+
+ADD FIELD "periodo_dest" OF "ext_pend_sdo_bgc" AS integer 
+  FORMAT "->,>>>,>>9"
+  INITIAL "0"
+  POSITION 12
+  MAX-WIDTH 4
+  ORDER 110
+
+ADD FIELD "ano_dest" OF "ext_pend_sdo_bgc" AS integer 
+  FORMAT "->,>>>,>>9"
+  INITIAL "0"
+  POSITION 13
+  MAX-WIDTH 4
+  ORDER 120
+
+ADD TABLE "ext_receitas"
+  AREA "Schema Area"
+  DUMP-NAME "ext_receitas"
+
+ADD FIELD "cod_rubrica" OF "ext_receitas" AS character 
+  FORMAT "x(40)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 80
+  ORDER 10
+
+ADD FIELD "cod_livre_1" OF "ext_receitas" AS character 
+  FORMAT "x(100)"
+  INITIAL ""
+  POSITION 3
+  MAX-WIDTH 200
+  ORDER 20
+
+ADD FIELD "cod_livre_2" OF "ext_receitas" AS character 
+  FORMAT "x(100)"
+  INITIAL ""
+  POSITION 4
+  MAX-WIDTH 200
+  ORDER 30
+
+ADD FIELD "log_livre_1" OF "ext_receitas" AS logical 
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 5
+  MAX-WIDTH 1
+  ORDER 40
+
+ADD FIELD "log_livre_2" OF "ext_receitas" AS logical 
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 6
+  MAX-WIDTH 1
+  ORDER 50
+
+ADD FIELD "num_livre_1" OF "ext_receitas" AS integer 
+  FORMAT ">>>>>9"
+  INITIAL "0"
+  POSITION 7
+  MAX-WIDTH 4
+  ORDER 60
+
+ADD FIELD "num_livre_2" OF "ext_receitas" AS integer 
+  FORMAT ">>>>>9"
+  INITIAL "0"
+  POSITION 8
+  MAX-WIDTH 4
+  ORDER 70
+
+ADD FIELD "val_livre_1" OF "ext_receitas" AS decimal 
+  FORMAT ">>>,>>>,>>9.9999"
+  INITIAL "0"
+  POSITION 9
+  MAX-WIDTH 17
+  DECIMALS 2
+  ORDER 80
+
+ADD FIELD "val_livre_2" OF "ext_receitas" AS decimal 
+  FORMAT ">>>,>>>,>>9.9999"
+  INITIAL "0"
+  POSITION 10
+  MAX-WIDTH 17
+  DECIMALS 2
+  ORDER 90
+
+ADD FIELD "dat_livre_1" OF "ext_receitas" AS date 
+  FORMAT "99/99/9999"
+  INITIAL ?
+  POSITION 11
+  MAX-WIDTH 4
+  ORDER 100
+
+ADD FIELD "dat_livre_2" OF "ext_receitas" AS date 
+  FORMAT "99/99/9999"
+  INITIAL ?
+  POSITION 12
+  MAX-WIDTH 4
+  ORDER 110
+
+ADD TABLE "ext_sdo_orcto_ctbl_ca"
+  AREA "Schema Area"
+  DUMP-NAME "ext_sdo_orcto_ctbl_ca"
+
+ADD FIELD "cod_cenar_orctario" OF "ext_sdo_orcto_ctbl_ca" AS character 
+  FORMAT "x(40)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 80
+  ORDER 10
+
+ADD FIELD "cod_unid_orctaria" OF "ext_sdo_orcto_ctbl_ca" AS character 
+  FORMAT "x(40)"
+  INITIAL ""
+  POSITION 3
+  MAX-WIDTH 80
+  ORDER 20
+
+ADD FIELD "num_seq_orcto_ctbl" OF "ext_sdo_orcto_ctbl_ca" AS integer 
+  FORMAT "->,>>>,>>9"
+  INITIAL "0"
+  POSITION 4
+  MAX-WIDTH 4
+  ORDER 30
+
+ADD FIELD "cod_vers_orcto_ctbl" OF "ext_sdo_orcto_ctbl_ca" AS character 
+  FORMAT "x(40)"
+  INITIAL ""
+  POSITION 5
+  MAX-WIDTH 80
+  ORDER 40
+
+ADD FIELD "cod_cenar_ctbl" OF "ext_sdo_orcto_ctbl_ca" AS character 
+  FORMAT "x(40)"
+  INITIAL ""
+  POSITION 6
+  MAX-WIDTH 80
+  ORDER 50
+
+ADD FIELD "cod_exerc_ctbl" OF "ext_sdo_orcto_ctbl_ca" AS character 
+  FORMAT "x(40)"
+  INITIAL ""
+  POSITION 7
+  MAX-WIDTH 80
+  ORDER 60
+
+ADD FIELD "num_period_ctbl" OF "ext_sdo_orcto_ctbl_ca" AS integer 
+  FORMAT "->,>>>,>>9"
+  INITIAL "0"
+  POSITION 8
+  MAX-WIDTH 4
+  ORDER 70
+
+ADD FIELD "cod_empresa" OF "ext_sdo_orcto_ctbl_ca" AS character 
+  FORMAT "x(40)"
+  INITIAL ""
+  POSITION 9
+  MAX-WIDTH 80
+  ORDER 80
+
+ADD FIELD "cod_plano_cta_ctbl" OF "ext_sdo_orcto_ctbl_ca" AS character 
+  FORMAT "x(40)"
+  INITIAL ""
+  POSITION 10
+  MAX-WIDTH 80
+  ORDER 90
+
+ADD FIELD "cod_cta_ctbl" OF "ext_sdo_orcto_ctbl_ca" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 11
+  MAX-WIDTH 40
+  ORDER 100
+
+ADD FIELD "cod_plano_ccusto" OF "ext_sdo_orcto_ctbl_ca" AS character 
+  FORMAT "x(40)"
+  INITIAL ""
+  POSITION 12
+  MAX-WIDTH 80
+  ORDER 110
+
+ADD FIELD "cod_ccusto" OF "ext_sdo_orcto_ctbl_ca" AS character 
+  FORMAT "x(40)"
+  INITIAL ""
+  POSITION 13
+  MAX-WIDTH 80
+  ORDER 120
+
+ADD FIELD "cod_estab" OF "ext_sdo_orcto_ctbl_ca" AS character 
+  FORMAT "x(40)"
+  INITIAL ""
+  POSITION 14
+  MAX-WIDTH 80
+  ORDER 130
+
+ADD FIELD "cod_unid_negoc" OF "ext_sdo_orcto_ctbl_ca" AS character 
+  FORMAT "x(40)"
+  INITIAL ""
+  POSITION 15
+  MAX-WIDTH 80
+  ORDER 140
+
+ADD FIELD "val_orcado" OF "ext_sdo_orcto_ctbl_ca" AS decimal 
+  FORMAT ">>>,>>>,>>>,>>>,>>>,>>>.99"
+  INITIAL "0"
+  POSITION 16
+  MAX-WIDTH 17
+  DECIMALS 2
+  ORDER 150
+
+ADD TABLE "it_rubricas"
+  AREA "Schema Area"
+  DUMP-NAME "it_rubricas"
+
+ADD FIELD "cod_rubrica" OF "it_rubricas" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 16
+  ORDER 10
+
+ADD FIELD "Descricao" OF "it_rubricas" AS character 
+  FORMAT "x(100)"
+  INITIAL ""
+  POSITION 3
+  MAX-WIDTH 200
+  ORDER 20
+
+ADD FIELD "Tipo" OF "it_rubricas" AS integer 
+  FORMAT "->,>>>,>>9"
+  INITIAL "0"
+  POSITION 4
+  MAX-WIDTH 4
+  ORDER 30
+
+ADD FIELD "Devolucao" OF "it_rubricas" AS logical 
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 5
+  MAX-WIDTH 1
+  ORDER 40
+
+ADD TABLE "periodo_orcto"
+  AREA "Schema Area"
+  DUMP-NAME "periodo_orcto"
+
+ADD FIELD "Mes" OF "periodo_orcto" AS integer 
+  FORMAT "99"
+  INITIAL "0"
+  POSITION 2
+  MAX-WIDTH 4
+  ORDER 10
+
+ADD FIELD "Ano" OF "periodo_orcto" AS integer 
+  FORMAT "9999"
+  INITIAL "0"
+  POSITION 3
+  MAX-WIDTH 4
+  ORDER 20
+
+ADD FIELD "usuario" OF "periodo_orcto" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 4
+  MAX-WIDTH 40
+  ORDER 30
+
+ADD TABLE "Rubricas"
+  AREA "Schema Area"
+  DUMP-NAME "rubricas"
+
+ADD FIELD "cod_pcte_cta_ctbl" OF "Rubricas" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 16
+  ORDER 10
+  MANDATORY
+
+ADD FIELD "cod_rubrica" OF "Rubricas" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 3
+  MAX-WIDTH 16
+  ORDER 20
+
+ADD FIELD "Descricao" OF "Rubricas" AS character 
+  FORMAT "x(100)"
+  INITIAL ""
+  POSITION 4
+  MAX-WIDTH 200
+  ORDER 30
+
+ADD FIELD "ind_justifica" OF "Rubricas" AS integer 
+  FORMAT "->,>>>,>>9"
+  INITIAL "0"
+  POSITION 5
+  MAX-WIDTH 4
+  ORDER 40
+
+ADD FIELD "cod_livre_1" OF "Rubricas" AS character 
+  FORMAT "x(100)"
+  INITIAL ""
+  POSITION 6
+  MAX-WIDTH 200
+  ORDER 50
+
+ADD FIELD "cod_livre_2" OF "Rubricas" AS character 
+  FORMAT "x(100)"
+  INITIAL ""
+  POSITION 7
+  MAX-WIDTH 200
+  ORDER 60
+
+ADD FIELD "log_livre_1" OF "Rubricas" AS logical 
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 8
+  MAX-WIDTH 1
+  ORDER 70
+
+ADD FIELD "log_livre_2" OF "Rubricas" AS logical 
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 9
+  MAX-WIDTH 1
+  ORDER 80
+
+ADD FIELD "num_livre_1" OF "Rubricas" AS integer 
+  FORMAT ">>>>>9"
+  INITIAL "0"
+  POSITION 10
+  MAX-WIDTH 4
+  ORDER 90
+
+ADD FIELD "num_livre_2" OF "Rubricas" AS integer 
+  FORMAT ">>>>>9"
+  INITIAL "0"
+  POSITION 11
+  MAX-WIDTH 4
+  ORDER 100
+
+ADD FIELD "val_livre_1" OF "Rubricas" AS decimal 
+  FORMAT ">>>,>>>,>>9.9999"
+  INITIAL "0"
+  POSITION 12
+  MAX-WIDTH 17
+  DECIMALS 2
+  ORDER 110
+
+ADD FIELD "val_livre_2" OF "Rubricas" AS decimal 
+  FORMAT ">>>,>>>,>>9.9999"
+  INITIAL "0"
+  POSITION 13
+  MAX-WIDTH 17
+  DECIMALS 2
+  ORDER 120
+
+ADD FIELD "dat_livre_1" OF "Rubricas" AS date 
+  FORMAT "99/99/9999"
+  INITIAL ?
+  POSITION 14
+  MAX-WIDTH 4
+  ORDER 130
+
+ADD FIELD "dat_livre_2" OF "Rubricas" AS date 
+  FORMAT "99/99/9999"
+  INITIAL ?
+  POSITION 15
+  MAX-WIDTH 4
+  ORDER 140
+
+.
+PSC
+cpstream=ibm850
+.
+0000029717

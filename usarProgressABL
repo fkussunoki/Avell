@@ -1,0 +1,8 @@
+Para usar o Progress no VisualSTudio, criar o arquivo .openedge.json
+
+O workingDirectory deve conter o diretorio de trabalho que terá os arquivos .opendege.json, o arquivo .ini do Progress e o arquivo .pf do progress.
+
+Procedure startup nao é obrigatoria, mas servira para carregar os dados do dicionario que serao mencionados nesta tag. O startup será identico ao arquivo .p da carga de bancos do 
+Datasul, definindo os aliases dos bancos.
+
+Para dar carga nos dados do dicionario, é so clicar em CTRL + SHIFT + P  e buscar por ABL: Read Dictionary Estrutures.

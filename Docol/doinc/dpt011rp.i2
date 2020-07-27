@@ -1,0 +1,51 @@
+/* Saldo Imobilizado */
+FIND FIRST tt-dados NO-LOCK
+     WHERE tt-dados.cod_empresa       = cta_pat.cod_empresa
+       AND tt-dados.cod_cta_pat       = cta_pat.cod_cta_pat
+       AND tt-dados.ind_finalid_ctbl  = 'Saldo Imobilizado' NO-ERROR.
+IF NOT AVAIL tt-dados THEN DO:
+   
+   FIND FIRST PARAM_ctbz_cta_pat OF cta_pat NO-LOCK
+        WHERE param_ctbz_cta_pat.cod_cenar_ctbl   = c-cenar-contab
+          AND param_ctbz_cta_pat.cod_finalid_econ = c-cod-finalid
+          AND param_ctbz_cta_pat.ind_finalid_ctbl = 'Saldo Imobilizado' NO-ERROR.
+
+   CREATE tt-dados.
+   ASSIGN tt-dados.cod_empresa       = cta_pat.cod_empresa
+          tt-dados.cod_cta_ctbl_cr   = IF AVAIL param_ctbz_cta_pat THEN param_ctbz_cta_pat.cod_cta_ctbl_cr
+                                       ELSE                             ""
+          tt-dados.cod_cta_pat       = cta_pat.cod_cta_pat
+          tt-dados.des_cta_pat       = cta_pat.des_cta_pat
+          tt-dados.ind_finalid_ctbl  = 'Saldo Imobilizado'.
+
+END.
+
+ASSIGN tt-dados.vl-cta-pat = tt-dados.vl-cta-pat + sdo_bem_pat.val_origin_corrig.
+/* Fim Saldo Imobilizado */
+
+/* Deprecia‡Æo */
+FIND FIRST tt-dados NO-LOCK
+     WHERE tt-dados.cod_empresa      = cta_pat.cod_empresa
+       AND tt-dados.cod_cta_pat      = cta_pat.cod_cta_pat
+       AND tt-dados.ind_finalid_ctbl = 'Deprecia‡Æo' NO-ERROR.
+IF NOT AVAIL tt-dados THEN DO:
+
+   FIND FIRST PARAM_ctbz_cta_pat OF cta_pat NO-LOCK
+        WHERE param_ctbz_cta_pat.cod_cenar_ctbl   = c-cenar-contab
+          AND param_ctbz_cta_pat.cod_finalid_econ = c-cod-finalid
+          AND param_ctbz_cta_pat.ind_finalid_ctbl = 'Deprecia‡Æo' NO-ERROR.
+
+   CREATE tt-dados.
+   ASSIGN tt-dados.cod_empresa       = cta_pat.cod_empresa
+          tt-dados.cod_cta_ctbl_cr   = IF AVAIL param_ctbz_cta_pat THEN param_ctbz_cta_pat.cod_cta_ctbl_cr
+                                       ELSE                             ""
+          tt-dados.cod_cta_pat       = cta_pat.cod_cta_pat
+          tt-dados.des_cta_pat       = cta_pat.des_cta_pat
+          tt-dados.ind_finalid_ctbl  = 'Deprecia‡Æo'.
+END.
+ 
+ASSIGN tt-dados.vl-cta-pat       = tt-dados.vl-cta-pat + 
+                                 ((sdo_bem_pat.val_dpr_val_origin + sdo_bem_pat.val_dpr_cm + sdo_bem_pat.val_cm_dpr) * -1).
+/* Fim Deprecia‡Æo */
+
+/* dpt011rp.i2 */

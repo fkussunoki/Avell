@@ -1,0 +1,16 @@
+ADD TABLE "ext_setor_fechamento"
+  AREA "Schema Area"
+  DUMP-NAME "ext_setor_fechamento"
+
+ADD FIELD "cod_setor" OF "ext_setor_fechamento" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 40
+  ORDER 10
+
+.
+PSC
+cpstream=ibm850
+.
+0000000236

@@ -1,0 +1,143 @@
+/******************************************************************************
+**  Include...: esof0540.I5
+**  Objetivo..: Display das totais.
+******************************************************************************/
+
+if i-op-rel = 1 then do:
+    assign c-desc-tot = "SUBTOTAL DE " + string(da-est-ini) +
+                        " A " + string(da-est-fim) + " "
+           c-desc-tot = c-desc-tot + fill(".",62 - length(c-desc-tot)).
+        
+    run pi-verifica-linhas in h-esof0540e (line-counter,3,c-localiz).
+
+    put c-desc-tot                           at   1
+        "1"                                  at  82
+        accum total it-doc-fisc.vl-bicms-it  to  98 format ">>>>>>>>>>9.99"
+        accum total it-doc-fisc.vl-icms-it   to 115 format ">>>>>>>9.99"
+        "1"                                  at 117
+        accum total it-doc-fisc.vl-bipi-it   to 132 format ">>>>>>>>>>9.99"
+        accum total it-doc-fisc.vl-ipi-it    to 144 format ">>>>>>>9.99". 
+        
+        if  (accum total doc-fiscal.vl-icms-com) > 0 then do:
+            if c-estado = "MG" then
+                 /* Inicio -- Projeto Internacional */
+                 DO:
+                 DEFINE VARIABLE c-lbl-liter-debito AS CHARACTER FORMAT "X(9)" NO-UNDO.
+                 {utp/ut-liter.i "DEBITO" *}
+                 ASSIGN c-lbl-liter-debito = TRIM(RETURN-VALUE).
+                 put c-lbl-liter-debito + ":"                at 146      skip.
+                 END. 
+            else /* Inicio -- Projeto Internacional */
+ DO:
+     DEFINE VARIABLE c-lbl-liter-difaliicms AS CHARACTER FORMAT "X(14)" NO-UNDO.
+     {utp/ut-liter.i "Dif.Ali.ICMS" *}
+     ASSIGN c-lbl-liter-difaliicms = TRIM(RETURN-VALUE).
+     put c-lbl-liter-difaliicms           at 146      skip.
+ END. 
+        end.
+
+    put "2"                                  at  82
+        de-sub-vl-icmsnt-it /* accum total it-doc-fisc.vl-icmsnt-it*/ to  98 format ">>>>>>>>>>9.99"
+        0                                    to 115 format ">>>>>>>9.99"
+        "2"                                  at 117  
+        de-sub-vl-ipint-it /* accum total it-doc-fisc.vl-ipint-it*/  to 132 format ">>>>>>>>>>9.99"
+        0                                    to 144 format ">>>>>>>9.99".
+    
+    if  (accum total doc-fiscal.vl-icms-com) > 0 then
+            put accum total doc-fiscal.vl-icms-com at 146 format ">>>>>>>>9.99" skip.
+        
+    put "3"                                  at  82
+        de-sub-vl-icmsou-it /* accum total it-doc-fisc.vl-icmsou-it*/ to  98 format ">>>>>>>>>>9.99"
+        0                                    to 115 format ">>>>>>>9.99"
+        "3"                                  at 117
+        de-sub-vl-ipiou-it /*accum total it-doc-fisc.vl-ipiou-it*/  to 132 format ">>>>>>>>>>9.99"
+        0                                    to 144 format ">>>>>>>9.99".
+
+    if  c-estado = "MG" and de-auxi > 0 then do:
+        /* Inicio -- Projeto Internacional */
+        DEFINE VARIABLE c-lbl-liter-credito AS CHARACTER FORMAT "X(10)" NO-UNDO.
+        {utp/ut-liter.i "CREDITO" *}
+        ASSIGN c-lbl-liter-credito = TRIM(RETURN-VALUE).
+        put c-lbl-liter-credito + ":"                       at 146     skip.
+    end.
+
+    run pi-verifica-linhas in h-esof0540e (line-counter,1,c-localiz).
+
+    put "ST"                                 at  82
+        accum total it-doc-fisc.vl-bsubs-it  to  98 format ">>>>>>>>>>9.99"
+        accum total it-doc-fisc.vl-icmsub-it to 115 format ">>>>>>>9.99".
+
+    if c-estado = "MG" and de-auxi > 0 then do:
+        put de-auxi  AT 146 format ">>>>>>>>9.99".
+    end.
+
+    if (c-estado = "MG"
+    or  c-estado = "PE") and de-obs-tot > 0 then do:
+       run pi-verifica-linhas in h-esof0540e (line-counter,1,c-localiz).
+       /* Inicio -- Projeto Internacional */
+       DEFINE VARIABLE c-lbl-liter-obs AS CHARACTER FORMAT "X(5)" NO-UNDO.
+       {utp/ut-liter.i "OBS" *}
+       ASSIGN c-lbl-liter-obs = TRIM(RETURN-VALUE).
+       put c-lbl-liter-obs                             at 117
+           de-obs-tot                        to 132 format ">>>>>>>>>>9.99"
+           0                                 to 144 format ">>>>>>>9.99" skip.
+  
+    end.                              
+end.
+/*
+else do:
+    assign c-desc-tot = "SUBTOTAL DE " + string(da-est-ini) +
+                        " A " + string(da-est-fim) + " "
+           c-desc-tot = c-desc-tot + fill(".",62 - length(c-desc-tot)).
+
+    run pi-verifica-linhas in h-esof0540e (line-counter,3,c-localiz).
+
+    put c-desc-tot                           at 1
+        "ICMS"                               at 83
+        "1"                                  at 88
+        accum total it-doc-fisc.vl-bicms-it  to 106  format ">>>>>>>>,>>9.99"
+        accum total it-doc-fisc.vl-icms-it   to 126 format ">>>>>>>,>>9.99"
+        accum total it-doc-fisc.vl-bsubs-it  to 140 format ">>>>>>,>>9.99"
+        accum total it-doc-fisc.vl-icmsub-it to 152 format ">>>>>>>9.99".
+
+    if  (accum total doc-fiscal.vl-icms-com) > 0 then
+        put "Dif.Aliq.ICMS="          at 154        skip.
+
+    put "2"                                  at 88
+        accum total it-doc-fisc.vl-icmsnt-it to 106  format ">>>>>>>>,>>9.99"
+        0                                    to 126 format ">>>>>>>,>>9.99".
+
+        if  (accum total doc-fiscal.vl-icms-com) > 0 then
+            put "("                       at 154
+                accum total doc-fiscal.vl-icms-com format ">>>,>>>,>>9.99"
+                ")"                                     skip.
+
+    put "3"                                  at 88
+        accum total it-doc-fisc.vl-icmsou-it to 106 format ">>>>>>>>,>>9.99"
+        0                                    to 126 format ">>>>>>>,>>9.99"
+    skip.
+
+    run pi-verifica-linhas in h-esof0540e (line-counter,3,c-localiz).
+
+    put "IPI"                               at 83
+        "1"                                 at 88
+        accum total it-doc-fisc.vl-bipi-it  to 106 format ">>>>>>>>,>>9.99"
+        accum total it-doc-fisc.vl-ipi-it   to 126 format ">>>>>>>,>>9.99" skip
+        "2"                                 at 88
+        accum total it-doc-fisc.vl-ipint-it to 106 format ">>>>>>>>,>>9.99"
+        0                                   to 126 format ">>>>>>>,>>9.99" skip
+        "3"                                 at 88
+        accum total it-doc-fisc.vl-ipiou-it to 106 format ">>>>>>>>,>>9.99"
+        0                                   to 126 format ">>>>>>>,>>9.99" skip.
+
+    if (c-estado = "MG"
+    or c-estado = "PE") and de-obs-tot > 0 then do:
+       run pi-verifica-linhas in h-esof0540e (line-counter,1,c-localiz).
+
+       put "OBS"                          at 83
+           de-obs-tot                     to 106  format ">>>>>>>>,>>9.99"
+           0                              to 126 format ">>>>>>>,>>9.99" skip.
+    end.
+end.
+  */
+/* esof0540.i5 */

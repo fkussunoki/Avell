@@ -1,0 +1,31 @@
+    FOR EACH sumar-ft NO-LOCK
+           WHERE sumar-ft.cod-estabel = '9'
+             AND sumar-ft.dt-movto    = da-aux
+             AND (sumar-ft.ct-conta = v_conta_expositor OR 
+                  sumar-ft.ct-conta = v_conta_metais_exp),
+            EACH {1}.nota-fiscal NO-LOCK
+           WHERE {1}.nota-fiscal.cod-estabel = sumar-ft.cod-estabel
+             AND {1}.nota-fiscal.serie       = sumar-ft.serie
+             AND {1}.nota-fiscal.nr-nota-fis = sumar-ft.nr-nota-fis:
+
+
+        FIND tt-nota-fiscal
+            WHERE tt-nota-fiscal.data        = dt-refer
+            AND   tt-nota-fiscal.ct-codigo   = sumar-ft.ct-conta
+            AND   tt-nota-fiscal.sc-codigo   = sumar-ft.sc-conta
+            AND   tt-nota-fiscal.cod-estabel = {1}.nota-fiscal.cod-estabel
+            AND   tt-nota-fiscal.serie       = {1}.nota-fiscal.serie
+            AND   tt-nota-fiscal.nr-nota-fis = {1}.nota-fiscal.nr-nota-fis NO-ERROR.
+        IF NOT AVAIL tt-nota-fiscal THEN DO:
+            CREATE tt-nota-fiscal.
+            ASSIGN tt-nota-fiscal.cod-estabel  = {1}.nota-fiscal.cod-estabel
+                   tt-nota-fiscal.serie        = {1}.nota-fiscal.serie
+                   tt-nota-fiscal.nr-nota-fis  = {1}.nota-fiscal.nr-nota-fis
+                   tt-nota-fiscal.cod-emitente = {1}.nota-fiscal.cod-emitente
+                   tt-nota-fiscal.nat-operacao = {1}.nota-fiscal.nat-operacao
+                   tt-nota-fiscal.data         = dt-refer
+                   tt-nota-fiscal.ct-codigo    = sumar-ft.ct-conta
+                   tt-nota-fiscal.sc-codigo    = sumar-ft.sc-conta.
+        END.
+
+    END. /* for each sumar-ft ... */    

@@ -1,0 +1,42 @@
+/*****************************************************************************
+ ** Programa..: dop/dco002rp.i1                                             **
+ ** Autor.....: 01/12/2003 - Ivan Marcelo Silveira                          **
+ ** Objetivo..: Ler base conforme parƒmetros do relat¢rio                   **
+ **             -- ADIANTAMENTO --                                          **
+ *****************************************************************************/
+
+FOR EACH dc-comis-movto  NO-LOCK
+   WHERE dc-comis-movto.cod_empresa     = representante.cod_empresa
+     AND dc-comis-movto.cdn_repres      = representante.cdn_repres
+     AND dc-comis-movto.cod_transacao   = i-cod_transacao
+     AND ((NOT dc-comis-movto.flag-integrou-apb and l-integra-contas-a-pagar) or not l-integra-contas-a-pagar)
+     AND dc-comis-movto.dat_transacao  >= dt-ini-trans
+     AND dc-comis-movto.dat_transacao  <= dt-fim-trans,
+
+   FIRST dc-comis-trans NO-LOCK 
+   WHERE dc-comis-trans.cod_transacao   = dc-comis-movto.cod_transacao
+     AND dc-comis-trans.dat_inic_valid <= dc-comis-movto.dat_transacao
+     AND dc-comis-trans.dat_fim_valid  >= dc-comis-movto.dat_transacao:
+
+    ASSIGN  de-tot-val    = de-tot-val + dc-comis-movto.val_movto
+            de-tot-apb    = de-tot-apb + dc-comis-movto.val_movto
+            dt-trans-adto = dc-comis-movto.dat_transacao.
+    /*
+    CREATE  tt-extrato.
+    ASSIGN  tt-extrato.dat_transacao        = dc-comis-movto.dat_transacao 
+            tt-extrato.val_movto            = dc-comis-movto.val_movto 
+            tt-extrato.des_transacao        = dc-comis-movto.des_transacao
+            tt-extrato.tipo                 = 'CR'.
+    */        
+
+    /*temp-table para atualiza‡Æo da flag de integra‡Æo com APB*/
+    CREATE  tt-dc-comis-movto.
+    ASSIGN  tt-dc-comis-movto.rw-dc-comis-movto = ROWID(dc-comis-movto).
+
+END. /* FOR EACH dc-comis-movto */
+
+ASSIGN  de-tot-vl-ir    = 0
+        de-nota-fiscal  = de-tot-val
+        de-tot-ir       = 0.
+        
+/*FIM - dco002rp.i1*/

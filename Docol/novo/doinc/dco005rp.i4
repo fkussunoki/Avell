@@ -1,0 +1,64 @@
+find first dc-comis-trans-ctb where dc-comis-trans-ctb.cod_empresa    = tt-repres.cod_empresa
+                                and dc-comis-trans-ctb.cod_transacao  = dc-comis-trans.cod_transacao
+                                and dc-comis-trans-ctb.dat_inic_valid = dc-comis-trans.dat_inic_valid no-lock no-error.
+if avail dc-comis-trans-ctb then do:
+   IF  dc-comis-trans-ctb.cod_ccusto = ? THEN DO:
+       
+       IF  FIRST-OF(tt-movto.cod_ccusto) THEN DO:
+           CREATE dc-comis-movto.
+           ASSIGN dc-comis-movto.cod_empresa        = tt-repres.cod_empresa
+                  dc-comis-movto.cdn_repres         = tt-repres.cdn_repres
+                  dc-comis-movto.cod_transacao      = dc-comis-trans-ctb.cod_transacao
+                  dc-comis-movto.dat_transacao      = dt-fim-periodo
+                  dc-comis-movto.des_transacao      = dc-comis-trans.descricao
+                  dc-comis-movto.cod_plano_cta_ctbl = dc-comis-trans-ctb.cod_plano_cta_ctbl
+                  dc-comis-movto.cod_cta_ctbl       = dc-comis-trans-ctb.cod_cta_ctbl
+                  dc-comis-movto.cod_plano_ccusto   = dc-comis-trans-ctb.cod_plano_ccusto  
+                  dc-comis-movto.cod_ccusto         = tt-movto.cod_ccusto 
+                  dc-comis-movto.ind_origin_movto   = "dco005"
+                  
+                  de-val-ccusto  = 0.
+       END.
+           
+       ASSIGN  de-val-ccusto = de-val-ccusto + {1}.
+       
+       IF  LAST-OF(tt-movto.cod_ccusto) THEN DO:
+         IF  de-val-ccusto = 0 
+             THEN DELETE  dc-comis-movto.
+             ELSE ASSIGN  dc-comis-movto.val_movto = de-val-ccusto.
+       END.
+       
+   END. /*IF  dc-comis-trans-ctb.cod_ccusto = ? THEN DO:*/
+end.
+else do:
+   IF  dc-comis-trans.cod_ccusto = ? THEN DO:
+       
+       IF  FIRST-OF(tt-movto.cod_ccusto) THEN DO:
+           CREATE dc-comis-movto.
+           ASSIGN dc-comis-movto.cod_empresa        = tt-repres.cod_empresa
+                  dc-comis-movto.cdn_repres         = tt-repres.cdn_repres
+                  dc-comis-movto.cod_transacao      = dc-comis-trans.cod_transacao
+                  dc-comis-movto.dat_transacao      = dt-fim-periodo
+                  dc-comis-movto.des_transacao      = dc-comis-trans.descricao
+                  dc-comis-movto.cod_plano_cta_ctbl = dc-comis-trans.cod_plano_cta_ctbl
+                  dc-comis-movto.cod_cta_ctbl       = dc-comis-trans.cod_cta_ctbl
+                  dc-comis-movto.cod_plano_ccusto   = dc-comis-trans.cod_plano_ccusto  
+                  dc-comis-movto.cod_ccusto         = tt-movto.cod_ccusto 
+                  dc-comis-movto.ind_origin_movto   = "dco005"
+                  
+                  de-val-ccusto  = 0.
+       END.
+           
+       ASSIGN  de-val-ccusto = de-val-ccusto + {1}.
+       
+       IF  LAST-OF(tt-movto.cod_ccusto) THEN DO:
+         IF  de-val-ccusto = 0 
+             THEN DELETE  dc-comis-movto.
+             ELSE ASSIGN  dc-comis-movto.val_movto = de-val-ccusto.
+       END.
+       
+   END. /*IF  dc-comis-trans.cod_ccusto = ? THEN DO:*/
+
+end. 
+
+/*FIM - dco005rp.i4 */

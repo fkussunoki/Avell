@@ -1,0 +1,12 @@
+DEF VAR P-RESP AS CHAR.
+
+FIND FIRST AMKT-SOLICITACAO WHERE AMKT-SOLICITACAO.NUMERO = 6433 NO-ERROR.
+ASSIGN AMKT-SOLICITACAO.SITUACAO-PAGTO = "sOLICITA€ÇO pAGTO. lIBERADA".
+RUN dows\CRIAPAGTOSOLICMKT.P(INPUT "3fad9cd3498e1c43d2d08364bb5bd3d9",
+                            INPUT 808,
+                            INPUT 6433,
+                            INPUT 1200,
+                            INPUT "TESTEW",
+                            OUTPUT P-RESP).
+
+MESSAGE P-RESP VIEW-AS ALERT-BOX.

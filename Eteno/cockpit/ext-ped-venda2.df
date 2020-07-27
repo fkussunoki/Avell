@@ -1,0 +1,127 @@
+ADD TABLE "ext-ped-venda2"
+  AREA "Schema Area"
+  DUMP-NAME "ext-ped-venda2"
+
+ADD FIELD "nome-abrev" OF "ext-ped-venda2" AS character 
+  FORMAT "x(12)"
+  INITIAL ""
+  LABEL "Cliente"
+  LABEL-SA "R9"
+  POSITION 2
+  MAX-WIDTH 24
+  COLUMN-LABEL "Cliente"
+  COLUMN-LABEL-SA "L12"
+  HELP "Nome abreviado do cliente"
+  ORDER 10
+  MANDATORY
+
+ADD FIELD "nr-pedcli" OF "ext-ped-venda2" AS character 
+  FORMAT "x(12)"
+  INITIAL ""
+  LABEL "Pedido Cliente"
+  LABEL-SA "R17"
+  POSITION 3
+  MAX-WIDTH 24
+  COLUMN-LABEL "Ped Cli"
+  COLUMN-LABEL-SA "L12"
+  HELP "Numero do Pedido do cliente"
+  ORDER 20
+  MANDATORY
+
+ADD FIELD "nr-processo" OF "ext-ped-venda2" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 4
+  MAX-WIDTH 40
+  ORDER 30
+
+ADD FIELD "vpc" OF "ext-ped-venda2" AS logical 
+  DESCRIPTION "Venda Proibida ao Comercio."
+  FORMAT "yes/no"
+  INITIAL "no"
+  LABEL "Venda Proibida ao Comercio"
+  POSITION 5
+  MAX-WIDTH 1
+  VIEW-AS "view-as toggle-box"
+  COLUMN-LABEL "VPC"
+  ORDER 40
+
+ADD FIELD "char-1" OF "ext-ped-venda2" AS character 
+  FORMAT "x(255)"
+  INITIAL ""
+  POSITION 6
+  MAX-WIDTH 510
+  ORDER 50
+
+ADD FIELD "int-1" OF "ext-ped-venda2" AS integer 
+  FORMAT "->,>>>,>>9"
+  INITIAL "0"
+  POSITION 7
+  MAX-WIDTH 4
+  ORDER 60
+
+ADD FIELD "int-2" OF "ext-ped-venda2" AS integer 
+  FORMAT "->,>>>,>>9"
+  INITIAL "0"
+  POSITION 8
+  MAX-WIDTH 4
+  ORDER 70
+
+ADD FIELD "date-1" OF "ext-ped-venda2" AS date 
+  FORMAT "99/99/9999"
+  INITIAL ?
+  POSITION 9
+  MAX-WIDTH 4
+  ORDER 80
+
+ADD FIELD "date-2" OF "ext-ped-venda2" AS date 
+  FORMAT "99/99/9999"
+  INITIAL ?
+  POSITION 10
+  MAX-WIDTH 4
+  ORDER 90
+
+ADD FIELD "log-1" OF "ext-ped-venda2" AS logical 
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 11
+  MAX-WIDTH 1
+  ORDER 100
+
+ADD FIELD "log-2" OF "ext-ped-venda2" AS logical 
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 12
+  MAX-WIDTH 1
+  ORDER 110
+
+ADD FIELD "dec-1" OF "ext-ped-venda2" AS decimal 
+  FORMAT "->>>>>>>>>>>9.99999999"
+  INITIAL "0"
+  POSITION 13
+  MAX-WIDTH 23
+  COLUMN-LABEL-SA "R22"
+  DECIMALS 8
+  ORDER 120
+
+ADD FIELD "dec-2" OF "ext-ped-venda2" AS decimal 
+  FORMAT "->>>>>>>>>>>9.99999999"
+  INITIAL "0"
+  POSITION 14
+  MAX-WIDTH 23
+  COLUMN-LABEL-SA "R22"
+  DECIMALS 8
+  ORDER 130
+
+ADD FIELD "cod-usuar" OF "ext-ped-venda2" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 15
+  MAX-WIDTH 40
+  ORDER 140
+
+.
+PSC
+cpstream=ibm850
+.
+0000002455

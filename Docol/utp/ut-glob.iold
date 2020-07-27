@@ -1,0 +1,50 @@
+/***************************************************************************
+**  Programa : UT-GLOB.I
+**  Include padrão para definição de variaveis globais.
+***************************************************************************/ 
+
+&if  defined(GLOBALS) &then 
+
+&else
+     &glob GLOBALS ok 
+
+     def new global shared var i-ep-codigo-usuario  as int  no-undo.
+     def new Global shared var l-implanta           as logical    init no.
+     def new Global shared var c-seg-usuario        as char format "x(12)" no-undo.
+     def new global shared var i-num-ped-exec-rpw  as integer no-undo.   
+     def var rw-log-exec                            as rowid no-undo.
+     def new global shared var i-pais-impto-usuario as integer format ">>9" no-undo.
+     def new global shared var l-rpc as logical no-undo.
+     def new global shared temp-table tt-servid-rpc-aplicat
+         field tta-cod-aplicat-dtsul like emsbas.aplicat_dtsul.cod_aplicat_dtsul
+         field tta-hdl-servid-rpc    as   handle.
+     def var c-erro-rpc as character format "x(60)" initial " " no-undo.
+     def var c-erro-aux as character format "x(60)" initial " " no-undo.
+     def new global shared var r-registro-atual as rowid no-undo.
+     def new global shared var c-arquivo-log    as char  format "x(60)"no-undo.
+     
+      /* Variáveis Padrão DWB / Datasul HR */
+     def new global shared var i-num-ped as integer no-undo.         
+     def new global shared var v_cdn_empres_usuar   as int no-undo.
+     def new global shared var v_cod_usuar_corren   like emsbas.usuar_mestre.cod_usuario no-undo.
+     def new global shared var h_prog_segur_estab     as handle                   no-undo.
+     def new global shared var v_cod_grp_usuar_lst    as char                     no-undo.
+     def new global shared var v_num_tip_aces_usuar   as int                      no-undo.
+&endif
+
+
+/* Transformacaoo Window */
+&IF DEFINED(TransformacaoWindow) <> 0 &THEN
+&ELSE
+    if session:window-system <> "TTY" then do:
+      &global-define TransformacaoWindow OK
+      {include/i-win.i}
+      define var h-prog     as handle  no-undo.
+      define var h-pai      as handle  no-undo.
+      define var c-prog-tec as char    no-undo format "x(256)".
+      define var i-template as integer no-undo.
+    end.  
+&ENDIF
+/* Transformacaoo Window */
+
+/* ut-glob.i */

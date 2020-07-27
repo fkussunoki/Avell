@@ -1,0 +1,23 @@
+ADD TABLE "ext_situacao_orcto"
+  AREA "Schema Area"
+  DUMP-NAME "ext_situacao_orcto"
+
+ADD FIELD "cod_situacao" OF "ext_situacao_orcto" AS integer 
+  FORMAT "->,>>>,>>9"
+  INITIAL "0"
+  POSITION 2
+  MAX-WIDTH 4
+  ORDER 10
+
+ADD FIELD "Descricao" OF "ext_situacao_orcto" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 3
+  MAX-WIDTH 40
+  ORDER 20
+
+.
+PSC
+cpstream=ibm850
+.
+0000000373

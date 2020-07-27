@@ -1,0 +1,29 @@
+
+FOR EACH b-movto-cheque OF b-tit-cheque NO-LOCK /* Soma todas as liquida‡äes do cheque anteriores a data termino do per¡odo selecionado */
+   WHERE b-movto-cheque.ind_trans_acr_abrev = "LIQ"
+     AND b-movto-cheque.dat_transacao      <= dt-fim-periodo
+     AND NOT b-movto-cheque.log_movto_estordo.
+     
+    if b-movto-cheque.cod_portador = "9500" then do: /* Portador Lucro e Perdas */
+                                                     /* Chamado 1523            */
+       ASSIGN de-tot-lucr-perdas = de-tot-lucr-perdas + b-movto-cheque.val_movto_tit_acr.
+    end.
+    else do:
+       IF b-movto-cheque.num_id_movto_cta_corren <> 0 THEN /* Liquida‡Æo com Movimento no Caixa e Bancos - entrada na conta corrente */
+          ASSIGN de-tot-liq = de-tot-liq + b-movto-cheque.val_movto_tit_acr - (b-movto-cheque.val_abat_tit_acr + b-movto-cheque.val_desconto).
+       
+       IF b-movto-cheque.log_liquidac_contra_antecip THEN DO: /* Liquida‡Æo contra antecipa‡Æo */
+          FIND FIRST b-movto-antecip NO-LOCK
+               WHERE b-movto-antecip.cod_estab_tit_acr_pai    = b-movto-cheque.cod_estab
+                 AND b-movto-antecip.num_id_movto_tit_acr_pai = b-movto-cheque.num_id_movto_tit_acr NO-ERROR.
+          IF AVAIL b-movto-antecip THEN DO:
+             IF b-movto-antecip.cod_espec_doc = "DV" THEN   /* Se antecipa‡Æo for devolu‡Æo */
+                ASSIGN de-tot-dev = de-tot-dev + b-movto-cheque.val_movto_tit_acr - (b-movto-cheque.val_abat_tit_acr + b-movto-cheque.val_desconto).
+             ELSE
+                ASSIGN de-tot-liq = de-tot-liq + b-movto-cheque.val_movto_tit_acr - (b-movto-cheque.val_abat_tit_acr + b-movto-cheque.val_desconto).
+          END.
+       END.
+       
+       ASSIGN de-tot-des = de-tot-des +  b-movto-cheque.val_abat_tit_acr + b-movto-cheque.val_desconto. /* Soma Abatimentos e Descontos */
+    end.
+END.

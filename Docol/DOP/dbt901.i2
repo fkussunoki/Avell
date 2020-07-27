@@ -1,0 +1,10 @@
+/*
+&IF  DEFINED(VariaveisDeConexao) <> 0 &THEN
+
+    /*disconectar os bancos externos*/
+    DO  i-cont-bancos = 1 TO NUM-ENTRIES(c-lista-bancos):
+        DISCONNECT VALUE(ENTRY(i-cont-bancos, c-lista-bancos)) NO-ERROR.
+    END.
+
+&ENDIF
+*/

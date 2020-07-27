@@ -1,0 +1,209 @@
+ADD TABLE "ar-boleto"
+  AREA "Schema Area"
+  DUMP-NAME "ar-boleto"
+
+ADD FIELD "cod-estabel" OF "ar-boleto" AS character 
+  FORMAT "x(3)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 6
+  ORDER 10
+
+ADD FIELD "serie" OF "ar-boleto" AS character 
+  FORMAT "x(3)"
+  INITIAL ""
+  POSITION 3
+  MAX-WIDTH 6
+  ORDER 20
+
+ADD FIELD "nr-fatura" OF "ar-boleto" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 4
+  MAX-WIDTH 16
+  ORDER 30
+
+ADD FIELD "parcela" OF "ar-boleto" AS integer 
+  FORMAT ">>9"
+  INITIAL "0"
+  POSITION 5
+  MAX-WIDTH 4
+  ORDER 40
+
+ADD FIELD "dt-emissao" OF "ar-boleto" AS datetime 
+  FORMAT "99/99/9999 HH:MM:SS.SSS"
+  INITIAL ?
+  POSITION 6
+  MAX-WIDTH 8
+  ORDER 50
+
+ADD FIELD "usuario" OF "ar-boleto" AS character 
+  FORMAT "x(12)"
+  INITIAL ""
+  POSITION 7
+  MAX-WIDTH 24
+  ORDER 60
+
+ADD FIELD "NOSSO-NUMERO" OF "ar-boleto" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 8
+  MAX-WIDTH 40
+  ORDER 70
+
+ADD INDEX "ch-prin" ON "ar-boleto" 
+  AREA "Schema Area"
+  UNIQUE
+  PRIMARY
+  INDEX-FIELD "cod-estabel" ASCENDING 
+  INDEX-FIELD "serie" ASCENDING 
+  INDEX-FIELD "nr-fatura" ASCENDING 
+  INDEX-FIELD "parcela" ASCENDING 
+
+ADD TABLE "ext_roteiro_fechamento"
+  AREA "Schema Area"
+  DUMP-NAME "ext_roteiro_fechamento"
+
+ADD FIELD "periodo" OF "ext_roteiro_fechamento" AS character 
+  FORMAT "99/9999"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 14
+  ORDER 10
+
+ADD FIELD "rotina" OF "ext_roteiro_fechamento" AS character 
+  FORMAT "x(50)"
+  INITIAL ""
+  POSITION 4
+  MAX-WIDTH 100
+  ORDER 30
+
+ADD FIELD "programa" OF "ext_roteiro_fechamento" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 5
+  MAX-WIDTH 40
+  ORDER 40
+
+ADD FIELD "semana-1" OF "ext_roteiro_fechamento" AS logical 
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 6
+  MAX-WIDTH 1
+  ORDER 50
+
+ADD FIELD "semana-2" OF "ext_roteiro_fechamento" AS logical 
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 7
+  MAX-WIDTH 1
+  ORDER 60
+
+ADD FIELD "semana-3" OF "ext_roteiro_fechamento" AS logical 
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 8
+  MAX-WIDTH 1
+  ORDER 70
+
+ADD FIELD "semana-4" OF "ext_roteiro_fechamento" AS logical 
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 9
+  MAX-WIDTH 1
+  ORDER 80
+
+ADD FIELD "usuario-1" OF "ext_roteiro_fechamento" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 10
+  MAX-WIDTH 16
+  ORDER 90
+
+ADD FIELD "usuario-2" OF "ext_roteiro_fechamento" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 11
+  MAX-WIDTH 16
+  ORDER 100
+
+ADD FIELD "usuario-3" OF "ext_roteiro_fechamento" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 12
+  MAX-WIDTH 16
+  ORDER 110
+
+ADD FIELD "usuario-4" OF "ext_roteiro_fechamento" AS character 
+  FORMAT "x(8)"
+  INITIAL ""
+  POSITION 13
+  MAX-WIDTH 16
+  ORDER 120
+
+ADD FIELD "date1" OF "ext_roteiro_fechamento" AS date 
+  FORMAT "99/99/9999"
+  INITIAL ?
+  POSITION 14
+  MAX-WIDTH 4
+  ORDER 130
+
+ADD FIELD "data2" OF "ext_roteiro_fechamento" AS date 
+  FORMAT "99/99/9999"
+  INITIAL ?
+  POSITION 15
+  MAX-WIDTH 4
+  ORDER 140
+
+ADD FIELD "data3" OF "ext_roteiro_fechamento" AS date 
+  FORMAT "99/99/9999"
+  INITIAL ?
+  POSITION 16
+  MAX-WIDTH 4
+  ORDER 150
+
+ADD FIELD "data4" OF "ext_roteiro_fechamento" AS date 
+  FORMAT "99/99/9999"
+  INITIAL ?
+  POSITION 17
+  MAX-WIDTH 4
+  ORDER 160
+
+ADD FIELD "sequenca" OF "ext_roteiro_fechamento" AS integer 
+  FORMAT "->,>>>,>>9"
+  INITIAL "0"
+  POSITION 18
+  MAX-WIDTH 4
+  ORDER 170
+
+ADD FIELD "periodicidade" OF "ext_roteiro_fechamento" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 19
+  MAX-WIDTH 40
+  ORDER 180
+
+ADD FIELD "setor" OF "ext_roteiro_fechamento" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 20
+  MAX-WIDTH 40
+  ORDER 190
+
+ADD FIELD "responsavel" OF "ext_roteiro_fechamento" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 21
+  MAX-WIDTH 40
+  ORDER 200
+
+ADD INDEX "sequencia" ON "ext_roteiro_fechamento" 
+  AREA "Schema Area"
+  PRIMARY
+  INDEX-FIELD "sequenca" ASCENDING 
+
+.
+PSC
+cpstream=ibm850
+.
+0000004098

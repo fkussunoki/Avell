@@ -1,0 +1,52 @@
+DEFINE VAR c-portador AS char VIEW-AS FILL-IN LABEL "Informe Portador Novo".
+
+OUTPUT TO value (SESSION:TEMP-DIRECTORY + "emitentes.txt").
+
+
+DEFINE VAR h-prog AS HANDLE NO-UNDO.
+
+RUN utp/ut-acomp.p PERSISTENT SET h-prog.
+
+RUN pi-inicializar IN h-prog(INPUT "Aguarde").
+
+FOR EACH emitente NO-LOCK WHERE emitente.modalidade = 1
+                          AND   emitente.identific  <> 2:
+
+    RUN pi-acompanhar IN h-prog (INPUT string(emitente.cod-emitente) + " " + emitente.nome-abrev).
+    disp emitente.cod-emitente COLUMN-LABEL "Codigo"
+        emitente.nome-abrev    COLUMN-LABEL "NomAbrev"
+        emitente.portador      COLUMN-LABEL "Portador"
+        WITH STREAM-IO WIDTH 600.
+
+END.
+RUN pi-finalizar IN h-prog.
+OUTPUT CLOSE.
+
+UPDATE c-portador.
+
+RUN utp/ut-acomp.p PERSISTENT SET h-prog.
+
+RUN pi-inicializar IN h-prog(INPUT "Alterando").
+
+FOR EACH emitente         WHERE emitente.modalidade = 1
+                          AND   emitente.identific  <> 2:
+    RUN pi-acompanhar IN h-prog (INPUT string(emitente.cod-emitente) + " " + emitente.nome-abrev).
+
+    ASSIGN emitente.portador = int(c-portador)
+           emitente.emite-bloq = YES.
+
+           run cdp/cd1608.p (input emitente.cod-emitente,
+                  input emitente.cod-emitente,
+                  input emitente.identific,
+                  input 1,
+                  input 1,
+                  input 0,
+                  input SESSION:TEMP-DIRECTORY + string(cod-emitente) + ".txt",
+                  input "arquivo",
+                  input "").
+
+END.
+
+RUN pi-finalizar IN h-prog.
+
+

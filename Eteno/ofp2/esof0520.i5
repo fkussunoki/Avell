@@ -1,0 +1,358 @@
+/******************************************************************************
+**  Include...: esof0520.I5
+**  Objetivo..: Display das totais.
+******************************************************************************/
+
+if  l-separadores then do:
+    put substr(c-desc-tot,1,86) at 1 format "x(86)".
+    run pi-verifica-linhas in h-esof0520e (3).
+    /* Inicio -- Projeto Internacional */
+    DEFINE VARIABLE c-lbl-liter-icms AS CHARACTER FORMAT "X(4)" NO-UNDO.
+    {utp/ut-liter.i "ICMS" *}
+    ASSIGN c-lbl-liter-icms = TRIM(RETURN-VALUE).
+    put c-sep at i-posicao[1] c-lbl-liter-icms
+        c-sep at i-posicao[2] 
+        "1"   at i-posicao[3]
+        c-sep at i-posicao[4] 
+        accum total it-doc-fisc.vl-bicms-it format ">>>>>>>>>>9.99" to i-posicao[5]
+        c-sep at i-posicao[6]
+        c-sep at i-posicao[7] 
+        accum total it-doc-fisc.vl-icms-it  format ">>>>>>>9.99" to i-posicao[8] /* Sub Total */ 
+        c-sep at i-posicao[9].
+    if  i-op-rel = 2 then
+        put accum total it-doc-fisc.vl-bsubs-it  format ">>>>>>>>>9.99" c-sep
+            accum total it-doc-fisc.vl-icmsub-it format ">>>>>>>>>9.99" c-sep.
+   
+    put skip
+        substr(c-linha-branco,1,91) at 1 format "x(91)"
+        c-sep at i-posicao[2] 
+        "2"   at i-posicao[3]
+        c-sep at i-posicao[4] 
+        de-sub-vl-icmsnt-it /*accum total it-doc-fisc.vl-icmsnt-it*/ format ">>>>>>>>>>9.99" to i-posicao[5]
+        c-sep at i-posicao[6]
+        c-sep at i-posicao[7] 
+        0                                    format ">>>>>>9.99"  to i-posicao[8]
+        c-sep at i-posicao[9].
+    if  i-op-rel = 2 then
+        put c-sep at i-posicao[1]
+            c-sep at i-posicao[2].
+    put skip.
+    put substr(c-linha-branco,1,91) at 1 format "x(91)"
+        c-sep at i-posicao[2] 
+        "3"   at i-posicao[3]
+        c-sep at i-posicao[4] 
+        de-sub-vl-icmsou-it              format ">>>>>>>>>>9.99" to i-posicao[5]         
+        c-sep at i-posicao[6]
+        c-sep at i-posicao[7] 
+        0                                format ">>>>>>9.99"  to i-posicao[8]
+        c-sep at i-posicao[9].
+    if  i-op-rel = 2 then
+        put c-sep at i-posicao[1]
+            c-sep at i-posicao[2].
+    put skip.
+    run pi-verifica-linhas in h-esof0520e(3).
+    
+    /* Inicio -- Projeto Internacional */
+    DEFINE VARIABLE c-lbl-liter-ipi AS CHARACTER FORMAT "X(3)" NO-UNDO.
+    {utp/ut-liter.i "IPI" *}
+    ASSIGN c-lbl-liter-ipi = TRIM(RETURN-VALUE).
+    put substr(c-linha-branco,1,86) at 1 format "x(86)"
+        c-sep at i-posicao[1] c-lbl-liter-ipi
+        c-sep at i-posicao[2]  
+        "1"   at i-posicao[3]
+        c-sep at i-posicao[4] 
+        accum total it-doc-fisc.vl-bipi-it format ">>>>>>>>>>9.99" to i-posicao[5]
+        c-sep at i-posicao[6]
+        c-sep at i-posicao[7] 
+        accum total it-doc-fisc.vl-ipi-it  format ">>>>>>9.99"  to i-posicao[8]
+        c-sep at i-posicao[9].
+    if  i-op-rel = 2 then
+        put c-sep at i-posicao[1]
+            c-sep at i-posicao[2].
+    put skip.
+    put substr(c-linha-branco,1,91) at 1 format "x(91)"
+        c-sep at i-posicao[2] 
+        "2"   at i-posicao[3]
+        c-sep at i-posicao[4] 
+        de-sub-vl-ipint-it /*accum total it-doc-fisc.vl-ipint-it*/ format ">>>>>>>>>>9.99" to i-posicao[5]
+        c-sep at i-posicao[6]
+        c-sep at i-posicao[7] 
+        0                                   format ">>>>>>9.99"  to i-posicao[8]
+        c-sep at i-posicao[9].
+    if  i-op-rel = 2 then
+        put c-sep at i-posicao[1]
+            c-sep at i-posicao[2].
+    put skip.
+    put substr(c-linha-branco,1,91) at 1 format "x(91)"
+        c-sep at i-posicao[2]  
+        "3"   at i-posicao[3]
+        c-sep at i-posicao[4] 
+        de-sub-vl-ipiou-it /*accum total it-doc-fisc.vl-ipiou-it*/ format ">>>>>>>>>>9.99" to i-posicao[5]
+        c-sep at i-posicao[6]
+        c-sep at i-posicao[7] 
+        0                                   format ">>>>>>9.99"  to i-posicao[8]
+        c-sep at i-posicao[9].
+    if  i-op-rel = 2 then
+        put c-sep at i-posicao[1]
+            c-sep at i-posicao[2].
+    put skip.
+    run pi-verifica-linhas in h-esof0520e (1).
+    put substr(c-linha-branco,1,86) at 1 format "x(86)"
+        c-sep at i-posicao[1] 
+        "ST"
+        c-sep at i-posicao[2]
+        c-sep at i-posicao[4] 
+        accum total it-doc-fisc.vl-bsubs-it  format ">>>>>>>>>>9.99" to i-posicao[5]
+        c-sep at i-posicao[6]
+        c-sep at i-posicao[7] 
+        accum total it-doc-fisc.vl-icmsub-it format ">>>>>>9.99"  to i-posicao[8]
+        c-sep at i-posicao[9].
+    if  i-op-rel = 2 then
+        put c-sep at i-posicao[1]
+            c-sep at i-posicao[2].
+    put skip.
+    if (c-estado = "MG" or c-estado = "PE") 
+    and de-obs-tot > 0 then do:
+        run pi-verifica-linhas in h-esof0520e(1).
+    
+        /* Inicio -- Projeto Internacional */
+        DEFINE VARIABLE c-lbl-liter-obs AS CHARACTER FORMAT "X(5)" NO-UNDO.
+        {utp/ut-liter.i "OBS" *}
+        ASSIGN c-lbl-liter-obs = TRIM(RETURN-VALUE).
+        put substr(c-linha-branco,1,86) at 1 format "x(86)"
+            c-sep at i-posicao[1] c-lbl-liter-obs
+            c-sep at i-posicao[2]
+            c-sep at i-posicao[3]  
+            de-obs-tot             format ">>>>>>>>>>9.99" to i-posicao[5]            
+            c-sep at 182 0         format ">>>>>>9.99"     to i-posicao[8]
+            c-sep at i-posicao[9].
+        if  i-op-rel = 2 then
+            put c-sep at i-posicao[1]
+                c-sep at i-posicao[2].
+        put skip.
+    end.
+    assign c-obs-total = c-linha-branco
+           i-inicio    = 14.
+    overlay(c-obs-total,2) = "Observacao:".
+
+    if  (accum total doc-fiscal.vl-icms-com) > 0
+    and l-imp-dif-aliq then do:
+        if  c-estado = "MG" then do:
+            overlay(c-obs-total,i-inicio) =
+            "DEBITO: " +
+            string(accum total doc-fiscal.vl-icms-com,">,>>>,>>9.99") +
+            (if  de-cred-com > 0  
+            then ("  CREDITO: " +
+            string(de-cred-com,">,>>>,>>9.99"))
+            else "").
+            assign i-inicio = 33 + if de-cred-com > 0
+                   then 24 else 1.
+        end.
+        else do:
+            overlay(c-obs-total,i-inicio) = "Dif.Aliq.ICMS: " +
+            string(accum total doc-fiscal.vl-icms-com,">>>>,>>9.99").
+            assign i-inicio = 42.
+        end.
+    end.
+    if  i-inicio > 14 then do:
+        run pi-verifica-linhas in h-esof0520e(1).
+        if  i-op-rel = 1 then
+            put c-obs-total at 1 format "x(132)" skip.
+        else
+            put c-obs-total at 1 format "x(159)" skip.
+        put skip.
+    end.
+    run pi-verifica-linhas in h-esof0520e(1).
+    if  not l-nova-pagina then
+        if  i-op-rel = 1 then
+            put c-linha-branco at 1 format "x(132)" skip.
+        else
+            put c-linha-branco at 1 format "x(159)" skip.
+end.
+else do:
+    if i-op-rel = 1 then do:
+       run pi-verifica-linhas in h-esof0520e (3).
+ 
+       /* Inicio -- Projeto Internacional */
+       DEFINE VARIABLE c-lbl-liter-icms-2 AS CHARACTER FORMAT "X(4)" NO-UNDO.
+       {utp/ut-liter.i "ICMS" *}
+       ASSIGN c-lbl-liter-icms-2 = TRIM(RETURN-VALUE).
+       put c-desc-tot   at 1
+           c-lbl-liter-icms-2       at i-posicao[10]
+           "1"          at i-posicao[11]
+           accum total it-doc-fisc.vl-bicms-it format ">>>>>>>>>>9.99" to i-posicao[12]
+           accum total it-doc-fisc.vl-icms-it  format ">>>>>>>>>9.99"  to i-posicao[13].
+
+       if  (accum total doc-fiscal.vl-icms-com) > 0 
+       and l-imp-dif-aliq then
+           if  c-estado = "MG"
+           then /* Inicio -- Projeto Internacional */
+ DO:
+     DEFINE VARIABLE c-lbl-liter-debito AS CHARACTER FORMAT "X(8)" NO-UNDO.
+     {utp/ut-liter.i "DEBITO" *}
+     ASSIGN c-lbl-liter-debito = TRIM(RETURN-VALUE).
+     put c-lbl-liter-debito    at i-posicao[15] skip.
+ END. 
+           else /* Inicio -- Projeto Internacional */
+ DO:
+     DEFINE VARIABLE c-lbl-liter-difaliq AS CHARACTER FORMAT "X(11)" NO-UNDO.
+     {utp/ut-liter.i "Dif.Aliq" *}
+     ASSIGN c-lbl-liter-difaliq = TRIM(RETURN-VALUE).
+     put c-lbl-liter-difaliq + "." at i-posicao[15] skip.
+ END. 
+   
+       put "2"         at i-posicao[11]
+           de-sub-vl-icmsnt-it /*accum total it-doc-fisc.vl-icmsnt-it*/ format ">>>>>>>>>>9.99" to i-posicao[12]
+           0                                    format ">>>>>>>>>9.99"  to i-posicao[13].
+  
+       if  (accum total doc-fiscal.vl-icms-com) > 0
+       and l-imp-dif-aliq then
+           /* Inicio -- Projeto Internacional */
+           DO:
+           DEFINE VARIABLE c-lbl-liter-icms-3 AS CHARACTER FORMAT "X(4)" NO-UNDO.
+           {utp/ut-liter.i "ICMS" *}
+           ASSIGN c-lbl-liter-icms-3 = TRIM(RETURN-VALUE).
+           put c-lbl-liter-icms-3 at i-posicao[15] skip.
+           END. 
+
+       put "3"        at i-posicao[11]
+           de-sub-vl-icmsou-it /*accum total it-doc-fisc.vl-icmsou-it*/ format ">>>>>>>>>>9.99" to i-posicao[12] 
+           0                                    format ">>>>>>>>>9.99"  to i-posicao[13].
+       
+       if  de-cred-com  > 0  then
+           /* Inicio -- Projeto Internacional */
+           DO:
+           DEFINE VARIABLE c-lbl-liter-credito AS CHARACTER FORMAT "X(9)" NO-UNDO.
+           {utp/ut-liter.i "CREDITO" *}
+           ASSIGN c-lbl-liter-credito = TRIM(RETURN-VALUE).
+           put c-lbl-liter-credito at i-posicao[15].
+           END. 
+       else
+               if  (accum total doc-fiscal.vl-icms-com) > 0
+               and l-imp-dif-aliq then
+                   put accum total doc-fiscal.vl-icms-com  format ">>>>>>>>9.99" at i-posicao[15].
+
+       put skip.
+
+       run pi-verifica-linhas in h-esof0520e(3).
+    
+       /* Inicio -- Projeto Internacional */
+       DEFINE VARIABLE c-lbl-liter-ipi-2 AS CHARACTER FORMAT "X(3)" NO-UNDO.
+       {utp/ut-liter.i "IPI" *}
+       ASSIGN c-lbl-liter-ipi-2 = TRIM(RETURN-VALUE).
+       put c-lbl-liter-ipi-2        at i-posicao[10]
+            "1"         at i-posicao[11]
+            accum total it-doc-fisc.vl-bipi-it format ">>>>>>>>>>9.99" to i-posicao[12] 
+            accum total it-doc-fisc.vl-ipi-it  format ">>>>>>>>>9.99"  to i-posicao[13] .
+
+       if  de-cred-com > 0 then
+           put "("              at i-posicao[14]
+               de-cred-com  format ">>>>,>>9.99"
+               ")".
+       put skip
+           "2"          at i-posicao[11]
+            de-sub-vl-ipint-it /*accum total it-doc-fisc.vl-ipint-it*/ format ">>>>>>>>>>9.99" to i-posicao[12] 
+            0                                   format ">>>>>>>>>9.99"  to i-posicao[13].
+
+       put  skip
+            "3"         at i-posicao[11]
+            de-sub-vl-ipiou-it /*accum total it-doc-fisc.vl-ipiou-it*/ format ">>>>>>>>>>9.99" to i-posicao[12] 
+            0                                   format ">>>>>>>>>9.99"  to i-posicao[13].
+         
+       run pi-verifica-linhas in h-esof0520e (1).
+       
+       put  skip
+            "ST"        at i-posicao[10]
+            accum total it-doc-fisc.vl-bsubs-it  format ">>>>>>>>>>9.99" to i-posicao[12] 
+            accum total it-doc-fisc.vl-icmsub-it format ">>>>>>>>>9.99"  to i-posicao[13] .
+       put skip.
+
+       if (c-estado = "MG"
+       or c-estado = "PE") and de-obs-tot > 0 then do:
+           run pi-verifica-linhas in h-esof0520e(1).
+    
+           /* Inicio -- Projeto Internacional */
+           DEFINE VARIABLE c-lbl-liter-obs-2 AS CHARACTER FORMAT "X(5)" NO-UNDO.
+           {utp/ut-liter.i "OBS" *}
+           ASSIGN c-lbl-liter-obs-2 = TRIM(RETURN-VALUE).
+           put  c-lbl-liter-obs-2       at i-posicao[3]
+                de-obs-tot  format ">>>>>>>>>>9.99" to 101
+                0           format ">>>>>>>>>9.99"  to 120  skip.
+       end.
+    end.
+
+    else do:
+       run pi-verifica-linhas in h-esof0520e (3).
+ 
+       /* Inicio -- Projeto Internacional */
+       DEFINE VARIABLE c-lbl-liter-icms-4 AS CHARACTER FORMAT "X(4)" NO-UNDO.
+       {utp/ut-liter.i "ICMS" *}
+       ASSIGN c-lbl-liter-icms-4 = TRIM(RETURN-VALUE).
+       put c-desc-tot   at 1
+           c-lbl-liter-icms-4       at i-posicao[3]
+           "1"          at i-posicao[1]
+           accum total it-doc-fisc.vl-bicms-it  format ">>>>>>>>>>>9.99" to i-posicao[4]
+           accum total it-doc-fisc.vl-icms-it   format ">>>>>>>>>>9.99"  to i-posicao[5]
+           accum total it-doc-fisc.vl-bsubs-it  format ">>>>>>>>>9.99"   to i-posicao[6]
+           accum total it-doc-fisc.vl-icmsub-it format ">>>>,>>9.99"     to i-posicao[7].
+
+       if  (accum total doc-fiscal.vl-icms-com) > 0
+       and l-imp-dif-aliq then
+           /* Inicio -- Projeto Internacional */
+           DO:
+           DEFINE VARIABLE c-lbl-liter-difaliqicms AS CHARACTER FORMAT "X(16)" NO-UNDO.
+           {utp/ut-liter.i "Dif.Aliq.ICMS" *}
+           ASSIGN c-lbl-liter-difaliqicms = TRIM(RETURN-VALUE).
+           put c-lbl-liter-difaliqicms + "=" at i-posicao[8].
+           END. 
+   
+       put skip
+           "2"          at i-posicao[1]
+           de-sub-vl-icmsnt-it /*accum total it-doc-fisc.vl-icmsnt-it*/ format ">>>>>>>>>>>9.99" to i-posicao[4]
+           0                                    format ">>>>>>>>>>9.99"  to i-posicao[5].
+
+       if  (accum total doc-fiscal.vl-icms-com) > 0
+       and l-imp-dif-aliq then
+            put "("              at i-posicao[8]
+               accum total doc-fiscal.vl-icms-com format ">>>>>>,>>9.99"
+               ")".
+
+       put skip
+           "3"          at i-posicao[1]
+           de-sub-vl-icmsou-it /*accum total it-doc-fisc.vl-icmsou-it*/ format ">>>>>>>>>>>9.99" to i-posicao[4]
+           0                                    format ">>>>>>>>>>9.99"  to i-posicao[5] skip.
+       run pi-verifica-linhas in h-esof0520e(3).
+    
+       /* Inicio -- Projeto Internacional */
+       DEFINE VARIABLE c-lbl-liter-ipi-3 AS CHARACTER FORMAT "X(3)" NO-UNDO.
+       {utp/ut-liter.i "IPI" *}
+       ASSIGN c-lbl-liter-ipi-3 = TRIM(RETURN-VALUE).
+       put c-lbl-liter-ipi-3        at i-posicao[3]
+           "1"          at i-posicao[1]
+            accum total it-doc-fisc.vl-bipi-it  format ">>>>>>>>>>>9.99" to i-posicao[4]
+            accum total it-doc-fisc.vl-ipi-it   format ">>>>>>>>>>9.99"  to i-posicao[5] skip
+            "2"         at i-posicao[1]
+            de-sub-vl-ipint-it /*accum total it-doc-fisc.vl-ipint-it*/ format ">>>>>>>>>>>9.99" to i-posicao[4]
+            0                                   format ">>>>>>>>>>9.99"  to i-posicao[5] skip
+            "3"         at i-posicao[1]
+            de-sub-vl-ipiou-it /*accum total it-doc-fisc.vl-ipiou-it*/ format ">>>>>>>>>>>9.99" to i-posicao[4]
+            0                                   format ">>>>>>>>>>9.99"  to i-posicao[5] skip.
+       
+       if (c-estado = "MG"
+       or c-estado = "PE") and de-obs-tot > 0 then do:
+          run pi-verifica-linhas in h-esof0520e(1).
+          /* Inicio -- Projeto Internacional */
+          DEFINE VARIABLE c-lbl-liter-obs-3 AS CHARACTER FORMAT "X(5)" NO-UNDO.
+          {utp/ut-liter.i "OBS" *}
+          ASSIGN c-lbl-liter-obs-3 = TRIM(RETURN-VALUE).
+          put c-lbl-liter-obs-3       at i-posicao[3]
+              de-obs-tot  format ">>>>>>>>>>>9.99" to i-posicao[4] skip.
+       end.
+    end.
+    run pi-verifica-linhas in h-esof0520e(1).
+    if  not l-nova-pagina then
+        put skip(1).
+end.
+
+/* esof0520.i5 */
+

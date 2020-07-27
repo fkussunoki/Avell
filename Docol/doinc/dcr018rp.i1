@@ -1,0 +1,190 @@
+/*******************************************************************************************************************************************
+** Include: dcr018rp.i1
+** Fun‡Æo: Cria‡Æo de Planilhas Excel e Gr ficos das Tarifas Banc rias
+*******************************************************************************************************************************************/   
+   
+   IF FIRST-OF(tt-res-desp-bcia.des-grp-ocor-bcia) THEN DO:
+
+      IF l-som-valor-medio                           OR     /* Somente Valor M‚dio gera nova Planilha por Grupo de Ocorrˆncia */
+         first(tt-res-desp-bcia.des-grp-ocor-bcia) THEN DO: /* Sempre gera nova planilha na primeira ocorrˆncia do break by tt-res-desp-bcia.des-grp-ocor-bcia */
+
+         ASSIGN i-plan-arq = i-plan-arq + 1.
+
+         IF i-plan-orig >= i-plan-arq THEN DO:
+            ch-planilha  = ch-arquivo:Sheets:ITEM(i-plan-arq).
+         END.
+         ELSE DO:
+            ch-planilha = ch-arquivo:Sheets:ADD().
+         END.
+
+         ch-planilha:cells(1,1):VALUE     = "Tarifas Banc rias".
+         ch-planilha:cells(1,1):Font:Bold = TRUE.
+         ch-planilha:cells(1,1):EntireColumn:ColumnWidth = 20.
+
+         IF l-som-valor-medio THEN
+            ch-planilha:NAME = "Grp " + substr(tt-res-desp-bcia.des-grp-ocor-bcia,1,3).
+         ELSE
+            ch-planilha:NAME = "Tarif Banc rias".
+    
+         ASSIGN i-linha      = 3
+                de-valor-max = 0.
+      END. /* if l-som-valor-medio or first(tt-res-desp-bcia) */
+
+      ch-planilha:cells(i-linha,01):VALUE     = substr(tt-res-desp-bcia.des-grp-ocor-bcia,5,30). 
+      ch-planilha:cells(i-linha,01):Font:Bold = TRUE.
+      
+      ASSIGN i-linha        = i-linha + 2
+             i-lin-graf-ini = i-linha.
+
+      ch-planilha:cells(i-linha,01):VALUE     = "Banco".
+      ch-planilha:cells(i-linha,01):Font:Bold = TRUE.
+
+      IF NOT l-som-valor-medio THEN DO:
+         ch-planilha:range(ch-planilha:cells(i-linha,01):ADDRESS(FALSE,FALSE,1,FALSE),ch-planilha:cells(i-linha + 1,01):ADDRESS(FALSE,FALSE,1,FALSE)):Mergecells = TRUE.
+         ch-planilha:cells(i-linha,01):VerticalAlignment = {&xlCenter}.
+      END.
+
+      ASSIGN i-mes-aux = MONTH(dat-inicial)
+             i-ano-aux = YEAR(dat-inicial).
+      DO i-cont = 1 TO 12:
+         IF l-som-valor-medio OR i-cont = 1 THEN
+            ASSIGN i-col-mes[i-mes-aux] = i-cont + 1.
+         ELSE
+            ASSIGN i-col-mes[i-mes-aux] = (i-cont * 3) - 1.
+
+         ch-planilha:cells(i-linha,i-col-mes[i-mes-aux]):NumberFormat        = "@".
+         ch-planilha:cells(i-linha,i-col-mes[i-mes-aux]):VALUE               = string(c-descr-mes[i-mes-aux] + "/" + SUBSTR(string(i-ano-aux),3,2)).
+         ch-planilha:cells(i-linha,i-col-mes[i-mes-aux]):Font:Bold           = TRUE.
+         ch-planilha:cells(i-linha,i-col-mes[i-mes-aux]):HorizontalAlignment = {&xlCenter}.
+
+         IF NOT l-som-valor-medio THEN
+            ch-planilha:range(ch-planilha:cells(i-linha,i-col-mes[i-mes-aux]):ADDRESS(FALSE,FALSE,1,FALSE),ch-planilha:cells(i-linha,i-col-mes[i-mes-aux] + 2):ADDRESS(FALSE,FALSE,1,FALSE)):Mergecells = TRUE.
+
+         ASSIGN i-ano-aux            = IF i-mes-aux = 12 THEN i-ano-aux + 1
+                                                         ELSE i-ano-aux
+                i-mes-aux            = IF i-mes-aux = 12 THEN 1
+                                                         ELSE i-mes-aux + 1.
+      END.
+
+      ASSIGN i-mes-aux = MONTH(dat-inicial) 
+             i-ano-aux = YEAR(dat-inicial).
+      IF NOT l-som-valor-medio THEN DO: /* Lista Valor Total, Quantidade e Valor M‚dio por Ocorrˆncia */
+         ASSIGN i-linha = i-linha + 1.                                       
+         DO i-cont = 1 TO 12:
+             ch-planilha:cells(i-linha,i-col-mes[i-mes-aux]):VALUE                   = "Valor Total".
+             ch-planilha:cells(i-linha,i-col-mes[i-mes-aux]):Font:Bold               = TRUE.
+             ch-planilha:cells(i-linha,i-col-mes[i-mes-aux]):HorizontalAlignment     = {&xlCenter}.
+             ch-planilha:cells(i-linha,i-col-mes[i-mes-aux] + 1):VALUE               = "Qtd".
+             ch-planilha:cells(i-linha,i-col-mes[i-mes-aux] + 1):Font:Bold           = TRUE.
+             ch-planilha:cells(i-linha,i-col-mes[i-mes-aux] + 1):HorizontalAlignment = {&xlCenter}.
+             ch-planilha:cells(i-linha,i-col-mes[i-mes-aux] + 2):VALUE               = "Valor M‚dio".
+             ch-planilha:cells(i-linha,i-col-mes[i-mes-aux] + 2):Font:Bold           = TRUE.
+             ch-planilha:cells(i-linha,i-col-mes[i-mes-aux] + 2):HorizontalAlignment = {&xlCenter}.
+
+             ASSIGN i-ano-aux            = IF i-mes-aux = 12 THEN i-ano-aux + 1
+                                                             ELSE i-ano-aux
+                    i-mes-aux            = IF i-mes-aux = 12 THEN 1
+                                                             ELSE i-mes-aux + 1.
+         END.
+         DO i-cont = 2 TO 37:
+            ch-planilha:cells(i-linha,i-cont):EntireColumn:AutoFit.
+         END.
+      END. /* IF NOT l-som-valor-medio */
+      i-linha = i-linha + 1.
+   END.
+
+   IF FIRST-OF(tt-res-desp-bcia.nom_banco) THEN DO:
+      ch-planilha:cells(i-linha,01):VALUE             = tt-res-desp-bcia.nom_banco. 
+   END.
+
+   IF l-som-valor-medio THEN DO: /* Somente Lista Valor M‚dio por Ocorrˆncia */
+      ch-planilha:cells(i-linha,i-col-mes[tt-res-desp-bcia.mes]):VALUE                     = ROUND((tt-res-desp-bcia.val_despes_bcia / tt-res-desp-bcia.qtd),2).
+      ch-planilha:cells(i-linha,i-col-mes[tt-res-desp-bcia.mes]):entirecolumn:NumberFormat = "0,00".
+      if de-valor-max < ROUND((tt-res-desp-bcia.val_despes_bcia / tt-res-desp-bcia.qtd),2) then
+         assign de-valor-max = ROUND((tt-res-desp-bcia.val_despes_bcia / tt-res-desp-bcia.qtd),2).
+   END.
+   ELSE DO: /* Lista Valor Total, Quantidade e Valor M‚dio por Ocorrˆncia */
+      ch-planilha:cells(i-linha,i-col-mes[tt-res-desp-bcia.mes]):VALUE                         = ROUND(tt-res-desp-bcia.val_despes_bcia,2).
+      ch-planilha:cells(i-linha,i-col-mes[tt-res-desp-bcia.mes]):entirecolumn:NumberFormat     = "#.##0,00".
+      ch-planilha:cells(i-linha,i-col-mes[tt-res-desp-bcia.mes] + 1):VALUE                     = tt-res-desp-bcia.qtd.
+      ch-planilha:cells(i-linha,i-col-mes[tt-res-desp-bcia.mes] + 1):entirecolumn:NumberFormat = "###.##0".
+      ch-planilha:cells(i-linha,i-col-mes[tt-res-desp-bcia.mes] + 2):VALUE                     = ROUND(tt-res-desp-bcia.val_despes_bcia / tt-res-desp-bcia.qtd,2).
+      ch-planilha:cells(i-linha,i-col-mes[tt-res-desp-bcia.mes] + 2):entirecolumn:NumberFormat = "0,00".
+
+   END.
+
+   IF LAST-OF(tt-res-desp-bcia.nom_banco) THEN DO:
+      ch-area-borda = ch-planilha:cells(i-linha,1):CurrentRegion.
+      RUN pi-borda.
+      release object ch-area-borda.
+      ASSIGN i-linha = i-linha + 1.
+   END.
+
+   IF LAST-OF(tt-res-desp-bcia.des-grp-ocor-bcia) THEN DO:
+
+      ASSIGN i-linha = i-linha + 1.
+      
+      IF l-som-valor-medio THEN DO:
+         /* Seleciona µrea para Montagem do Gr fico */
+         ASSIGN i-lin-graf-fim = i-linha - 2.
+    
+         ch-Planilha:Activate().
+         ch-Cell-ini = ch-Planilha:Cells(i-lin-graf-ini, 1).
+         ch-Cell-fim = ch-Planilha:Cells(i-lin-graf-fim, 13).
+    
+         ch-Planilha:Range(string(ch-Cell-ini:Address(,,1,,)) + ":" + 
+                           string(ch-Cell-fim:Address(,,1,,))):Select().
+           
+         RELEASE OBJECT ch-Cell-ini.
+         RELEASE OBJECT ch-Cell-fim.
+         /* FIM-Seleciona µrea para Montagem do Gr fico */
+    
+         /* Cria e Formata Gr fico */
+         ch-Grafico                                                          = ch-Arquivo:Charts:Add().
+         ch-Grafico:NAME                                                     = "Graf Grp " + substr(tt-res-desp-bcia.des-grp-ocor-bcia,1,3).
+         ch-Grafico:ChartType                                                = {&xlColumnClustered}.
+         ch-Grafico:PlotBy                                                   = {&xlRows}.
+         ch-Grafico:HasTitle                                                 = yes.           
+         ch-Grafico:ChartTitle:Characters:Text                               = substr(tt-res-desp-bcia.des-grp-ocor-bcia,5,30).
+         ch-Grafico:Axes({&xlValue}, {&xlPrimary}):HasTitle                  = True.
+         ch-Grafico:Axes({&xlValue}, {&xlPrimary}):AxisTitle:Characters:Text = "Valores M‚dios".
+         
+         if de-valor-max / 7 < 1 then
+            assign de-unid-eixo-y = round((de-valor-max / 7),1).
+         else
+            assign de-unid-eixo-y = round((de-valor-max / 7),0).   
+         
+         ch-Grafico:Axes({&xlValue}, {&xlPrimary}):MajorUnit                 = de-unid-eixo-y.
+         ch-Grafico:Axes({&xlValue}, {&xlPrimary}):MinimumScale              = 0.
+         ch-Grafico:Axes({&xlValue}, {&xlPrimary}):CrossesAt                 = 0.
+
+         ch-Grafico:Legend:Position                                          = {&xlLegendPositionBottom}.
+         ch-Grafico:Legend:LEFT                                              = 100.
+         ch-Grafico:Legend:Width                                             = 500.
+         /* FIM-Cria e Formata Gr fico */
+         
+         /* Move o Gr fico para Dentro da Planilha de Dados */
+         ch-Grafico:Location({&xlLocationAsObject},ch-planilha:NAME).
+         /* FIM- Move o Gr fico para Dentro da Planilha de Dados */
+        
+         RELEASE OBJECT ch-Grafico.
+         
+         /* Redimensiona Gr fico na Planilha */
+         ch-planilha:ChartObjects(1):ShapeRange:ScaleWidth(1.865,FALSE,2).
+         ch-planilha:ChartObjects(1):ShapeRange:HEIGHT = 255.
+         ch-planilha:ChartObjects(1):ShapeRange:WIDTH  = 685.
+         /* FIM-Redimensiona Gr fico na Planilha */
+
+         /* Formata P gina da Planilha */
+         ch-planilha:PageSetup:Orientation    = 2 /*xlLandscape */.
+         ch-planilha:PageSetup:Zoom           = False.
+         ch-planilha:PageSetup:FitToPagesWide = 1.
+         ch-planilha:PageSetup:FitToPagesTall = 1.
+         /* FIM-Formata P gina da Planilha */
+
+         RELEASE OBJECT ch-planilha.
+      END. /* if l-som-valor-medio */
+      
+   END. /* IF LAST-OF(tt-res-desp-bcia.des-grp-ocor-bcia) */
+
+/* dcr018rp.i1 */

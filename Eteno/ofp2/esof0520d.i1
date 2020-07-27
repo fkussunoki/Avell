@@ -1,0 +1,4 @@
+    if  i-op-rel = 1 then
+        view frame f-cab.
+    else
+        view frame f-cab-exp.

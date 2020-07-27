@@ -1,0 +1,19 @@
+/* Chamado pelo OF0770rp.p */
+
+for each  doc-fiscal {1} use-index ch-notas 
+    where doc-fiscal.dt-docto    >= tt-param.dt-periodo-ini
+    and   doc-fiscal.dt-docto    <= tt-param.dt-periodo-fim     
+    and   doc-fiscal.cod-estabel  = tt-param.cod-estabel
+    and   doc-fiscal.ind-sit-doc <> 2 NO-LOCK, /* cancelado */
+   
+    first natur-oper {2}
+    where natur-oper.nat-operacao = doc-fiscal.nat-operacao no-lock,
+
+    each  it-doc-fisc {3}
+    where it-doc-fisc.cod-estabel  = doc-fiscal.cod-estabel
+    and   it-doc-fisc.serie        = doc-fiscal.serie
+    and   it-doc-fisc.nr-doc-fis   = doc-fiscal.nr-doc-fis
+    and   it-doc-fisc.cod-emitente = doc-fiscal.cod-emitente
+    and   it-doc-fisc.nat-operacao = natur-oper.nat-operacao no-lock:
+
+	   

@@ -1,0 +1,47 @@
+/**************************************************************************
+**
+**  Include: esof0520.I10
+**
+**  Objetivo: Totalizacao dos valores para geracao do tt-tab-ocor por estado
+**
+**  Parametro {1} = nome do arquivo
+**            {2} = nome do arquivo
+***************************************************************************/
+   
+if (estabelec.estado <> {1}.estado and
+   estabelec.estado  <> "RS"       and
+   estabelec.estado  <> "SC"       and
+   estabelec.estado  <> "PR"       and
+   {1}.pais           = "Brasil")  or
+   ((estabelec.estado = "RS"       or
+     estabelec.estado = "SC"       or
+     estabelec.estado = "PR")      and
+   {1}.pais           = "Brasil")  then do:
+
+    find first tt-tab-ocor 
+        where tt-tab-ocor.cod-tab    = 249
+        and   tt-tab-ocor.c-campo[1] = {1}.estado
+        and   tt-tab-ocor.c-campo[2] = c-usuario
+        and   tt-tab-ocor.c-campo[3] = "RESUMO" 
+        no-error.
+
+    if  not avail tt-tab-ocor then do:
+        find last tt-tab-ocor where tt-tab-ocor.cod-tab = 249 no-lock no-error.
+        assign i-aux-1 = if avail tt-tab-ocor then tt-tab-ocor.cod-ocor + 1 else 1. 
+
+        create tt-tab-ocor.
+        assign tt-tab-ocor.cod-tab    = 249
+               tt-tab-ocor.cod-ocor   = i-aux-1
+               tt-tab-ocor.c-campo[1] = {1}.estado
+               tt-tab-ocor.c-campo[2] = c-usuario
+               tt-tab-ocor.c-campo[3] = "RESUMO".
+    end.
+    assign tt-tab-ocor.de-campo[1] = tt-tab-ocor.de-campo[1] + {2}.vl-bsubs-it
+           tt-tab-ocor.de-campo[2] = tt-tab-ocor.de-campo[2] + {2}.vl-icmsub-it
+           tt-tab-ocor.de-campo[3] = tt-tab-ocor.de-campo[3] + {2}.vl-bicms-it
+           tt-tab-ocor.de-campo[4] = tt-tab-ocor.de-campo[4] + {2}.vl-icmsou-it
+           tt-tab-ocor.de-campo[5] = tt-tab-ocor.de-campo[5] + {2}.vl-tot-item.
+end.
+
+/* esof0520.I10 */
+

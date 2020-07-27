@@ -1,0 +1,135 @@
+/**************************************************************************
+**
+**  Include: esof0520.I1
+**
+**  Objetivo: Totalizacao dos valores para geracao do tt-tab-ocor por cfop
+**
+**  Parametro {1} = nome do arquivo
+**            {2} = 1 entao gera resumo dos periodos anteriores
+**            {2} = 2 entao gera resumo
+**            {3} = define o codigo da tabela no tt-tab-ocor.
+***************************************************************************/
+ 
+    accumulate {1}.vl-bicms-it  (total)
+               {1}.vl-icms-it   (total)
+               {1}.vl-icmsnt-it (total)
+               {1}.vl-icmsou-it (total)
+               {1}.vl-bipi-it   (total)
+               {1}.vl-ipi-it    (total)
+               {1}.vl-ipint-it  (total)
+               {1}.vl-ipiou-it  (total).
+
+    if  l-subs or c-estado = "PE" then
+        accumulate {1}.vl-bsubs-it  (total)
+                   {1}.vl-icmsub-it (total).
+
+assign l-soma = no.
+
+if  it-doc-fisc.cd-trib-icm = "O"
+or  it-doc-fisc.cd-trib-icm = "I" then do:
+    for first b-it-doc-fisc fields ()
+        where b-it-doc-fisc.cod-estabel  = it-doc-fisc.cod-estabel
+        and   b-it-doc-fisc.serie        = it-doc-fisc.serie
+        and   b-it-doc-fisc.nr-doc-fis   = it-doc-fisc.nr-doc-fis
+        and   b-it-doc-fisc.cod-emitente = it-doc-fisc.cod-emitente
+        and   b-it-doc-fisc.nat-operacao = it-doc-fisc.nat-operacao
+        and   b-it-doc-fisc.cd-trib-icm  = "T" no-lock.
+    end.
+    assign l-soma = avail b-it-doc-fisc.
+end. 
+
+if  not l-soma 
+or  r-tt-tab-ocor = ? then do:
+    find first tt-tab-ocor where
+               tt-tab-ocor.cod-tab    = {3}
+           and tt-tab-ocor.c-campo[1] = substring({1}.nat-operacao,4,3)
+           and tt-tab-ocor.c-campo[2] = c-usuario
+           and (if {2} = 1 then tt-tab-ocor.c-campo[3] = "RES ANT"
+                           else tt-tab-ocor.c-campo[3] = "RES PER")
+           and tt-tab-ocor.c-campo[4] = substring({1}.nat-operacao,1,3)
+           and tt-tab-ocor.c-campo[5] = string({1}.aliquota-icm,"99.99")
+           and tt-tab-ocor.l-campo[1] = yes
+           no-error.  /* refere-se a ICMS */
+
+    if not avail tt-tab-ocor then do:
+       find last tt-tab-ocor where tt-tab-ocor.cod-tab = {3} no-lock no-error.
+       if avail tt-tab-ocor then i-aux-1 = tt-tab-ocor.cod-ocor + 1.
+                            else i-aux-1 = 1.
+
+       create tt-tab-ocor.
+       assign tt-tab-ocor.cod-tab    = {3}
+              tt-tab-ocor.cod-ocor   = i-aux-1
+              tt-tab-ocor.c-campo[1] = substring({1}.nat-operacao,4,3)
+              tt-tab-ocor.c-campo[2] = c-usuario
+              tt-tab-ocor.c-campo[3] = if {2} = 1 then "RES ANT"
+                                                  else "RES PER"
+              tt-tab-ocor.c-campo[4] = substring({1}.nat-operacao,1,3)
+              tt-tab-ocor.c-campo[5] = string({1}.aliquota-icm,"99.99")
+              tt-tab-ocor.l-campo[1] = yes. /* refere-se a ICMS */
+    end.
+    assign r-tt-tab-ocor = rowid(tt-tab-ocor).
+end.    
+
+find tt-tab-ocor
+    where rowid(tt-tab-ocor) = r-tt-tab-ocor  no-error.
+
+assign tt-tab-ocor.descricao   = string(decimal(tt-tab-ocor.descricao) + {1}.vl-tot-item,">>>>>>>>>>99.99")
+       tt-tab-ocor.de-campo[1] = tt-tab-ocor.de-campo[1] + {1}.vl-bicms-it
+       tt-tab-ocor.de-campo[2] = tt-tab-ocor.de-campo[2] + {1}.vl-icms-it
+       tt-tab-ocor.de-campo[3] = tt-tab-ocor.de-campo[3] + {1}.vl-icmsnt-it
+       tt-tab-ocor.de-campo[4] = tt-tab-ocor.de-campo[4] + {1}.vl-icmsou-it.
+
+if l-subs or c-estado = "PE" then
+   assign tt-tab-ocor.de-campo[5] = tt-tab-ocor.de-campo[5] + {1}.vl-bsubs-it.
+
+find first tt-tab-ocor where
+           tt-tab-ocor.cod-tab    = {3}
+       and tt-tab-ocor.c-campo[1] = substring({1}.nat-operacao,4,3)
+       and tt-tab-ocor.c-campo[2] = c-usuario
+       and (if {2} = 1 then tt-tab-ocor.c-campo[3] = "RES ANT"
+                       else tt-tab-ocor.c-campo[3] = "RES PER")
+       and tt-tab-ocor.c-campo[4] = substring({1}.nat-operacao,1,3)
+       and tt-tab-ocor.c-campo[5] = string(r-tt-tab-ocor)
+       and tt-tab-ocor.l-campo[1] = no
+       no-error.  /* refere-se a IPI */
+
+if not avail tt-tab-ocor then do:
+   find last tt-tab-ocor where tt-tab-ocor.cod-tab = {3} no-lock no-error.
+   if avail tt-tab-ocor then i-aux-1 = tt-tab-ocor.cod-ocor + 1.
+                        else i-aux-1 = 1.
+
+   create tt-tab-ocor.
+   assign tt-tab-ocor.cod-tab    = {3}
+          tt-tab-ocor.cod-ocor   = i-aux-1
+          tt-tab-ocor.c-campo[1] = substring({1}.nat-operacao,4,3)
+          tt-tab-ocor.c-campo[2] = c-usuario        
+          tt-tab-ocor.c-campo[3] = if {2} = 1 then "RES ANT"
+                                              else "RES PER"
+          tt-tab-ocor.c-campo[4] = substring({1}.nat-operacao,1,3)
+          tt-tab-ocor.c-campo[5] = string(r-tt-tab-ocor)
+          tt-tab-ocor.l-campo[1] = no.  /* refere-se a IPI */
+end.
+
+if l-subs or c-estado = "PE" then
+   assign tt-tab-ocor.de-campo[1] = tt-tab-ocor.de-campo[1] + {1}.vl-icmsub-it.
+
+assign tt-tab-ocor.de-campo[2] = tt-tab-ocor.de-campo[2] + {1}.vl-bipi-it
+       tt-tab-ocor.de-campo[3] = tt-tab-ocor.de-campo[3] + {1}.vl-ipi-it
+       tt-tab-ocor.de-campo[4] = tt-tab-ocor.de-campo[4] + {1}.vl-ipint-it
+       tt-tab-ocor.de-campo[5] = tt-tab-ocor.de-campo[5] + {1}.vl-ipiou-it
+
+       /**** acumulo dos valores para o total *****/
+       /* ICMS */
+       de-tot-bicms    = de-tot-bicms   + {1}.vl-bicms-it
+       de-tot-icms     = de-tot-icms    + {1}.vl-icms-it
+       de-tot-icmsnt   = de-tot-icmsnt  + {1}.vl-icmsnt-it
+       de-tot-icmsou   = de-tot-icmsou  + {1}.vl-icmsou-it
+       de-tot-bicmsub  = de-tot-bicmsub + {1}.vl-bsubs-it
+       de-tot-icmsub   = de-tot-icmsub  + {1}.vl-icmsub-it
+       /* IPI */      
+       de-tot-bipi     = de-tot-bipi    + {1}.vl-bipi-it
+       de-tot-ipi      = de-tot-ipi     + {1}.vl-ipi-it
+       de-tot-ipint    = de-tot-ipint   + {1}.vl-ipint-it
+       de-tot-ipiou    = de-tot-ipiou   + {1}.vl-ipiou-it.
+/* esof0520.I1 */
+

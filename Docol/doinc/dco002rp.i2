@@ -1,0 +1,172 @@
+/*****************************************************************************
+ ** Programa..: dop/dco002rp.i2                                             **
+ ** Autor.....: 01/12/2003 - Ivan Marcelo Silveira                          **
+ ** Objetivo..: Ler base conforme parÉmetros do relat¢rio                   **
+ **             -- Pagamento Mensal --                                      **
+ *****************************************************************************/
+
+FOR EACH dc-comis-movto  NO-LOCK
+   WHERE dc-comis-movto.cod_empresa     = representante.cod_empresa
+     AND dc-comis-movto.cdn_repres      = representante.cdn_repres
+     AND dc-comis-movto.cod_transacao  <> 900 /*= i-cod_transacao*/
+     /*
+     AND NOT dc-comis-movto.flag-integrou-apb
+     */
+     AND dc-comis-movto.dat_transacao  >= dt-ini-trans
+     AND dc-comis-movto.dat_transacao  <= dt-fim-trans,
+
+   FIRST dc-comis-trans NO-LOCK 
+   WHERE dc-comis-trans.cod_transacao   = dc-comis-movto.cod_transacao
+     AND dc-comis-trans.dat_inic_valid <= dc-comis-movto.dat_transacao
+     AND dc-comis-trans.dat_fim_valid  >= dc-comis-movto.dat_transacao:
+
+    IF  dc-comis-trans.ind_incid_liquido = 'positivo' THEN
+        ASSIGN  de-tot-val = de-tot-val + dc-comis-movto.val_movto.
+    IF  dc-comis-trans.ind_incid_liquido = 'negativo' THEN
+        ASSIGN  de-tot-val = de-tot-val - dc-comis-movto.val_movto. 
+    
+    IF  dc-comis-trans.ind_incid_ir THEN DO:
+        IF  dc-comis-trans.ind_incid_liquido = 'positivo' THEN
+            ASSIGN  de-tot-vl-ir = de-tot-vl-ir + dc-comis-movto.val_movto.
+        IF  dc-comis-trans.ind_incid_liquido = 'negativo' THEN
+            ASSIGN  de-tot-vl-ir = de-tot-vl-ir - dc-comis-movto.val_movto. 
+    END. /*IF  dc-comis-trans.ind_incid_ir THEN DO:*/
+   
+    /*ISS*/
+    IF  dc-comis-trans.ind_incid_iss = 'positivo' THEN
+        ASSIGN  de-nota-fiscal = de-nota-fiscal + dc-comis-movto.val_movto.
+    IF  dc-comis-trans.ind_incid_iss = 'negativo' THEN
+        ASSIGN  de-nota-fiscal = de-nota-fiscal - dc-comis-movto.val_movto. 
+    /*FIM - ISS*/
+    
+    if  not dc-comis-movto.flag-integrou-apb then do:
+        IF  dc-comis-trans.ind_incid_liquido = 'positivo' THEN
+            ASSIGN  de-tot-apb = de-tot-apb + dc-comis-movto.val_movto.
+        IF  dc-comis-trans.ind_incid_liquido = 'negativo'      and
+            dc-comis-trans.ind_tip_trans    <> 'adiantamento' THEN
+            ASSIGN  de-tot-apb = de-tot-apb - dc-comis-movto.val_movto. 
+    end.
+    
+    if not(dc-comis-movto.cod_transacao = 102 or dc-comis-movto.cod_transacao = 202) then do:    
+        CREATE  tt-extrato.
+        ASSIGN  tt-extrato.cod_transacao        = dc-comis-movto.cod_transacao
+                tt-extrato.dat_transacao        = dc-comis-movto.dat_transacao 
+                tt-extrato.val_movto            = dc-comis-movto.val_movto
+                tt-extrato.ind_incid_iss        = if dc-comis-trans.ind_incid_iss = 'positivo' 
+                                                     then '+'
+                                                     else if dc-comis-trans.ind_incid_iss = 'negativo' 
+                                                             then '-'
+                                                             else ' '
+                tt-extrato.des_transacao        = dc-comis-movto.des_transacao.
+        
+        IF  dc-comis-trans.ind_incid_liquido = 'Positivo' THEN 
+            ASSIGN  tt-extrato.tipo = 'CR'.
+        ELSE 
+        IF  dc-comis-trans.ind_incid_liquido = 'Negativo' THEN 
+            ASSIGN  tt-extrato.tipo = 'DB'.
+        ELSE ASSIGN  tt-extrato.tipo = ''.
+    end.
+    else do:
+        find first tt-extrato where tt-extrato.cod_transacao = 11 no-error.
+        if avail tt-extrato then
+            assign tt-extrato.val_movto = tt-extrato.val_movto + (if dc-comis-movto.cod_transacao = 102 then - (dc-comis-movto.val_movto) else dc-comis-movto.val_movto).
+        else do:
+            find first tt-extrato where tt-extrato.cod_transacao = 2 no-error.
+            if avail tt-extrato then
+                assign tt-extrato.val_movto = tt-extrato.val_movto + (if dc-comis-movto.cod_transacao = 102 then - (dc-comis-movto.val_movto) else dc-comis-movto.val_movto). 
+        end.
+    end.
+
+    /*temp-table para atualizaá∆o da flag de integraá∆o com APB*/
+    CREATE  tt-dc-comis-movto.
+    ASSIGN  tt-dc-comis-movto.rw-dc-comis-movto = ROWID(dc-comis-movto).
+
+END. /* FOR EACH dc-comis-movto */
+
+find last dc-comis-movto  NO-LOCK
+    WHERE dc-comis-movto.cod_empresa     = representante.cod_empresa
+      AND dc-comis-movto.cdn_repres      = representante.cdn_repres
+      AND dc-comis-movto.cod_transacao   = 900
+      AND dc-comis-movto.flag-integrou-apb
+      AND dc-comis-movto.dat_transacao  >= dt-ini-trans
+      AND dc-comis-movto.dat_transacao  <= dt-fim-trans no-error.
+if avail dc-comis-movto then
+   find first movto_tit_ap NO-LOCK
+        WHERE movto_tit_ap.cod_estab     = v_cod_estab_usuar
+          AND movto_tit_ap.cod_refer     = dc-comis-movto.cod_refer
+          AND movto_tit_ap.cod_espec_doc = "CO" no-error.
+
+if avail movto_tit_ap then do:
+   for each compl_impto_retid_ap no-lock
+      where compl_impto_retid_ap.cod_estab               = movto_tit_ap.cod_estab
+        and compl_impto_retid_ap.num_id_movto_tit_ap_pai = movto_tit_ap.num_id_movto_tit_ap.
+      find first imposto of compl_impto_retid_ap no-lock no-error. 
+      
+      CREATE  tt-extrato.
+      ASSIGN  tt-extrato.dat_transacao        = dt-fim-trans 
+              tt-extrato.tipo                 = 'DB'
+              tt-extrato.val_movto            = compl_impto_retid_ap.val_impto_indic_econ_orig
+              tt-extrato.log_imposto          = yes
+              tt-extrato.des_transacao        = trim(imposto.des_imposto) + STRING(compl_impto_retid_ap.val_aliq_impto,'>9.99%') + ' Calculado s/ Total Nota Fiscal'
+              
+              de-tot-val                      = de-tot-val - tt-extrato.val_movto.
+   end.     
+end.
+else do: /* Comiss∆o n∆o integrada com APB */
+   IF dc-repres.cod_cat_repres <> "T"    OR
+      dc-repres.cod_tip_repres <> "TT" THEN DO:
+      
+      ASSIGN l-simples = NO.
+      find dc-emit-fiscal NO-LOCK where dc-emit-fiscal.cod-emitente = fornec_financ.cdn_fornecedor no-error.
+      IF AVAIL dc-emit-fiscal THEN
+         IF  dc-emit-fiscal.char-1 BEGINS "Optante SIMPLES" OR
+             dc-emit-fiscal.char-1 BEGINS "SIMPLES"         THEN 
+             ASSIGN l-simples = YES.
+      
+      IF (ROUND(de-tot-vl-ir * fi-aliq-imposto(de-tot-vl-ir) / 100,2) >= fi-val-min-imposto(de-tot-ir)) and not l-simples THEN DO:
+         ASSIGN  de-tot-ir       = ROUND(de-tot-vl-ir * fi-aliq-imposto(de-tot-vl-ir) / 100,2)
+                 de-tot-val      = de-tot-val - de-tot-ir.
+         if de-tot-ir > 0 then do:
+            CREATE  tt-extrato.
+            ASSIGN  tt-extrato.dat_transacao        = dt-fim-trans 
+                    tt-extrato.tipo                 = 'DB'
+                    tt-extrato.val_movto            = de-tot-ir
+                    tt-extrato.log_imposto          = yes.
+            ASSIGN  tt-extrato.des_transacao        = trim(imposto.des_imposto) + STRING(fi-aliq-imposto(de-tot-vl-ir),'>9.99%') + ' Calculado s/ Total Nota Fiscal'.
+         end.   
+      end.    
+   
+      /* Outros Impostos Obrigat¢ris */
+      for each impto_vincul_fornec of fornec_financ no-lock
+         where impto_vincul_fornec.log_impto_opcnal = no:
+         
+         if impto_vincul_fornec.cod_pais          = c-cod_pais           and
+            impto_vincul_fornec.cod_imposto       = c-cod_imposto        and
+            impto_vincul_fornec.cod_classif_impto = c-cod_classif_impto then next.
+            
+         FIND FIRST classif_impto NO-LOCK 
+              WHERE classif_impto.cod_pais           = impto_vincul_fornec.cod_pais
+                AND classif_impto.cod_unid_federac   = impto_vincul_fornec.cod_unid_federac
+                AND classif_impto.cod_imposto        = impto_vincul_fornec.cod_imposto
+                AND classif_impto.cod_classif_impto  = impto_vincul_fornec.cod_classif_impto NO-ERROR.
+         if avail classif_impto then do:
+            find first imposto of classif_impto no-lock no-error.
+            IF ROUND(de-nota-fiscal * fi-aliq-imposto(de-nota-fiscal) / 100,2) >= fi-val-min-imposto(de-nota-fiscal) THEN DO:
+               assign de-imposto = ROUND(de-nota-fiscal * fi-aliq-imposto(de-nota-fiscal) / 100,2)
+                      de-tot-val = de-tot-val - de-imposto.
+               if de-imposto > 0 then do:
+                  CREATE  tt-extrato.
+                  ASSIGN  tt-extrato.dat_transacao        = dt-fim-trans 
+                          tt-extrato.tipo                 = 'DB'
+                          tt-extrato.val_movto            = de-imposto
+                          tt-extrato.log_imposto          = yes.
+                  assign  tt-extrato.des_transacao        = trim(imposto.des_imposto) + STRING(fi-aliq-imposto(de-nota-fiscal),'>9.99%') + ' Calculado s/ Total Nota Fiscal'.
+               end.   
+            end.   
+         end.        
+      end.
+      /* FIM - Outros Impostos Obrigat¢rios */
+   end. /* dc-repres.cod_cat_repres <> "T" OR dc-repres.cod_tip_repres <> "TT" */
+end. /* FIM - else - Comiss∆o n∆o Integrado no APB */
+
+/*FIM - dco002rp.i1*/

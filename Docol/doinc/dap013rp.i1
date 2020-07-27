@@ -1,0 +1,43 @@
+/***********************************************************************************************************
+** Include.: dap013rp.i1
+** Objetivo: Mostrar Relat¢rio Detalhado
+***********************************************************************************************************/
+
+def new global shared var v_cod_empres_usuar       as character format "x(3)":U  label "Empresa"          column-label "Empresa"          no-undo.
+
+find first tt-pagamentos NO-LOCK
+     WHERE tt-pagamentos.cod_tip_fluxo_financ = {1} no-error.
+if avail tt-pagamentos then
+   put skip(1).
+
+FOR EACH tt-pagamentos NO-LOCK
+   WHERE tt-pagamentos.cod_tip_fluxo_financ = {1}.
+   if line-count >= 64 or line-counter < 8 then
+      put c-descr-fluxo format 'x(80)' at 01 skip(1).
+   find first emsuni.fornecedor no-lock
+        where emsuni.fornecedor.cod_empresa    = v_cod_empres_usuar /*'DOC'*/
+          and emsuni.fornecedor.cdn_fornecedor = tt-pagamentos.cdn_fornecedor no-error.
+   disp tt-pagamentos.dat_transacao                 column-label 'Transacao'
+        tt-pagamentos.cod_grp_forn                  column-label 'Grp'
+        tt-pagamentos.cod_espec_doc                 column-label 'Esp'
+        tt-pagamentos.cod_espec_orig                column-label 'Esp Or'
+        tt-pagamentos.cdn_fornecedor                column-label 'Fornecedor'
+        string(fornecedor.nom_pessoa) when avail fornecedor column-label 'Nome' format 'x(39)'
+        tt-pagamentos.vl-movto                      column-label 'Valor' format '>>>,>>>,>>9.99'
+        tt-pagamentos.cod_estab                     column-label 'Est'
+        tt-pagamentos.cod_ser_doc                   column-label 'Ser'
+        tt-pagamentos.cod_tit_ap                    column-label 'Titulo'
+        tt-pagamentos.cod_parcela                   column-label 'P'
+        tt-pagamentos.ind_trans_acr_abrev           column-label 'Tra'
+        tt-pagamentos.cod_portador                  column-label 'Port'
+        line-counter
+        with width 200 stream-io down no-box column 4 frame {2}.
+   down with frame {2}.
+END.
+find first tt-pagamentos NO-LOCK
+     WHERE tt-pagamentos.cod_tip_fluxo_financ = {1} no-error.
+if avail tt-pagamentos then
+   put fill('-',132) format 'x(132)' at 01 skip(1).
+   
+/* dap013rp.i1 */
+

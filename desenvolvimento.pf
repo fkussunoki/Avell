@@ -1,0 +1,176 @@
+#***************************************************************************
+# Copyright DATASUL S.A. (2010)
+# All rights reserved.
+#
+# Arquivo...............: scripts-8080/datasul.pf
+# Descricao.............: Parametros de conexao Cliente/Servidor
+# Criado por............: Instalador TOTVS Datasul - GAPE
+# Data de criacao.......: 2-26-2016 10:50:35
+#***************************************************************************
+
+-mmax 2048
+-s 4000
+-TB 24
+-TM 24
+-d dmy
+-Bt 2048
+-Mm 4096
+-cpstream ibm850
+-cpterm iso8859-1
+-inp 32000
+-h 50
+-numsep 46
+-numdec 44
+-nb 255
+-zn
+-db eai
+-ld eai
+-S 23621
+-H localhost
+-N tcp
+
+-db eai2
+-ld eai2
+-S 23623
+-H localhost
+-N tcp
+
+-db ems2adt
+-ld mgadt
+-S 23600
+-H localhost
+-N tcp
+
+-db ems2cad
+-ld mgcad
+-S 23611
+-H localhost
+-N tcp
+
+-db ems2mov
+-ld mgmov
+-S 23601
+-H localhost
+-N tcp
+
+-db ems2mp
+-ld mgmp
+-S 23602
+-H localhost
+-N tcp
+
+-db ems2sor
+-ld mgsor
+-S 23609
+-H localhost
+-N tcp
+
+-db neogrid
+-ld neogrid
+-S 23603
+-H localhost
+-N tcp
+
+-db emsinc
+-ld emsinc
+-S 23604
+-H localhost
+-N tcp
+
+-db cad2loc
+-ld cad2loc
+-S 23635
+-H localhost
+-N tcp
+
+-db mov2loc
+-ld mov2loc
+-S 23637
+-H localhost
+-N tcp
+
+-db ems5cad
+-ld emscad
+-S 23605
+-H localhost
+-N tcp
+
+-db ems5mov
+-ld emsmov
+-S 23606
+-H localhost
+-N tcp
+
+-db cad5loc
+-ld cad5loc
+-S 23639
+-H localhost
+-N tcp
+
+-db mov5loc
+-ld mov5loc
+-S 23641
+-H localhost
+-N tcp
+
+-db hcm
+-ld hcm
+-S 23607
+-H localhost
+-N tcp
+
+-db payroll2
+-ld payroll2
+-S 23615
+-H localhost
+-N tcp
+
+-db totvsgen
+-ld totvsgen
+-S 23633
+-H localhost
+-N tcp
+
+-db srcadger
+-ld srcadger
+-S 23631
+-H localhost
+-N tcp
+
+-db srmovfin
+-ld srmovfin
+-S 23608
+-H localhost
+-N tcp
+
+-db emsfnd
+-ld emsfnd
+-S 23619
+-H localhost
+-N tcp
+
+-db mdtcrm
+-ld mdtcrm
+-S 23629
+-H localhost
+-N tcp
+
+
+#-db sports
+#-ld sports
+#-S 23669
+#-H localhost
+#-N tcp
+
+-db mgesp
+-ld mgesp
+-S 23650
+-H localhost
+-N tcp
+
+#-db emsdocol
+#-ld emsdocol
+#-S 23655
+#-H localhost
+#-N tcp
+

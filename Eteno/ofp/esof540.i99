@@ -1,0 +1,28 @@
+/*******************************************************************************
+**
+** esof0540.I99
+** Versao..: 
+** G.00.000 - 26/10/96 - Sofia - Elaborado a partir da versao G.07.003 do
+**            programa of0520 (modelo P1/A).
+** G.00.001 - 29/10/96 - Sofia - Problema progress 6 - hide frame
+** G.00.002 - Tatiana - 30/10/96 - FO. 394 - Kendall
+**            O include esof0540.i foi alterado para que nao seja mais emitida
+**            a mensagem  de erro: "table estabel is in database mgadm (425)
+**            unknow table name estabel (200)".
+** G.00.003 - 30/10/96 - Sofia - FO 800 - Toledo
+**            Implementado no parametro de OF "Reinicia pag. apos encerramento
+**            livro". Zera pagina ou continua numeracao quando encerrar o
+**            livro, exceto para fechamento anual, ou parametro iniciliza
+**            mensalmente = sim que zera automaticamente.
+******************************************************************************/
+
+assign c-programa     = "OF/0540"
+       c-versao       = "G.00"
+       c-revisao      = "003"
+       c-sistema      = "OBRIGACOES FISCAIS"
+       c-rodape       = string(today) +
+                        "DATASUL - " + c-sistema + " - " + c-programa +
+                        " - V:" + c-versao
+       c-rodape       = fill("-", 132 - length(c-rodape)) + c-rodape.
+
+/* esof0540.i99 */

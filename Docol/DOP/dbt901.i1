@@ -1,0 +1,53 @@
+
+/*Vari†veis de Conex∆o*/
+&IF DEFINED(VariaveisDeConexao) <> 0 &THEN
+&ELSE
+    &GLOBAL-DEFINE VariaveisDeConexao OK
+    
+    DEFINE VARIABLE p-lista-bancos          AS CHARACTER    NO-UNDO.  
+    DEFINE VARIABLE c-lista-bancos          AS CHARACTER    NO-UNDO.  
+    DEFINE VARIABLE i-cont-bancos           AS INTEGER      NO-UNDO.
+    DEFINE VARIABLE c-lista-erro            AS CHARACTER    NO-UNDO.
+&ENDIF
+/*FIM - Vari†veis de Conex∆o*/
+
+/*
+ASSIGN  p-lista-bancos  = '{1}'
+        c-lista-bancos  = ''
+        i-cont-bancos   = 0
+        c-lista-erro    = ''.
+
+/*conectar bancos externos*/
+    DO  i-cont-bancos = 1 TO NUM-ENTRIES(p-lista-bancos):
+        IF  NOT CONNECTED( ENTRY(i-cont-bancos,p-lista-bancos) ) THEN DO:
+            FIND FIRST bco_ext NO-LOCK
+                 WHERE bco_ext.cod_empresa  = v_cod_empres_usuar
+                   AND bco_ext.num_livre_1  = 1 /*Banco unificado*/
+                   AND LOOKUP(ENTRY(i-cont-bancos,p-lista-bancos),bco_ext.cod_livre_1) > 0 NO-ERROR.
+            IF  NOT AVAIL bco_ext OR 
+                NOT CONNECTED(bco_ext.cod_bco_ext) THEN
+                ASSIGN  c-lista-bancos = c-lista-bancos + ENTRY(i-cont-bancos,p-lista-bancos) + ','.
+        END.
+    END.
+    
+    IF  LENGTH(c-lista-bancos) > 0 THEN
+        ASSIGN  c-lista-bancos = SUBSTRING(c-lista-bancos,1,LENGTH(c-lista-bancos) - 1).
+
+    RUN dop/dbt901.p (c-lista-bancos).
+
+    ASSIGN  c-lista-erro = ''.
+    DO  i-cont-bancos = 1 TO NUM-ENTRIES(c-lista-bancos):
+        IF  NOT CONNECTED(ENTRY(i-cont-bancos, c-lista-bancos)) THEN
+            ASSIGN  c-lista-erro = c-lista-erro + ENTRY(i-cont-bancos, c-lista-bancos) + ','.
+    END.
+    IF  c-lista-erro <> '' THEN DO:
+        RUN message.p ('Bancos n∆o conectados!   Dados n∆o ser∆o atualizados!',
+                       'N∆o poss°vel conectar os seguintes bancos de dados: ' +
+                       c-lista-erro + ' atraves do Cadastro de Bancos Externos.' + CHR(10) +
+                       'Esses bancos s∆o necess†rios para este processo, ' +
+                       'verifique a parametrizaá∆o antes de rodar novamente.').
+        RETURN 'NOK'.
+    END.   
+ */            
+/*fim - conectar bancos externos*/
+

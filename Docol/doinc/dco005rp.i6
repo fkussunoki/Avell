@@ -1,0 +1,434 @@
+/* DCO005RP.i6 */
+/* Exporta para Excel*/
+
+
+create tt-param.
+assign tt-param.descricao = "Lista Estabelec"
+       tt-param.valor     = c-lista-cod-estab.
+       
+create tt-param.
+assign tt-param.descricao = "Lista Especie"
+       tt-param.valor     = c-lista-cod-esp.
+       
+create tt-param.
+assign tt-param.descricao = "Lista Represent"
+       tt-param.valor     = c-lista-cdn-repres.
+       
+create tt-param.
+assign tt-param.descricao = "Cliente Inicial"
+       tt-param.valor     =  string(i-ini-cliente).
+       
+create tt-param.
+assign tt-param.descricao = "Cliente Final"
+       tt-param.valor     = string(i-fim-cliente).
+       
+create tt-param.
+assign tt-param.descricao = "%Comiss Emissao Inicial"
+       tt-param.valor     = string(i-ini-perc-comis).
+
+create tt-param.
+assign tt-param.descricao = "%Comiss Emissao Final"
+       tt-param.valor     = string(i-fim-perc-comis).
+       
+create tt-param.
+assign tt-param.descricao = "Comissao Periodo ini"
+       tt-param.valor     = string(dt-ini-periodo).
+
+create tt-param.
+assign tt-param.descricao = "Comissao Periodo fim"
+       tt-param.valor     = string(dt-fim-periodo).
+
+create tt-param.
+assign tt-param.descricao = "Referencia Inicial"
+       tt-param.valor     = string(c-ini-referencia).
+
+create tt-param.
+assign tt-param.descricao = "Referencia Final"
+       tt-param.valor     = string(c-fim-referencia).
+
+create tt-param.
+assign tt-param.descricao = "Imp.Comissoes"
+       tt-param.valor     = string(tg-imp-comissoes).
+    
+create tt-param.
+assign tt-param.descricao = "Rescisao"
+       tt-param.valor     = string(tg-rescisao).
+       
+create tt-param.
+assign tt-param.descricao = "Paga Comissao Vinculada"
+       tt-param.valor     = string(tg-paga-vinculada).
+
+create tt-param.
+assign tt-param.descricao = "Paga Ped Cart"
+       tt-param.valor     = string(tg-paga-carteira).
+       
+create tt-param.
+assign tt-param.descricao = "Data Pesquisa"
+       tt-param.valor     = string(rs-data).
+       
+create tt-param.
+assign tt-param.descricao = "Destino"
+       tt-param.valor     = string(c-destino).
+       
+create tt-param.
+assign tt-param.descricao = "Arquivo"
+       tt-param.valor     = string(c-arquivo).
+       
+create tt-param.
+assign tt-param.descricao = "Usuario"
+       tt-param.valor     = string(v_cod_usuar_corren).
+
+
+
+
+run utp/utapi033.p persistent set h-handle.
+
+run setTtParam in h-handle (input table tt-param).
+
+//cria cabecalho do Excel.
+run piColumn in h-handle(input 1, input "char", input "Cod.Rep", input "", input 10).
+run piColumn in h-handle(input 2 , input "char", input "Nom.Rep", input "", input 53 ).
+run piColumn in h-handle(input 3, input "date", input "Per.Ini", input "", input 10 ).
+run piColumn in h-handle(input 4, input "date", input "Per.Fim", input "", input 10).
+run piColumn in h-handle(input 5, input "char", input "Cod.Cli", input "", input 10).
+run piColumn in h-handle(input 6, input "char", input "Nom.Cli", input "", input 53).
+run piColumn in h-handle(input 7, input "char", input "Cidade", input "", input 20).
+run piColumn in h-handle(input 8, input "char", input "UF", input "", input 10 ).
+run piColumn in h-handle(input 9, input "char", input "Est", input "", input 10).
+run piColumn in h-handle(input 10, input "char", input "Esp", input "", input 10 ).
+run piColumn in h-handle(input 11, input "char", input "Ser", input "", input 10).
+run piColumn in h-handle(input 12, input "char", input "Titulo", input "", input 15).
+run piColumn in h-handle(input 13, input "char", input "Pa", input "", input 15 ).
+run piColumn in h-handle(input 14, input "date", input "Dt Emissao", input "", input 10).
+run piColumn in h-handle(input 15, input "date", input "Vencimento", input "", input 10).
+run piColumn in h-handle(input 16, input "date", input "Liquidacao", input "", input 10).
+run piColumn in h-handle(input 17, input "dec", input "Base Calculo", input "", input 20).
+run piColumn in h-handle(input 18, input "dec", input "Perc", input "", input 10).
+run piColumn in h-handle(input 19, input "dec", input "Comissao", input "", input 20).
+run piColumn in h-handle(input 20, input "dec", input "Estorno", input "", input 20).
+run piColumn in h-handle(input 21, input "dec", input "Creditado", input "", input 20).
+run piColumn in h-handle(input 22, input "dec", input "Vinculado", input "", input 20).
+run piColumn in h-handle(input 23, input "char", input "Vin.Mes", input "", input 10).
+run piColumn in h-handle(input 24, input "date", input "Periodo", input "", input 10).
+run piColumn in h-handle(input 25, input "dec", input "PIS/COFINS", input "", input 20).
+run piColumn in h-handle(input 26, input "dec", input "Vlr.Liquido", input "", input 20).
+run piColumn in h-handle(input 27, input "char", input "tp COmissao", input "", input 20).
+
+
+
+FOR EACH tt-movto NO-LOCK
+   BREAK BY tt-movto.cdn_repres
+         BY {1}
+         BY tt-movto.cod_estab
+         BY tt-movto.cod_espec_docto
+         BY tt-movto.cod_ser_docto
+         BY tt-movto.cod_tit_acr
+         BY tt-movto.cod_parcela:
+
+    IF  FIRST-OF(tt-movto.cdn_repres) THEN DO:
+        FIND FIRST tt-repres NO-LOCK
+             WHERE tt-repres.cod_empresa    = tt-movto.cod_empresa
+               AND tt-repres.cdn_repres     = tt-movto.cdn_repres NO-ERROR.
+
+        DISPLAY tt-movto.cdn_repres     tt-movto.nom_pessoa 
+                dt-ini-periodo          dt-fim-periodo WITH FRAME f-repres.
+        ASSIGN  de-rep-base      = 0
+                de-rep-comis     = 0
+                de-rep-estor     = 0
+                de-rep-vincu     = 0
+                c-cod_tip_repres = tt-repres.cod_tip_repres.
+        
+        /* ----- L¢gica para o projeto de fechamento antecipado ---- */
+        ASSIGN c-periodo-atu     = SUBSTRING(c-meses[MONTH(dt-fim-periodo)],1,3) + "/" + SUBSTRING(STRING(YEAR(dt-fim-periodo)),3,2)
+               c-periodo-prox    = SUBSTRING(c-meses[MONTH(ADD-INTERVAL(dt-fim-periodo,1,"month"))],1,3) + "/" + SUBSTRING(STRING(YEAR(ADD-INTERVAL(dt-fim-periodo,1,"month"))),3,2)
+               c-periodo         = c-periodo-atu
+               dt-fechamento-ini = dt-ini-periodo
+               dt-fechamento-fim = dt-fim-periodo
+               l-rep-fecha-ant   = NO.
+
+        FOR FIRST dc-fechamento-rep NO-LOCK
+            WHERE dc-fechamento-rep.cod-rep = tt-movto.cdn_repres,
+            EACH dc-fechamento-periodo NO-LOCK
+            WHERE dc-fechamento-periodo.cod-cenario = dc-fechamento-rep.cod-cenario
+            AND   dc-fechamento-periodo.periodo     = STRING(YEAR(dt-fim-periodo)) + STRING(MONTH(dt-fim-periodo),"99")
+            AND   dc-fechamento-periodo.log-comis:
+            ASSIGN dt-fechamento-ini = dc-fechamento-periodo.dt-inicio
+                   dt-fechamento-fim = dc-fechamento-periodo.dt-termino
+                   l-rep-fecha-ant   = YES.
+        END.
+        /* Fim ----- L¢gica para o projeto de fechamento antecipado ---- */
+
+    END.
+
+    ASSIGN l-cliente-home-center = NO.
+    IF  FIRST-OF({1}) THEN DO:
+        FIND FIRST emsuni.cliente NO-LOCK
+             WHERE emsuni.cliente.cod_empresa = tt-movto.cod_empresa /*'DOC'*/
+               AND emsuni.cliente.cdn_cliente = tt-movto.cdn_cliente NO-ERROR.
+        IF emsuni.cliente.num_pessoa / 2 <> INT(emsuni.cliente.num_pessoa / 2) THEN DO:
+           FIND FIRST pessoa_jurid NO-LOCK
+                WHERE pessoa_jurid.num_pessoa_jurid = emsuni.cliente.num_pessoa NO-ERROR.
+           IF AVAIL pessoa_jurid THEN
+              ASSIGN c-cidade = pessoa_jurid.nom_cidade
+                     c-uf     = pessoa_jurid.cod_unid_federac.
+           ELSE
+              ASSIGN c-cidade = ''
+                     c-uf     = ''.
+        END.
+        ELSE DO:
+           FIND FIRST pessoa_fisic NO-LOCK
+                WHERE pessoa_fisic.num_pessoa_fisic = emsuni.cliente.num_pessoa NO-ERROR.
+           IF AVAIL pessoa_fisic THEN
+              ASSIGN c-cidade = pessoa_fisic.nom_cidade
+                     c-uf     = pessoa_fisic.cod_unid_federac.
+           ELSE
+              ASSIGN c-cidade = ''
+                     c-uf     = ''.
+        END.
+
+        ASSIGN l-cliente-home-center = NO.
+        IF l-rep-fecha-ant THEN DO:
+            /* --- Cliente HOME CENTER n∆o participam do projeto de fechamento antecipado --- */
+            FIND FIRST emitente NO-LOCK WHERE emitente.cod-emitente = emsuni.cliente.cdn_cliente NO-ERROR.
+            FIND FIRST regiao-cliente NO-LOCK
+                 WHERE regiao-cliente.nome-matriz = emitente.nome-matriz NO-ERROR.
+            IF AVAIL regiao-cliente THEN
+                ASSIGN l-cliente-home-center = YES.
+        END.
+
+        DISPLAY tt-movto.cdn_cliente tt-movto.nom_cliente c-cidade c-uf
+                WITH FRAME f-cliente.
+        ASSIGN  de-cli-base     = 0
+                de-cli-comis    = 0
+                de-cli-estor    = 0
+                de-cli-vincu    = 0.
+    END.
+
+    /* SSI 071/2006 */
+    IF c-cod_tip_repres = "EXP" THEN DO:
+       RUN dop/dco005f.p (INPUT tt-movto.cod_estab,  
+                          INPUT tt-movto.cod_ser_doc,
+                          INPUT tt-movto.cod_tit_acr,
+                          INPUT tt-movto.cdn_repres,
+                          OUTPUT de-perc-comis-exp).
+       IF de-perc-comis-exp <> 0 THEN DO:
+          FIND FIRST b-tt-movto EXCLUSIVE-LOCK
+               WHERE RECID(b-tt-movto) = RECID(tt-movto) NO-ERROR.
+          ASSIGN b-tt-movto.val_perc_comis = de-perc-comis-exp.
+       END.
+    END.
+    /* FIM-SSI 071/2006 */
+
+    IF tt-movto.cod_espec_docto = "VD" THEN DO: /* Vendor com Comiss∆o na Liquidaá∆o - Percentual com decimais em virtude do Valor L°quido da VD ser igual ao Valor Original em virtude da Renegociaá∆o */
+       FIND FIRST tit_acr NO-LOCK
+            WHERE tit_acr.cod_estab       = tt-movto.cod_estab
+              AND tit_acr.cod_espec_docto = tt-movto.cod_espec_docto
+              AND tit_acr.cod_ser_docto   = tt-movto.cod_ser_docto
+              AND tit_acr.cod_tit_acr     = tt-movto.cod_tit_acr
+              AND tit_acr.cod_parcela     = tt-movto.cod_parcela NO-ERROR.
+
+       IF AVAIL tit_acr THEN DO:
+          FIND FIRST dc-tit_acr OF tit_acr NO-LOCK NO-ERROR.
+          FIND FIRST b-movto-ve NO-LOCK /* VE */
+               WHERE b-movto-ve.cod_estab           = tit_acr.cod_estab
+                 AND b-movto-ve.cod_refer           = dc-tit_acr.vend-cod-refer
+                 AND b-movto-ve.ind_trans_acr_abrev = 'LQRN' 
+                 AND NOT b-movto-ve.log_movto_estordo NO-ERROR.
+
+          IF AVAIL b-movto-ve THEN DO:
+             FIND FIRST b-tit-ve OF b-movto-ve NO-LOCK NO-ERROR.
+             IF AVAIL b-tit-ve THEN DO:
+                FIND FIRST repres_tit_acr NO-LOCK
+                     WHERE repres_tit_acr.cod_estab      = b-tit-ve.cod_estab
+                       AND repres_tit_acr.num_id_tit_acr = b-tit-ve.num_id_tit_acr
+                       AND repres_tit_acr.cdn_repres     = tt-movto.cdn_repres NO-ERROR.
+                IF AVAIL repres_tit_acr                       AND
+                   repres_tit_acr.val_perc_comis_repres <> 0 THEN DO:
+                   FIND FIRST b-tt-movto EXCLUSIVE-LOCK
+                        WHERE RECID(b-tt-movto) = RECID(tt-movto) NO-ERROR.
+                   ASSIGN b-tt-movto.val_perc_comis = repres_tit_acr.val_perc_comis_repres. /* Busca percentual de comiss∆o original da VE */
+                END.
+             END.
+          END.
+       END.
+    END. /* FIM-Vendor com Comiss∆o na Liquidaá∆o - Percentual com decimais em virtude do Valor L°quido da VD ser igual ao Valor Original em virtude da Renegociaá∆o */
+                ASSIGN c-periodo = c-periodo-atu.
+                
+
+
+    IF l-rep-fecha-ant            AND 
+       l-cliente-home-center = NO AND
+       NOT tg-rescisao            THEN DO:
+        /* Replica a mesma l¢gica para seleá∆o dos t°tulos que entram na transaá∆o 2 */
+        IF  LOOKUP(tt-movto.cod_espec_docto,"LP,LM") = 0 AND 
+            tt-movto.val_movto_comis   <> 0              AND
+            tt-movto.val_movto_estorno =  0 THEN DO:
+            FIND FIRST movto_comis_repres OF tt-movto NO-LOCK
+                 WHERE movto_comis_repres.ind_tip_movto         = "REALIZADO"
+                   AND movto_comis_repres.ind_natur_lancto_ctbl = "CR" NO-ERROR.
+            IF (if avail movto_comis_repres then movto_comis_repres.dat_transacao else tt-movto.dat_emis_docto) > dt-fechamento-fim AND
+               (if avail movto_comis_repres then movto_comis_repres.dat_transacao else tt-movto.dat_emis_docto) <= dt-fim-periodo THEN DO:
+                ASSIGN c-periodo = c-periodo-prox.
+
+                FIND FIRST tt-repres
+                     WHERE tt-repres.cod_empresa    = tt-movto.cod_empresa
+                       AND tt-repres.cdn_repres     = tt-movto.cdn_repres NO-ERROR.
+
+                IF  movto_comis_repres.ind_trans_comis = "Comiss∆o Emiss∆o" THEN DO:
+                    ASSIGN  tt-repres.de-tot-pg-emiss[1]  = tt-repres.de-tot-pg-emiss[1] - movto_comis_repres.val_movto_comis
+                            tt-repres.de-tot-pg-emiss[2]  = tt-repres.de-tot-pg-emiss[2] + movto_comis_repres.val_movto_comis
+                            c-tp-comiss = "Comissao Emissao".
+                    IF LOOKUP(tit_acr.cod_espec_docto,"VD,VV") = 0 THEN 
+                       ASSIGN  tt-repres.de-tot-vinc-mes[1]       = tt-repres.de-tot-vinc-mes[1] - movto_comis_repres.val_movto_comis
+                               tt-repres.de-tot-vinc-mes[2]       = tt-repres.de-tot-vinc-mes[2] + movto_comis_repres.val_movto_comis.
+                END. /* if Comiss∆o Emiss∆o */
+                ELSE DO: /* Comiss∆o na Liquidaá∆o */
+                   ASSIGN  tt-repres.de-tot-pg-baixa[1]  = tt-repres.de-tot-pg-baixa[1] - movto_comis_repres.val_movto_comis
+                           tt-repres.de-tot-pg-baixa[2]  = tt-repres.de-tot-pg-baixa[2] + movto_comis_repres.val_movto_comis
+                           c-tp-comiss = "Comissao Liquidacao".
+                END.
+            END.
+        END.
+    END.
+    
+
+
+    IF tt-movto.val_movto_vincul > 0 THEN
+        ASSIGN c-periodo = ''.
+        
+
+        FIND FIRST classif_impto NO-LOCK WHERE classif_impto.cod_pais = "BRA"
+                                         AND   classif_impto.cod_imposto = "26"
+                                         AND   classif_impto.cod_classif_impto = "5979" NO-ERROR. /* PIS SOBRE SERVICOS */
+
+            IF AVAIL classif_impto THEN
+
+            ASSIGN de-perc-pis = classif_impto.val_aliq_impto.
+
+            ELSE 
+
+            ASSIGN de-perc-pis = 0.
+
+
+        FIND FIRST classif_impto NO-LOCK WHERE classif_impto.cod_pais = "BRA"
+                                         AND   classif_impto.cod_imposto = "27"
+                                         AND   classif_impto.cod_classif_impto = "5960" NO-ERROR. /* cofins SOBRE SERVICOS */
+
+            IF AVAIL classif_impto THEN
+
+            ASSIGN de-perc-cofins = classif_impto.val_aliq_impto.
+
+            ELSE 
+
+            ASSIGN de-perc-cofins = 0.
+
+        ASSIGN de-vlr-pis-cofins = tt-movto.val_movto_vincul *  ((de-perc-pis + de-perc-cofins) / 100)
+               de-vlr-liquido    = tt-movto.val_movto_vincul - de-vlr-pis-cofins.
+
+
+
+        
+        run piNewLine in h-handle.
+        
+        run piLine in h-handle (input 1, 
+                                   input tt-movto.cdn_repres).
+
+
+        run piLine in h-handle (input 2, 
+                                   input tt-movto.nom_pessoa).
+                                   
+
+        run piLine in h-handle (input 3, 
+                                   input dt-ini-periodo).
+                                   
+
+        run piLine in h-handle (input 4, 
+                                   input dt-fim-periodo).
+                                   
+
+        run piLine in h-handle (input 5, 
+                                   input tt-movto.cdn_cliente).
+                                   
+
+        run piLine in h-handle (input 6, 
+                                   input tt-movto.nom_cliente).
+                                   
+        run piLine in h-handle (input 7, 
+                                   input c-cidade).
+                                   
+        run piLine in h-handle (input 8, 
+                                   input c-uf).
+
+        run piLine in h-handle (input 9, 
+                                   input tt-movto.cod_estab).
+                                   
+        run piLine in h-handle (input 10, 
+                                   input tt-movto.cod_espec_docto).
+                                   
+        run piLine in h-handle (input 11, 
+                                   input tt-movto.cod_ser_docto).
+                                   
+        run piLine in h-handle (input 12, 
+                                   input tt-movto.cod_tit_acr).
+                                   
+        run piLine in h-handle (input 13, 
+                                   input tt-movto.cod_parcela).
+                                   
+        run piLine in h-handle (input 14, 
+                                   input tt-movto.dat_emis_docto).
+                                   
+        run piLine in h-handle (input 15, 
+                                   input tt-movto.dat_vencto_tit_acr).
+                                   
+        run piLine in h-handle (input 16, 
+                                   input tt-movto.dat_liquidac_tit_Acr).
+                                   
+        run piLine in h-handle (input 17, 
+                                   input ((tt-movto.val_movto_comis + tt-movto.val_movto_vincul) / (tt-movto.val_perc_comis / 100))).
+                                   
+        run piLine in h-handle (input 18, 
+                                   input  tt-movto.val_perc_comis).
+
+        run piLine in h-handle (input 19, 
+                                   input  tt-movto.val_movto_comis).
+                                   
+        run piLine in h-handle (input 20, 
+                                   input  tt-movto.val_movto_estorno).
+                                   
+        run piLine in h-handle (input 21, 
+                                   input  (tt-movto.val_movto_comis - tt-movto.val_movto_estorno)).
+                                   
+        run piLine in h-handle (input 22, 
+                                   input  tt-movto.val_movto_vincul).
+                                   
+
+        run piLine in h-handle (input 23, 
+                                   input  tt-movto.vincul-no-mes).
+
+        run piLine in h-handle (input 24, 
+                                   input  c-periodo).
+
+        run piLine in h-handle (input 25, 
+                                   input  de-vlr-pis-cofins).
+
+
+        run piLine in h-handle (input 26, 
+                                   input  de-vlr-liquido).
+
+        run piLine in h-handle (input 27, 
+                                   input  c-tp-comiss).
+
+
+END.
+
+run piProcessa in h-handle(input-output c-arquivo,
+                           input "DCO005",
+                           input "Comissao de Representantes").
+                           
+                           
+RUN show IN h-handle (false).
+
+delete procedure h-handle.
+
+/* FIM DCO005RP.i */
+

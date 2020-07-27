@@ -1,0 +1,34 @@
+DEFINE TEMP-TABLE tt-apb
+field ttv-est as char
+field ttv-esp as char
+field ttv-serie as char
+field ttv-fornec as integer
+field ttv-titulo as char
+field ttv-parcela as char
+field ttv-dt-emissao as date.
+
+input from c:\desenv\fornec.txt.
+
+repeat:
+    create tt-apb.
+    import delimiter ";" tt-apb.
+end.
+
+for each tt-apb:
+    find first tit_ap no-lock where tit_ap.cod_estab = tt-apb.ttv-est
+                              and   tit_ap.cod_espec_docto = tt-apb.ttv-esp
+                              and   tit_ap.cod_ser_docto   = tt-apb.ttv-serie
+                              and   tit_ap.cdn_fornecedor  = tt-apb.ttv-fornec
+                              and   tit_ap.cod_tit_ap      = tt-apb.ttv-titulo
+                              and   tit_ap.cod_parcela     = tt-apb.ttv-parcela no-error.
+
+
+                              assign tt-apb.ttv-dt-emissao = tit_ap.dat_emis_docto.
+
+end.
+
+output to c:\desenv\dt-pagto.txt.
+
+for each tt-apb:
+    export delimiter ";" tt-apb.
+end.

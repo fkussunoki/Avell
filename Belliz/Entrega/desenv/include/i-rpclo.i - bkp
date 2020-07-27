@@ -1,0 +1,151 @@
+/**************************************************************************
+**
+** I-RPCLO - Define sa°da para impress∆o do relat¢rio - ex. cd9540.i
+** Parametros: {&stream} = nome do stream de saida no formato "stream nome"
+***************************************************************************/
+IF VALID-HANDLE(h-procextimpr) AND h-procextimpr:FILE-NAME = c_process-impress THEN                
+    RUN pi_before_close IN h-procextimpr (INPUT-OUTPUT TABLE tt-configur_layout_impres_fim).
+
+FOR EACH tt-configur_layout_impres_fim EXCLUSIVE-LOCK
+    BY tt-configur_layout_impres_fim.num_ord_funcao_imprsor :
+    do v_num_count = 1 to extent(tt-configur_layout_impres_fim.num_carac_configur):
+      case tt-configur_layout_impres_fim.num_carac_configur[v_num_count]:
+        when 0 then put {&stream} control null.
+        when ? then leave.
+        OTHERWISE PUT {&stream} control CODEPAGE-CONVERT(chr(tt-configur_layout_impres_fim.num_carac_configur[v_num_count]),
+                                                         session:cpinternal, 
+                                                         c-cod_pag_carac_conver).
+      end CASE.
+    END.
+    DELETE tt-configur_layout_impres_fim.
+END.
+
+/* N∆o gerar p†gina em branco - tech14207 11/02/2005 */
+&IF "{&RTF}":U = "YES":U &THEN
+    IF tt-param.l-habilitaRTF = YES THEN
+        PUT {&STREAM} SKIP "&FimArquivo":U SKIP.
+&ENDIF
+
+output {&stream} close.
+
+/* Sa°da para RTF - tech981 20/10/2004 */
+&IF "{&RTF}":U = "YES":U &THEN
+    /*Alterado 14/02/2005 - tech1007 - O teste foi alterado para verificar se o usu†rio selecionou a opá∆o para gerar o RTF, e
+      a chamada para o utilit†rio de convers∆o para RTF tambÇm foi alterada para que seja enviada a informaá∆o da forma de execuá∆o
+      do programa para que o arquivo gerado seja ou n∆o aberto ap¢s ser criado.*/
+    if  tt-param.l-habilitaRTF = YES then
+        /*Alterado 14/02/2005 - tech1007 - Criado novo teste para que a funcionalidade de RTF funcione adequadamente no modo de execuá∆o
+          em Batch*/
+        /*07/04/05 - tech14207 - Ser† passado o nome do diret¢rio spool dos servidores RPW para tratamento do endereáo apresentado */
+        /*na tela do monitor do servido de execuá∆o utilizado*/
+        if  i-num-ped-exec-rpw = 0 then do:                    
+
+            /* Alterado 18/07/2005 - tech14207 - Alterado o nome do campo tt-param.modelo para tt-param.modelo-rtf  pois esse Ç o nome 
+                correto do campo.
+            */
+                        run utp/ut-convrtf.p (input tt-param.arquivo,
+                                  INPUT "",
+                                  input tt-param.modelo-rtf,
+                                  input c-titulo-relat,
+                                  input c-sistema,
+                                  input c-prg-obj,
+                                  input c-prg-vrs,
+                                  INPUT tt-param.destino).
+        END.
+        ELSE DO:
+            IF OPSYS = "WIN32" THEN DO:
+            /* Alterado 18/07/2005 - tech14207 - Alterado o nome do campo tt-param.modelo para tt-param.modelo-rtf  pois esse Ç o nome 
+                correto do campo.
+            */
+                run utp/ut-convrtf.p (input c-dir-spool-servid-exec + "~/" + tt-param.arquivo,
+                                      INPUT c-dir-spool-servid-exec,
+                                      input tt-param.modelo-rtf,
+                                      input c-titulo-relat,
+                                      input c-sistema,
+                                      input c-prg-obj,
+                                      input c-prg-vrs,
+                                      INPUT tt-param.destino).
+
+            END.
+            ELSE DO:
+                /* Qdo o servidor RPW for unix Ç necess†rio utilizar a funá∆o TRIM caso contr†rio ocorrer† erro progress
+                   quanto ao n£mero de parametros. Favor n∆o remover o trim(c-dir-spool-servid-exec) na passagem do
+                   primeiro parametro - tech1139 - 04/03/2005.
+                */
+            /* Alterado 18/07/2005 - tech14207 - Alterado o nome do campo tt-param.modelo para tt-param.modelo-rtf  pois esse Ç o nome 
+                correto do campo.
+            */
+
+                run utp/ut-convrtf.p (input trim(c-dir-spool-servid-exec) + "~/" + tt-param.arquivo,
+                                      INPUT trim(c-dir-spool-servid-exec),
+                                      input tt-param.modelo-rtf,
+                                      input c-titulo-relat,
+                                      input c-sistema,
+                                      input c-prg-obj,
+                                      input c-prg-vrs,
+                                      INPUT tt-param.destino).
+
+            END.
+
+            IF  RETURN-VALUE <> "OK" THEN DO:
+                RETURN RETURN-VALUE.
+            END.
+        END.
+        /*Fim alteracao 14/02/2005*/
+    /*Fim alteracao 14/02/2005*/
+&ENDIF
+/* fim: Sa°da para RTF */
+
+/*tech14178 procedimentos de convers∆o PDF */
+&IF "{&PDF-RP}" = "YES" &THEN /*tech868*/
+
+    IF usePDF() THEN DO:
+        IF tt-param.destino = 1 THEN DO:
+            RUN pi_print IN h_pdf_controller.
+        END.
+        ELSE DO:
+            &if "{&PDF-FILE}" = "" &then  /*tech868*/
+                IF i-num-ped-exec-rpw <> 0 THEN
+                    RUN pi_convert IN h_pdf_controller (INPUT c-dir-spool-servid-exec + "~/" + v_output_file, IF tt-param.destino = 3 THEN YES ELSE NO). /* indica se vai para terminal, pois regras de nomenclatura s∆o diferentes */
+                ELSE
+                    RUN pi_convert IN h_pdf_controller (INPUT v_output_file, IF tt-param.destino = 3 THEN YES ELSE NO).
+            &elseif "{&PDF-FILE}" <> "" &then /*tech868*/
+                IF i-num-ped-exec-rpw <> 0 THEN
+                    RUN pi_convert IN h_pdf_controller (INPUT c-dir-spool-servid-exec + "~/" + v_output_file, IF tt-param.destino = 3 THEN YES ELSE NO). /* indica se vai para terminal, pois regras de nomenclatura s∆o diferentes */
+                ELSE
+                    RUN pi_convert IN h_pdf_controller (INPUT v_output_file, IF tt-param.destino = 3 THEN YES ELSE NO).            
+            &endif
+        END.
+    END.
+
+&ENDIF
+
+IF VALID-HANDLE(h-procextimpr) AND h-procextimpr:FILE-NAME = c_process-impress THEN DO:
+    RUN pi_after_close IN h-procextimpr (INPUT c-arq-control).
+    DELETE PROCEDURE h-procextimpr NO-ERROR.
+END.
+/* i-rpout */
+
+/*Alteraá∆o 20/07/2007 - tech1007 - Alterado para que os programas de relat¢rio possuam UPC, para execuá∆o da seguranáa por estabelecimento*/
+
+/* definicao da temp-table */
+&if lc("{2}") <> "window":U AND "{&EPC-ENABLED}" <> "yes" &then
+{include/i-epc200.i1}   
+
+  def var c-nom-prog-dpc-mg97  as char init "" no-undo.   
+  def var c-nom-prog-appc-mg97 as char init "" no-undo.
+  def var c-nom-prog-upc-mg97  as char init "" no-undo.
+  def var raw-rowObject        as raw          no-undo.
+
+find prog_dtsul where prog_dtsul.cod_prog_dtsul = c-prg-obj no-lock no-error.
+if  avail prog_dtsul then do:
+    assign c-nom-prog-dpc-mg97  = prog_dtsul.nom_prog_dpc
+           c-nom-prog-appc-mg97 = prog_dtsul.nom_prog_appc
+           c-nom-prog-upc-mg97  = prog_dtsul.nom_prog_upc.
+end.  
+&endif
+
+&global-define EPC-ENABLED yes
+
+{include/i-epc201.i "AFTER-CLOSE"}
+/*Fim alteraá∆o 20/07/2007*/

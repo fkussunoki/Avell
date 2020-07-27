@@ -1,0 +1,377 @@
+/**************************************************************************
+**
+**  Include: esof0520.I4
+**
+**  Objetivo: Display dos totais do Resumo de Operacoes
+**
+***************************************************************************/
+if  l-separadores then do:
+    if  i-op-rel = 1 then do: 
+        /* Inicio -- Projeto Internacional */
+        DEFINE VARIABLE c-lbl-liter-icms AS CHARACTER FORMAT "X(4)" NO-UNDO.
+        {utp/ut-liter.i "ICMS" *}
+        ASSIGN c-lbl-liter-icms = TRIM(RETURN-VALUE).
+        put c-lbl-liter-icms at 83
+            c-sep  at 87
+            "1"    to 90 c-sep
+            {1}[1]  format ">,>>>,>>>,>>9.99" 
+            c-sep.
+        if {2} = 1 then
+            IF  dec(tt-tab-ocor.c-campo[5]) = 100
+                THEN put dec(tt-tab-ocor.c-campo[5]) format ">>9" to 113.      
+            ELSE 
+             put dec(tt-tab-ocor.c-campo[5]) format ">9.99" to 113. 
+            
+        put c-sep at 114 {1}[2]  format ">,>>>,>>>,>>9.99" c-sep skip
+            substr(c-linha-branco,1,87) at 1 format "x(87)"
+            "2" to 90 c-sep
+            {1}[3]  format ">,>>>,>>>,>>9.99" c-sep
+            c-sep at 114
+            0       format ">,>>>,>>>,>>9.99" c-sep skip
+            substr(c-linha-branco,1,87) at 1 format "x(87)"
+            "3" to 90 c-sep
+            {1}[4]  format ">,>>>,>>>,>>9.99" c-sep
+            c-sep at 114
+            0       format ">,>>>,>>>,>>9.99" c-sep skip.
+        run ofp/esof0520e.p(3).
+        /* Inicio -- Projeto Internacional */
+        DEFINE VARIABLE c-lbl-liter-ipi AS CHARACTER FORMAT "X(3)" NO-UNDO.
+        {utp/ut-liter.i "IPI" *}
+        ASSIGN c-lbl-liter-ipi = TRIM(RETURN-VALUE).
+        put substr(c-linha-branco,1,82) at 1 format "x(82)"
+            c-lbl-liter-ipi at 83 c-sep at 87
+            "1" to 90 c-sep 
+            {1}[7]  format ">,>>>,>>>,>>9.99" c-sep
+            c-sep at 114
+            {1}[8]  format ">,>>>,>>>,>>9.99" c-sep skip
+            substr(c-linha-branco,1,87) at 1 format "x(87)"
+            "2" to 90 c-sep
+            {1}[9]  format ">,>>>,>>>,>>9.99" c-sep
+            c-sep at 114
+            0       format ">,>>>,>>>,>>9.99" c-sep skip
+            substr(c-linha-branco,1,87) at 1 format "x(87)"
+            "3" to 90 c-sep
+            {1}[10]  format ">,>>>,>>>,>>9.99" c-sep
+            c-sep at 114
+            0        format ">,>>>,>>>,>>9.99" c-sep skip.
+        if {1}[5] > 0 or {1}[6] > 0 then do:
+            run ofp/esof0520e.p(1).
+            put substr(c-linha-branco,1,82) at 1 format "x(82)"
+                "ST" at 83 c-sep at 87  
+                c-sep at 91 {1}[5]  format ">,>>>,>>>,>>9.99" c-sep
+                c-sep at 114
+                {1}[6]  format ">,>>>,>>>,>>9.99" c-sep skip.
+        end.
+        if (c-estado = "MG"
+        or c-estado = "PE") and {1}[12] > 0 then do:
+            run ofp/esof0520e.p(1).
+            /* Inicio -- Projeto Internacional */
+            DEFINE VARIABLE c-lbl-liter-obs AS CHARACTER FORMAT "X(5)" NO-UNDO.
+            {utp/ut-liter.i "OBS" *}
+            ASSIGN c-lbl-liter-obs = TRIM(RETURN-VALUE).
+            put substr(c-linha-branco,1,82) at 1 format "x(82)"
+                c-lbl-liter-obs at 83 c-sep at 87  
+                c-sep at 91 {1}[12]  format ">,>>>,>>>,>>9.99" c-sep
+                c-sep at 114
+                0                    format ">,>>>,>>>,>>9.99" c-sep skip.
+        end.
+    end.
+    else do:
+        /* Inicio -- Projeto Internacional */
+        DEFINE VARIABLE c-lbl-liter-icms-2 AS CHARACTER FORMAT "X(4)" NO-UNDO.
+        {utp/ut-liter.i "ICMS" *}
+        ASSIGN c-lbl-liter-icms-2 = TRIM(RETURN-VALUE).
+        put c-lbl-liter-icms-2 at 77
+            c-sep at 81
+            "1" to 84 c-sep
+            {1}[1]  format ">,>>>,>>>,>>9.99" 
+            c-sep.
+        if {2} = 1 then
+            IF  dec(tt-tab-ocor.c-campo[5]) = 100
+                THEN put dec(tt-tab-ocor.c-campo[5]) format ">>9" to 107.      
+            ELSE 
+             put dec(tt-tab-ocor.c-campo[5]) format ">9.99" to 107.                                              
+        put c-sep at 108 {1}[2]  format ">,>>>,>>>,>>9.99" c-sep
+                         {1}[5]  format ">,>>>,>>>,>>9.99" c-sep
+                         {1}[6]  format ">,>>>,>>>,>>9.99" c-sep skip
+            substr(c-linha-branco,1,81) at 1 format "x(81)"
+            "2" to 84 c-sep
+            {1}[3]  format ">,>>>,>>>,>>9.99" c-sep
+            c-sep at 108
+            0       format ">,>>>,>>>,>>9.99" c-sep
+            c-sep at 142
+            c-sep at 159 skip 
+            substr(c-linha-branco,1,81) at 1 format "x(81)"
+            "3" to 84 c-sep
+            {1}[4]  format ">,>>>,>>>,>>9.99" c-sep
+            c-sep at 108
+            0       format ">,>>>,>>>,>>9.99" c-sep
+            c-sep at 142
+            c-sep at 159 skip.  
+        run ofp/esof0520e.p(3).
+        /* Inicio -- Projeto Internacional */
+        DEFINE VARIABLE c-lbl-liter-ipi-2 AS CHARACTER FORMAT "X(3)" NO-UNDO.
+        {utp/ut-liter.i "IPI" *}
+        ASSIGN c-lbl-liter-ipi-2 = TRIM(RETURN-VALUE).
+        put substr(c-linha-branco,1,76) at 1 format "x(76)"
+            c-lbl-liter-ipi-2 at 77 c-sep at 81
+            "1" to 84 c-sep 
+            {1}[7]  format ">,>>>,>>>,>>9.99" c-sep
+            c-sep at 108
+            {1}[8]  format ">,>>>,>>>,>>9.99" c-sep
+            c-sep at 142
+            c-sep at 159 skip 
+            substr(c-linha-branco,1,81) at 1 format "x(81)"
+            "2" to 84 c-sep
+            {1}[9]  format ">,>>>,>>>,>>9.99" c-sep
+            c-sep at 108
+            0       format ">,>>>,>>>,>>9.99" c-sep
+            c-sep at 142
+            c-sep at 159 skip 
+            substr(c-linha-branco,1,81) at 1 format "x(81)"
+            "3" to 84 c-sep
+            {1}[10]  format ">,>>>,>>>,>>9.99" c-sep
+            c-sep at 108
+            0        format ">,>>>,>>>,>>9.99" c-sep
+            c-sep at 142
+            c-sep at 159 skip.  
+        if (c-estado = "MG"
+        or c-estado = "PE") and {1}[12] > 0 then do:
+            run ofp/esof0520e.p(1).
+            /* Inicio -- Projeto Internacional */
+            DEFINE VARIABLE c-lbl-liter-obs-2 AS CHARACTER FORMAT "X(5)" NO-UNDO.
+            {utp/ut-liter.i "OBS" *}
+            ASSIGN c-lbl-liter-obs-2 = TRIM(RETURN-VALUE).
+            put substr(c-linha-branco,1,76) at 1 format "x(76)"
+                c-lbl-liter-obs-2 at 77 c-sep at 81  
+                c-sep at 85 {1}[12]  format ">,>>>,>>>,>>9.99" c-sep
+                c-sep at 108
+                0                    format ">,>>>,>>>,>>9.99" c-sep
+                c-sep at 142
+                c-sep at 159 skip.  
+        end.
+    end.
+    assign c-desc-tot = c-linha-branco.
+    overlay(c-desc-tot,2) = "Observacao:".
+    if  {1}[11] > 0 then do:
+        if  c-estado = "MG" then do:
+            overlay(c-desc-tot,14) = "DEBITO: " +
+            string({1}[11],">,>>>,>>9.99") +
+            if  de-cred-com > 0 then 
+            ("  CREDITO: " + string(de-cred-com,">,>>>,>>9.99"))
+            else "".
+        end.
+        else do:
+            overlay(c-desc-tot,14) = "Dif.Aliq.ICMS: " +
+            string({1}[11],">>>>,>>9.99"). 
+        end.
+        run ofp/esof0520e.p (1).
+        if  i-op-rel = 1 then
+            put c-desc-tot at 1 format "x(131)" skip.
+        else
+            put c-desc-tot at 1 format "x(159)" skip.
+    end.
+end.
+else do:
+    if i-op-rel = 1 then do:
+        /* Inicio -- Projeto Internacional */
+        DEFINE VARIABLE c-lbl-liter-icms-3 AS CHARACTER FORMAT "X(4)" NO-UNDO.
+        {utp/ut-liter.i "ICMS" *}
+        ASSIGN c-lbl-liter-icms-3 = TRIM(RETURN-VALUE).
+        put c-lbl-liter-icms-3                                 at 61
+            "1"                                    at 66
+            {1}[1]  format ">>>,>>>,>>>,>>9.99"    at 69.
+    
+        if {2} = 1 then
+            IF  dec(tt-tab-ocor.c-campo[5]) = 100
+                THEN put dec(tt-tab-ocor.c-campo[5]) format ">>9" AT 88.      
+            ELSE 
+             put dec(tt-tab-ocor.c-campo[5]) format ">9.99" AT 88.                       
+
+        put {1}[2]  format ">>>,>>>,>>>,>>9.99"   at 94.
+    
+        if  {1}[11] > 0 then 
+            if  c-estado = "MG" then
+                /* Inicio -- Projeto Internacional */
+                DO:
+                DEFINE VARIABLE c-lbl-liter-debito AS CHARACTER FORMAT "X(8)" NO-UNDO.
+                {utp/ut-liter.i "DEBITO" *}
+                ASSIGN c-lbl-liter-debito = TRIM(RETURN-VALUE).
+                put c-lbl-liter-debito                      at 119 skip.
+                END.     
+            else 
+                /* Inicio -- Projeto Internacional */
+                DO:
+                DEFINE VARIABLE c-lbl-liter-difaliqicms AS CHARACTER FORMAT "X(16)" NO-UNDO.
+                {utp/ut-liter.i "Dif.Aliq.ICMS" *}
+                ASSIGN c-lbl-liter-difaliqicms = TRIM(RETURN-VALUE).
+                put c-lbl-liter-difaliqicms + "="              at 119 skip.
+                END. 
+      
+        put "2"                                   at 66
+            {1}[3]  format ">>>,>>>,>>>,>>9.99"   at 69
+            0       format ">>>,>>>,>>>,>>9.99"   at 94.
+        
+        if  {1}[11] > 0 then
+            put "("                               at 119
+                {1}[11]  format ">>>>,>>9.99"
+                ")".
+    
+        put skip
+            "3"                                   at 66
+            {1}[4]  format ">>>,>>>,>>>,>>9.99"   at 69
+            0       format ">>>,>>>,>>>,>>9.99"   at 94.
+    
+        if  de-cred-com > 0
+        then
+            /* Inicio -- Projeto Internacional */
+            DO:
+            DEFINE VARIABLE c-lbl-liter-credito AS CHARACTER FORMAT "X(9)" NO-UNDO.
+            {utp/ut-liter.i "CREDITO" *}
+            ASSIGN c-lbl-liter-credito = TRIM(RETURN-VALUE).
+            put c-lbl-liter-credito                         at 119.
+            END. 
+        
+        put skip.
+    
+        run ofp/esof0520e.p(3).
+     
+        /* Inicio -- Projeto Internacional */
+        DEFINE VARIABLE c-lbl-liter-ipi-3 AS CHARACTER FORMAT "X(3)" NO-UNDO.
+        {utp/ut-liter.i "IPI" *}
+        ASSIGN c-lbl-liter-ipi-3 = TRIM(RETURN-VALUE).
+        put c-lbl-liter-ipi-3                                 at 61
+            "1"                                   at 66
+            {1}[7]  format ">>>,>>>,>>>,>>9.99"   at 69
+            {1}[8]  format ">>>,>>>,>>>,>>9.99"   at 94.
+  
+        if  de-cred-com > 0 then
+            put "("                               at 119
+                de-cred-com  format ">,>>>,>>9.99"
+                ")".
+
+        put skip
+            "2"                                   at 66
+            {1}[9]  format ">>>,>>>,>>>,>>9.99"   at 69
+            0       format ">>>,>>>,>>>,>>9.99"   at 94 skip
+            "3"                                   at 66
+            {1}[10] format ">>>,>>>,>>>,>>9.99"   at 69
+            0       format ">>>,>>>,>>>,>>9.99"   at 94 skip.
+        if {1}[5] > 0 or {1}[6] > 0 then do:
+            run ofp/esof0520e.p(1).
+            put "ST"                                  at 61
+                {1}[5]  format ">>>,>>>,>>>,>>9.99"   at 69
+                {1}[6]  format ">>>,>>>,>>>,>>9.99"   at 94 skip.
+        end.
+        if (c-estado = "MG"
+        or c-estado = "PE") and {1}[12] > 0 then do:
+            run ofp/esof0520e.p(1).
+            /* Inicio -- Projeto Internacional */
+            DEFINE VARIABLE c-lbl-liter-obs-3 AS CHARACTER FORMAT "X(5)" NO-UNDO.
+            {utp/ut-liter.i "OBS" *}
+            ASSIGN c-lbl-liter-obs-3 = TRIM(RETURN-VALUE).
+            put c-lbl-liter-obs-3                               at 61
+                {1}[12] format ">>>,>>>,>>>,>>9.99" at 69
+                0       format ">>>,>>>,>>>,>>9.99" at 94 skip.
+        end.
+    end.
+    else do:
+        /* Inicio -- Projeto Internacional */
+        DEFINE VARIABLE c-lbl-liter-icms-4 AS CHARACTER FORMAT "X(4)" NO-UNDO.
+        {utp/ut-liter.i "ICMS" *}
+        ASSIGN c-lbl-liter-icms-4 = TRIM(RETURN-VALUE).
+        put c-lbl-liter-icms-4                                at 61
+            "1"                                   at 66
+            {1}[1]  format ">>>,>>>,>>>,>>9.99"   at 69.
+       
+        if  {2} = 1 then
+            IF  dec(tt-tab-ocor.c-campo[5]) = 100
+                THEN put dec(tt-tab-ocor.c-campo[5]) format ">>9" AT 88.      
+            ELSE 
+             put dec(tt-tab-ocor.c-campo[5]) format ">9.99" AT 88.
+        put {1}[2]  format ">>>,>>>,>>>,>>9.99"    at 93
+            {1}[5]  format ">>>,>>>,>>>,>>9.99"    at 111
+            {1}[6]  format ">>>,>>>,>>>,>>9.99"    at 131.
+        
+        if  {1}[11] > 0 then
+            if  c-estado = "MG" 
+            then /* Inicio -- Projeto Internacional */
+ DO:
+     DEFINE VARIABLE c-lbl-liter-debito-2 AS CHARACTER FORMAT "X(8)" NO-UNDO.
+     {utp/ut-liter.i "DEBITO" *}
+     ASSIGN c-lbl-liter-debito-2 = TRIM(RETURN-VALUE).
+     put c-lbl-liter-debito-2                          at 154 skip.
+ END. 
+            else 
+                 /* Inicio -- Projeto Internacional */
+                 DO:
+                 DEFINE VARIABLE c-lbl-liter-difaliqicms-2 AS CHARACTER FORMAT "X(16)" NO-UNDO.
+                 {utp/ut-liter.i "Dif.Aliq.ICMS" *}
+                 ASSIGN c-lbl-liter-difaliqicms-2 = TRIM(RETURN-VALUE).
+                 put c-lbl-liter-difaliqicms-2 + "="                  at 154 skip.
+                 END. 
+    
+        put "2"                                   at 66
+            {1}[3]  format ">>>,>>>,>>>,>>9.99"   at 69
+            0       format ">>>,>>>,>>>,>>9.99"   at 93.
+
+        if  {1}[11] > 0 then
+            put "("                               at 154
+                {1}[11]  format ">>>>,>>9.99"
+                ")".
+    
+        put skip
+            "3"                                   at 66
+            {1}[4]  format ">>>,>>>,>>>,>>9.99"   at 69
+            0       format ">>>,>>>,>>>,>>9.99"   at 93.
+    
+        if  de-cred-com > 0
+        then
+            /* Inicio -- Projeto Internacional */
+            DO:
+            DEFINE VARIABLE c-lbl-liter-credito-2 AS CHARACTER FORMAT "X(9)" NO-UNDO.
+            {utp/ut-liter.i "CREDITO" *}
+            ASSIGN c-lbl-liter-credito-2 = TRIM(RETURN-VALUE).
+            put c-lbl-liter-credito-2                         at 154.
+            END. 
+        
+        put skip.
+    
+        run ofp/esof0520e.p(3).
+        /* Inicio -- Projeto Internacional */
+        DEFINE VARIABLE c-lbl-liter-ipi-4 AS CHARACTER FORMAT "X(3)" NO-UNDO.
+        {utp/ut-liter.i "IPI" *}
+        ASSIGN c-lbl-liter-ipi-4 = TRIM(RETURN-VALUE).
+        put c-lbl-liter-ipi-4                                 at 61
+            "1"                                   at 66
+            {1}[7]  format ">>>,>>>,>>>,>>9.99"   at 69
+            {1}[8]  format ">>>,>>>,>>>,>>9.99"   at 93.
+    
+        if  de-cred-com  > 0
+        then
+            put "("                               at 154
+                  de-cred-com format ">,>>>,>>9.99"
+                ")".
+       
+        put skip
+            "2"                                   at 66
+            {1}[9]  format ">>>,>>>,>>>,>>9.99"   at 69
+            0       format ">>>,>>>,>>>,>>9.99"   at 93 skip
+            "3"                                   at 66
+            {1}[10] format ">>>,>>>,>>>,>>9.99"   at 69
+            0       format ">>>,>>>,>>>,>>9.99"   at 93 skip.
+        if (c-estado = "MG"
+        or c-estado = "PE") and {1}[12] > 0 then do:
+            run ofp/esof0520e.p(1).
+            /* Inicio -- Projeto Internacional */
+            DEFINE VARIABLE c-lbl-liter-obs-4 AS CHARACTER FORMAT "X(5)" NO-UNDO.
+            {utp/ut-liter.i "OBS" *}
+            ASSIGN c-lbl-liter-obs-4 = TRIM(RETURN-VALUE).
+            put c-lbl-liter-obs-4                               at 61
+                {1}[12] format ">>>,>>>,>>>,>>9.99" at 69
+                0       format ">>>,>>>,>>>,>>9.99" at 93 skip.
+        end.
+    end.
+end.
+/* fim include esof0520.i4. */
+

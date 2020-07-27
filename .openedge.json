@@ -1,0 +1,53 @@
+{
+    "workingDirectory": "C:/TOTVS/datasul/desenv/programas",
+    "proPath": [
+        "c:/temp",
+        "c:/totvs/datasul/desenv/programas/TesteArea",
+        "c:/totvs/datasul/desenv",
+        "C:/TOTVS/datasul/desenv/programas/Docol/VerbaCooperada",
+        "c:/totvs/fnd",
+        "c:/totvs/ems5",
+        "C:/totvs/Datasul 12.1.26/12.1.26/ems5/src",
+        "C:/totvs/Datasul 12.1.26/12.1.26/ems2/src",
+        "C:/totvs/Datasul 12.1.26/12.1.26/fnd/src",
+        "C:/totvs/datasul/dts-0/erp",
+            "C:/totvs/Datasul 12.1.26/12.1.26/ddk",
+            "C:/totvs/Datasul 12.1.26/12.1.26/ddk/src",
+            "c:/totvs/Datasul 12.1.26/12.1.26/ddk/resources",
+            "C:/TOTVS/Datasul 12.1.26/ddk/",        
+        "C:/totvs/Datasul 12.1.26/12.1.26/hcm/src",
+        "C:/Progressx86/OpenEdge/gui",
+        "C:/Progressx86/OpenEdge/gui/adecomm.pl",
+        "C:/Progressx86/OpenEdge/gui/adecomp.pl",
+        "C:/Progressx86/OpenEdge/gui/adedesk.pl",
+        "C:/Progressx86/OpenEdge/gui/adedict.pl",
+        "C:/Progressx86/OpenEdge/gui/adeedit.pl",
+        "C:/Progressx86/OpenEdge/gui/adeicon.pl",
+        "C:/Progressx86/OpenEdge/gui/aderes.pl",
+        "C:/Progressx86/OpenEdge/gui/adeshar.pl",
+        "C:/Progressx86/OpenEdge/gui/adeuib.pl",
+        "C:/Progressx86/OpenEdge/gui/adeweb.pl",
+        "C:/Progressx86/OpenEdge/gui/adexml.pl",
+        "C:/Progressx86/OpenEdge/gui/dataadmin.pl",
+        "C:/Progressx86/OpenEdge/gui/OpenEdge.BusinessLogic.pl",
+        "C:/Progressx86/OpenEdge/gui/OpenEdge.Core.pl",
+        "C:/Progressx86/OpenEdge/gui/OpenEdge.ServerAdmin.pl",
+        "C:/Progressx86/OpenEdge/gui/prodict.pl",
+        "C:/Progressx86/OpenEdge/gui/protools.pl",
+        "C:/Progressx86/OpenEdge",
+        "C:/Progressx86/OpenEdge/bin"
+    ],
+    "dlc": "C:/Progressx86/OpenEdge", 
+    "proPathMode": "append", 
+    "parameterFiles": [ 
+        "desenvolvimento.pf"
+    ],
+    "startupProcedure" : "vscode.p",
+    "dbDictionary": ["mgcad", "mgmov", "mgadt", "mgmp", "emsinc", "mgsor", "emscad", "emsmov", "hcm", "emsfnd","mgesp",
+        "emsdocol"
+
+    ],
+    "format": {
+        "trim": "right" 
+    }
+}

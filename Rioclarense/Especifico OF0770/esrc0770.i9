@@ -1,0 +1,339 @@
+/* procedure pi-normal-docto: */
+def input param p-tipo-nat as integer no-undo.
+DEF VAR i-linha AS INTEGER.
+
+
+ASSIGN i-linha = 1.
+
+
+run utp/utapi013.p persistent set h-utapi013.
+/*SYSTEM-DIALOG PRINTER-SETUP.*/
+os-delete value("c:\temp\esrc770.xlsx").
+
+CREATE tt-configuracao2.
+ASSIGN tt-configuracao2.versao-integracao   = 1
+       tt-configuracao2.arquivo-num         = 1
+       tt-configuracao2.arquivo             = "c:\temp\esrc770.xlsx"
+       tt-configuracao2.total-planilha      = 2
+       tt-configuracao2.exibir-construcao   = no
+       tt-configuracao2.abrir-excel-termino = yes
+       tt-configuracao2.imprimir = no
+       tt-configuracao2.orientacao = 2.
+
+CREATE tt-planilha2.
+ASSIGN tt-planilha2.arquivo-num   = 1
+       tt-planilha2.planilha-num  = 1
+       tt-planilha2.planilha-nome = "Plan 1"
+       tt-planilha2.linhas-grade  = no
+       tt-planilha2.largura-coluna = 12.50
+       tt-planilha2.formatar-planilha = NO
+       tt-planilha2.formatar-faixa = YES.
+
+CREATE tt-dados.
+ASSIGN tt-dados.arquivo-num   = 1
+       tt-dados.planilha-num  = 1
+       tt-dados.celula-coluna = 1
+       tt-dados.celula-linha  = i-linha
+       tt-dados.celula-valor  = "Periodo".
+
+CREATE tt-dados.
+ASSIGN tt-dados.arquivo-num   = 1
+       tt-dados.planilha-num  = 1
+       tt-dados.celula-coluna = 2
+       tt-dados.celula-linha  = i-linha
+       tt-dados.celula-valor  = string(tt-param.dt-periodo-ini) + " a " + STRING(tt-param.dt-periodo-fim).
+
+
+CREATE tt-dados.
+ASSIGN tt-dados.arquivo-num   = 1
+       tt-dados.planilha-num  = 1
+       tt-dados.celula-coluna = 3
+       tt-dados.celula-linha  = i-linha
+       tt-dados.celula-valor  = string("APURACAO DE PIS / COFINS NAS ENTRADAS - NORMAL").
+
+
+ASSIGN i-linha = 3.
+
+CREATE tt-dados.
+ASSIGN tt-dados.arquivo-num   = 1
+       tt-dados.planilha-num  = 1
+       tt-dados.celula-coluna = 1
+       tt-dados.celula-linha  = i-linha
+       tt-dados.celula-valor  = "Docto".
+
+CREATE tt-dados.
+ASSIGN tt-dados.arquivo-num   = 1
+       tt-dados.planilha-num  = 1
+       tt-dados.celula-coluna = 2
+       tt-dados.celula-linha  = i-linha
+       tt-dados.celula-valor  = "Item".
+
+
+CREATE tt-dados.
+ASSIGN tt-dados.arquivo-num   = 1
+       tt-dados.planilha-num  = 1
+       tt-dados.celula-coluna = 3
+       tt-dados.celula-linha  = i-linha
+       tt-dados.celula-valor  = "Emitente".
+
+
+
+CREATE tt-dados.
+ASSIGN tt-dados.arquivo-num   = 1
+       tt-dados.planilha-num  = 1
+       tt-dados.celula-coluna = 4
+       tt-dados.celula-linha  = i-linha
+       tt-dados.celula-valor  = "CFOP".
+
+CREATE tt-dados.
+ASSIGN tt-dados.arquivo-num   = 1
+       tt-dados.planilha-num  = 1
+       tt-dados.celula-coluna = 5
+       tt-dados.celula-linha  = i-linha
+       tt-dados.celula-valor  = "Descricao CFOP".
+
+CREATE tt-dados.
+ASSIGN tt-dados.arquivo-num   = 1
+       tt-dados.planilha-num  = 1
+       tt-dados.celula-coluna = 6
+       tt-dados.celula-linha  = i-linha
+       tt-dados.celula-valor  = "Vlr. Contabil".
+
+CREATE tt-dados.
+ASSIGN tt-dados.arquivo-num   = 1
+       tt-dados.planilha-num  = 1
+       tt-dados.celula-coluna = 7
+       tt-dados.celula-linha  = i-linha
+       tt-dados.celula-valor  = "B. Calc. PIS".
+
+CREATE tt-dados.
+ASSIGN tt-dados.arquivo-num   = 1
+       tt-dados.planilha-num  = 1
+       tt-dados.celula-coluna = 8
+       tt-dados.celula-linha  = i-linha
+       tt-dados.celula-valor  = "B. Calc. COFINS".
+
+CREATE tt-dados.
+ASSIGN tt-dados.arquivo-num   = 1
+       tt-dados.planilha-num  = 1
+       tt-dados.celula-coluna = 9
+       tt-dados.celula-linha  = i-linha
+       tt-dados.celula-valor  = "Vlr. PIS/PASEP".
+
+CREATE tt-dados.
+ASSIGN tt-dados.arquivo-num   = 1
+       tt-dados.planilha-num  = 1
+       tt-dados.celula-coluna = 10
+       tt-dados.celula-linha  = i-linha
+       tt-dados.celula-valor  = "Vlr. COFINS".
+
+
+ASSIGN i-linha = i-linha + 1.
+FOR EACH tt-doc-fiscal
+   WHERE tt-doc-fiscal.tipo-apuracao <= 2, /* 1 = normal 2 = ambos */
+      
+      /* Valores de PIS/COFINS Normal */
+      /* As notas que nÆo possuem valor de PIS e COFINS devem ser demonstradas no arquivo e o valor contabil deve ser c lculado com base no valor de todas as notas
+         tendo ou nÆo valor de PIS e COFINS */
+
+    each  doc-fiscal
+        where doc-fiscal.cod-estabel  = tt-doc-fiscal.estab
+        AND   doc-fiscal.serie        = tt-doc-fiscal.serie
+        AND   doc-fiscal.nr-doc-fis   = tt-doc-fiscal.nr-doc-fis
+        AND   doc-fiscal.cod-emitente = tt-doc-fiscal.emitente
+        AND   doc-fiscal.nat-operacao = tt-doc-fiscal.nat-operacao
+        AND   CAN-FIND(FIRST it-doc-fisc 
+                       WHERE it-doc-fisc.cod-estabel  = doc-fiscal.cod-estabel
+                       AND   it-doc-fisc.serie        = doc-fiscal.serie
+                       AND   it-doc-fisc.nr-doc-fis   = doc-fiscal.nr-doc-fis
+                       AND   it-doc-fisc.cod-emitente = doc-fiscal.cod-emitente
+                       AND   it-doc-fisc.nat-operacao = doc-fiscal.nat-operacao) 
+                       no-lock, 
+        first natur-oper
+              where natur-oper.nat-operacao = doc-fiscal.nat-operacao no-lock,
+              each  it-doc-fisc
+              where it-doc-fisc.cod-estabel  = doc-fiscal.cod-estabel
+              and   it-doc-fisc.serie        = doc-fiscal.serie
+              and   it-doc-fisc.nr-doc-fis   = doc-fiscal.nr-doc-fis
+              and   it-doc-fisc.cod-emitente = doc-fiscal.cod-emitente
+              and   it-doc-fisc.nat-operacao = natur-oper.nat-operacao 
+              BREAK by doc-fiscal.nat-operacao
+                    by doc-fiscal.dt-emis-doc
+                    by doc-fiscal.nr-doc-fis
+                    BY doc-fiscal.cod-emitente:
+
+
+
+
+
+      if  p-tipo-nat = 1 then do: /* entrada */
+          if (doc-fiscal.tipo-nat <> 1
+          and doc-fiscal.tipo-nat <> 3) then next. 
+
+          IF  doc-fiscal.tipo-nat = 3 
+          AND natur-oper.tipo    <> 1 THEN NEXT.
+      end.
+      else do: /*** Verifica documentos de Sa¡da ***/
+          if  doc-fiscal.tipo-nat <> 2
+          and doc-fiscal.tipo-nat <> 3 then next. 
+
+          IF doc-fiscal.tipo-nat  = 3 THEN DO:
+             IF  natur-oper.tipo <> 2 
+             and natur-oper.tipo <> 3 THEN NEXT.
+          END.
+      end. 
+
+
+
+      accumulate truncate(it-doc-fisc.vl-tot-item, 2)
+                   (total  by doc-fiscal.nat-operacao 
+                           by doc-fiscal.dt-emis-doc  
+                           by doc-fiscal.nr-doc-fis   
+                           BY doc-fiscal.cod-emitente).
+
+      accumulate truncate(it-doc-fisc.val-base-calc-pis, 2)
+                 (total BY doc-fiscal.nat-operacao
+                        BY doc-fiscal.dt-emis-doc
+                        BY doc-fiscal.nr-doc-fis
+                        BY doc-fiscal.cod-emitente).  
+      accumulate truncate(it-doc-fisc.val-pis, 2)
+                 (total BY doc-fiscal.nat-operacao
+                        BY doc-fiscal.dt-emis-doc
+                        BY doc-fiscal.nr-doc-fis
+                        BY doc-fiscal.cod-emitente).
+
+      accumulate truncate(it-doc-fisc.val-base-calc-cofins, 2)
+                 (total BY doc-fiscal.nat-operacao
+                        BY doc-fiscal.dt-emis-doc
+                        BY doc-fiscal.nr-doc-fis
+                        BY doc-fiscal.cod-emitente). 
+      accumulate truncate(it-doc-fisc.val-cofins, 2)
+                 (total BY doc-fiscal.nat-operacao
+                        BY doc-fiscal.dt-emis-doc
+                        BY doc-fiscal.nr-doc-fis
+                        BY doc-fiscal.cod-emitente).  
+
+
+
+      CREATE tt-dados.
+      ASSIGN tt-dados.arquivo-num   = 1
+             tt-dados.planilha-num  = 1
+             tt-dados.celula-coluna = 1
+             tt-dados.celula-linha  = i-linha
+             tt-dados.celula-valor  = it-doc-fisc.nr-doc-fis.
+
+      CREATE tt-dados.
+      ASSIGN tt-dados.arquivo-num   = 1
+             tt-dados.planilha-num  = 1
+             tt-dados.celula-coluna = 2
+             tt-dados.celula-linha  = i-linha
+             tt-dados.celula-valor  = it-doc-fisc.it-codigo.
+
+      CREATE tt-dados.
+      ASSIGN tt-dados.arquivo-num   = 1
+             tt-dados.planilha-num  = 1
+             tt-dados.celula-coluna = 3
+             tt-dados.celula-linha  = i-linha
+             tt-dados.celula-valor  = string(it-doc-fisc.cod-emitente).
+
+      CREATE tt-dados.
+      ASSIGN tt-dados.arquivo-num   = 1
+             tt-dados.planilha-num  = 1
+             tt-dados.celula-coluna = 4
+             tt-dados.celula-linha  = i-linha
+             tt-dados.celula-valor  = it-doc-fisc.nat-operacao.
+
+      CREATE tt-dados.
+      ASSIGN tt-dados.arquivo-num   = 1
+             tt-dados.planilha-num  = 1
+             tt-dados.celula-coluna = 5
+             tt-dados.celula-linha  = i-linha
+             tt-dados.celula-valor  = natur-oper.denominacao.
+
+      CREATE tt-dados.
+      ASSIGN tt-dados.arquivo-num   = 1
+             tt-dados.planilha-num  = 1
+             tt-dados.celula-coluna = 6
+             tt-dados.celula-linha  = i-linha
+             tt-dados.celula-valor  = string(it-doc-fisc.vl-tot-item).
+
+
+      CREATE tt-dados.
+      ASSIGN tt-dados.arquivo-num   = 1
+             tt-dados.planilha-num  = 1
+             tt-dados.celula-coluna = 7
+             tt-dados.celula-linha  = i-linha
+             tt-dados.celula-valor  = string(it-doc-fisc.val-base-calc-pis).
+
+
+      CREATE tt-dados.
+      ASSIGN tt-dados.arquivo-num   = 1
+             tt-dados.planilha-num  = 1
+             tt-dados.celula-coluna = 8
+             tt-dados.celula-linha  = i-linha
+             tt-dados.celula-valor  = string(it-doc-fisc.val-base-calc-cofins).
+
+      CREATE tt-dados.
+      ASSIGN tt-dados.arquivo-num   = 1
+             tt-dados.planilha-num  = 1
+             tt-dados.celula-coluna = 9
+             tt-dados.celula-linha  = i-linha
+             tt-dados.celula-valor  = string(it-doc-fisc.val-pis).
+
+
+      CREATE tt-dados.
+      ASSIGN tt-dados.arquivo-num   = 1
+             tt-dados.planilha-num  = 1
+             tt-dados.celula-coluna = 10
+             tt-dados.celula-linha  = i-linha
+             tt-dados.celula-valor  = string(it-doc-fisc.val-cofins).
+
+ASSIGN i-linha = i-linha + 1.
+
+    IF LAST-OF(doc-fiscal.nat-operacao) THEN DO:
+        ASSIGN i-linha = i-linha + 1.
+    
+        CREATE tt-dados.
+        ASSIGN tt-dados.arquivo-num   = 1
+               tt-dados.planilha-num  = 1
+               tt-dados.celula-coluna = 1
+               tt-dados.celula-linha  = i-linha
+               tt-dados.celula-valor  = "Total Nat. Oper " + doc-fiscal.nat-operacao.
+        
+    
+        CREATE tt-dados.
+        ASSIGN tt-dados.arquivo-num   = 1
+               tt-dados.planilha-num  = 1
+               tt-dados.celula-coluna = 7
+               tt-dados.celula-linha  = i-linha
+               tt-dados.celula-valor  = string(ACCUM TOTAL BY  doc-fiscal.nat-operacao truncate(it-doc-fisc.val-base-calc-pis, 2)).
+    
+        CREATE tt-dados.
+        ASSIGN tt-dados.arquivo-num   = 1
+               tt-dados.planilha-num  = 1
+               tt-dados.celula-coluna = 8
+               tt-dados.celula-linha  = i-linha
+               tt-dados.celula-valor  = string(ACCUM TOTAL BY  doc-fiscal.nat-operacao truncate(it-doc-fisc.val-base-calc-cofins, 2)).
+    
+        CREATE tt-dados.
+        ASSIGN tt-dados.arquivo-num   = 1
+               tt-dados.planilha-num  = 1
+               tt-dados.celula-coluna = 9
+               tt-dados.celula-linha  = i-linha
+               tt-dados.celula-valor  = string(ACCUM TOTAL BY  doc-fiscal.nat-operacao truncate(it-doc-fisc.val-pis, 2)).
+    
+        CREATE tt-dados.
+        ASSIGN tt-dados.arquivo-num   = 1
+               tt-dados.planilha-num  = 1
+               tt-dados.celula-coluna = 10
+               tt-dados.celula-linha  = i-linha
+               tt-dados.celula-valor  = string(ACCUM TOTAL BY doc-fiscal.nat-operacao truncate(it-doc-fisc.val-cofins, 2)).
+    
+        ASSIGN i-linha = i-linha + 1.
+    
+    END.
+
+
+
+END.
+      

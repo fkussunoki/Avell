@@ -1,0 +1,77 @@
+/**************************************************************************
+**
+**  Include: esof0540.I10
+**
+**  Objetivo: Totalizacao dos valores para geracao do tt-tab-ocor por estado
+**
+**  Parametro {1} = nome do arquivo
+**            {2} = nome do arquivo
+***************************************************************************/
+
+
+if  estabelec.estado <> {1}.estado 
+and {1}.pais          = "Brasil" then do:
+    find first tt-tab-ocor 
+        where tt-tab-ocor.cod-tab    = 249
+        and   tt-tab-ocor.c-campo[1] = {1}.estado
+        and   tt-tab-ocor.c-campo[2] = c-usuario
+        and   tt-tab-ocor.c-campo[3] = "RESUMO" 
+        no-error.
+
+    if  not avail tt-tab-ocor then do:
+        find last tt-tab-ocor where tt-tab-ocor.cod-tab = 249 no-lock no-error.
+        assign i-aux = if avail tt-tab-ocor then tt-tab-ocor.cod-ocor + 1 else 1. 
+
+        create tt-tab-ocor.
+        assign tt-tab-ocor.cod-tab     = 249
+               tt-tab-ocor.cod-ocor    = i-aux
+               tt-tab-ocor.c-campo[1]  = {1}.estado
+               tt-tab-ocor.c-campo[2]  = c-usuario
+               tt-tab-ocor.c-campo[3]  = "RESUMO"
+               tt-tab-ocor.cod-estabel = estabelec.cod-estabel.
+    end.
+
+    assign tt-tab-ocor.de-campo[1] = tt-tab-ocor.de-campo[1] + {2}.vl-bsubs-it
+           tt-tab-ocor.de-campo[2] = tt-tab-ocor.de-campo[2] + {2}.vl-icmsub-it
+           tt-tab-ocor.de-campo[4] = tt-tab-ocor.de-campo[4] + {2}.vl-bicms-it
+           tt-tab-ocor.de-campo[5] = tt-tab-ocor.de-campo[5] + (IF  doc-fiscal.tipo-nat = 3 
+                                                                AND AVAIL natur-oper 
+                                                                AND natur-oper.cd-trib-icm = 3
+                                                                    THEN {2}.vl-tot-item 
+                                                                    ELSE IF  doc-fiscal.tipo-nat <> 3 
+                                                                             THEN {2}.vl-icmsou-it
+                                                                             ELSE 0 ).
+
+    if  ({2}.vl-bsubs-it > 0
+        or {2}.vl-icmsub-it > 0) then
+        assign tt-tab-ocor.de-campo[3] = tt-tab-ocor.de-campo[3] + IF  doc-fiscal.tipo-nat = 3 THEN {2}.vl-tot-item ELSE {2}.vl-icmsou-it.
+            
+    if  (l-documentos /* somente documentos com icms substituto */
+        and ({2}.vl-bsubs-it > 0
+        or {2}.vl-icmsub-it > 0))
+        /* todos os documentos */
+        or not l-documentos then do:
+        
+       /*
+       &if '{&bf_dis_versao_ems}' = '2.04' or '{&bf_dis_versao_ems}' = '2.05' &then
+            if l-icms-subst = no then
+                assign tt-tab-ocor.descricao = string(decimal(tt-tab-ocor.descricao) + {2}.vl-tot-item - {1}.dec-2,">>>>>>>>>>99.99").
+            else
+                assign tt-tab-ocor.descricao = string(decimal(tt-tab-ocor.descricao) + {2}.vl-tot-item,">>>>>>>>>>99.99"). 
+       &elseif '{&bf_dis_versao_ems}' >= '2.06' &then
+                if l-icms-subst = no then
+                    assign tt-tab-ocor.descricao = string(decimal(tt-tab-ocor.descricao) + {2}.vl-tot-item - {1}.val-icms-subs-entr,">>>>>>>>>>99.99").
+                else
+                    assign tt-tab-ocor.descricao = string(decimal(tt-tab-ocor.descricao) + {2}.vl-tot-item,">>>>>>>>>>99.99").
+            &end
+                 assign tt-tab-ocor.descricao = string(decimal(tt-tab-ocor.descricao) + {2}.vl-tot-item,">>>>>>>>>>99.99").
+       &endif.
+       */
+       
+        assign tt-tab-ocor.descricao = string(decimal(tt-tab-ocor.descricao) + {2}.vl-tot-item,">>>>>>>>>>99.99").
+ 
+    end.
+    
+end.
+
+/* esof0540.I10 */

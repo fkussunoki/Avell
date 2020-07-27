@@ -1,0 +1,91 @@
+ADD TABLE "ext_lim_justif"
+  AREA "Schema Area"
+  DUMP-NAME "ext_lim_justif"
+  TABLE-TRIGGER "CREATE" NO-OVERRIDE PROCEDURE "tgesp\tgmgla1203.p" CRC "36065" 
+
+ADD FIELD "cod_empresa" OF "ext_lim_justif" AS character 
+  FORMAT "x(3)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 6
+  ORDER 10
+
+ADD FIELD "cod_exercicio" OF "ext_lim_justif" AS integer 
+  FORMAT "9999"
+  INITIAL "0"
+  POSITION 3
+  MAX-WIDTH 4
+  ORDER 20
+
+ADD FIELD "num_periodo_ctbl" OF "ext_lim_justif" AS integer 
+  FORMAT ">99"
+  INITIAL "0"
+  POSITION 4
+  MAX-WIDTH 4
+  ORDER 30
+
+ADD FIELD "cod_niv_usuario" OF "ext_lim_justif" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 5
+  MAX-WIDTH 40
+  ORDER 40
+
+ADD FIELD "dat_lim_justif" OF "ext_lim_justif" AS datetime 
+  FORMAT "99/99/9999 HH:MM:SS.SSS"
+  INITIAL ?
+  POSITION 6
+  MAX-WIDTH 8
+  ORDER 50
+
+ADD FIELD "dat_inicio_justif" OF "ext_lim_justif" AS datetime 
+  FORMAT "99/99/9999 HH:MM:SS.SSS"
+  INITIAL ?
+  POSITION 7
+  MAX-WIDTH 8
+  ORDER 60
+
+ADD FIELD "valor_minimo" OF "ext_lim_justif" AS decimal 
+  FORMAT "->>,>>9.99"
+  INITIAL "0"
+  POSITION 8
+  MAX-WIDTH 17
+  DECIMALS 2
+  ORDER 70
+
+ADD FIELD "var_perc_positiva" OF "ext_lim_justif" AS decimal 
+  FORMAT "->>>.99"
+  INITIAL "0"
+  POSITION 9
+  MAX-WIDTH 17
+  DECIMALS 2
+  ORDER 80
+
+ADD FIELD "val_perc_negativa" OF "ext_lim_justif" AS decimal 
+  FORMAT "->>>.99"
+  INITIAL "0"
+  POSITION 10
+  MAX-WIDTH 17
+  DECIMALS 2
+  ORDER 90
+
+ADD FIELD "valor_minimo_neg" OF "ext_lim_justif" AS decimal 
+  FORMAT "->>>,>>>,>>>,>>>,>>>.99"
+  INITIAL "0"
+  POSITION 11
+  MAX-WIDTH 17
+  DECIMALS 2
+  ORDER 100
+
+ADD FIELD "primary" OF "ext_lim_justif" AS logical 
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 12
+  MAX-WIDTH 1
+  ORDER 110
+
+.
+PSC
+cpstream=ibm850
+.
+0000001791

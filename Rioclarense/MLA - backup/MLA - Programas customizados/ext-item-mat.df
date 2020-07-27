@@ -1,0 +1,51 @@
+ADD TABLE "ext-item-mat"
+  AREA "Schema Area"
+  DUMP-NAME "ext-item-mat"
+
+ADD FIELD "it-codigo" OF "ext-item-mat" AS character 
+  FORMAT "x(16)"
+  INITIAL ""
+  POSITION 2
+  MAX-WIDTH 32
+  ORDER 10
+
+ADD FIELD "ct-codigo-adm" OF "ext-item-mat" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 3
+  MAX-WIDTH 40
+  ORDER 20
+
+ADD FIELD "ct-codigo-coml" OF "ext-item-mat" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 4
+  MAX-WIDTH 40
+  ORDER 30
+
+ADD FIELD "sc-cod-adm" OF "ext-item-mat" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 5
+  MAX-WIDTH 40
+  ORDER 40
+
+ADD FIELD "sc-cod-coml" OF "ext-item-mat" AS character 
+  FORMAT "x(20)"
+  INITIAL ""
+  POSITION 6
+  MAX-WIDTH 40
+  ORDER 50
+
+ADD FIELD "l-rateio" OF "ext-item-mat" AS logical 
+  FORMAT "yes/no"
+  INITIAL "no"
+  POSITION 7
+  MAX-WIDTH 1
+  ORDER 60
+
+.
+PSC
+cpstream=ibm850
+.
+0000000878

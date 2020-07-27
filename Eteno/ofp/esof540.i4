@@ -1,0 +1,173 @@
+/**************************************************************************
+**
+**  Include: esof0540.I4
+**
+**  Objetivo: Display dos totais do Resumo de Operacoes
+**
+***************************************************************************/
+if i-op-rel = 1 then do: 
+    put "1"                                    at  61
+        {2}[1]  format ">>>>>>,>>>,>>9.99"     at  63.
+    if  {3} = 1 then
+        /* put dec(tt-tab-ocor.c-campo[5]) format ">9.99" at 81. */
+        IF  dec(tt-tab-ocor.c-campo[5]) = 100                           /* Elaine Atv 245267 */
+                THEN put dec(tt-tab-ocor.c-campo[5]) format ">>9" AT 81.      
+            ELSE 
+             put dec(tt-tab-ocor.c-campo[5]) format ">9.99" AT 81.
+    put {2}[2]  format ">>>>>>,>>>,>>9.99"     at  87
+        "1"                                    at 107
+        {2}[7]  format ">>>>>>,>>>,>>9.99"     at 109
+        {2}[8]  format ">>>>>>,>>>,>>9.99"     at 127.
+    if  {2}[11] > 0 then do:
+        IF c-estado = "MG":U THEN DO:
+            /* Inicio -- Projeto Internacional */
+            {utp/ut-liter.i "DEBITO" *}
+            put TRIM(RETURN-VALUE) + ":" FORMAT "X(8)" at 145 skip.
+        END. 
+        ELSE DO:
+            /* Inicio -- Projeto Internacional */
+            {utp/ut-liter.i "Dif.Aliq.ICMS" *}
+            put TRIM(RETURN-VALUE) + "=" FORMAT "X(14)" at 145 skip.
+        END. 
+    end.
+    put "2"                                    at  61
+        {2}[3]  format ">>>>>>,>>>,>>9.99"     at  63
+        0       format ">>>>>>,>>>,>>9.99"     at  87
+        "2"                                    at 107
+        {2}[9]  format ">>>>>>,>>>,>>9.99"     at 109
+        0       format ">>>>>>,>>>,>>9.99"     at 127.
+    if  {2}[11] > 0 then
+        put "("                                at 145
+            {2}[11]  format ">>>>>,>>9.99"
+            ")"                                       skip.
+    put "3"                                    at  61
+        {2}[4]  format ">>>>>>,>>>,>>9.99"     at  63
+        0       format ">>>>>>,>>>,>>9.99"     at  87
+        "3"                                    at 107
+        {2}[10] format ">>>>>>,>>>,>>9.99"     at 109
+        0       format ">>>>>>,>>>,>>9.99"     at 127.
+
+    if {4} = 7 then do:
+        find first w-auxi where w-auxi.cfop = tt-tab-ocor.c-campo[4] no-error.
+        IF AVAIL w-auxi THEN DO:
+            /* Inicio -- Projeto Internacional */
+            {utp/ut-liter.i "CREDITO" *}
+            PUT TRIM(RETURN-VALUE) + ":" FORMAT "X(8)" AT 145 SKIP.
+        END. 
+    end.  
+
+    if {4} = 8 then do:
+        for each w-auxi where substr(w-auxi.cfop,1,1) =
+            substr(tt-tab-ocor.c-campo[4],1,1):
+            accumulate w-auxi.valor (total).
+        end.
+        if (accum total w-auxi.valor) > 0 THEN DO:
+            /* Inicio -- Projeto Internacional */
+            {utp/ut-liter.i "CREDITO" *}
+            PUT TRIM(RETURN-VALUE) + ":" FORMAT "X(8)" AT 145 SKIP.
+        END. 
+    end.
+
+    if {4} = 9 then do:
+        for each w-auxi:
+            accumulate w-auxi.valor (total).
+        end.
+        if (accum total w-auxi.valor) > 0 THEN DO:
+            /* Inicio -- Projeto Internacional */
+            {utp/ut-liter.i "CREDITO" *}
+            PUT TRIM(RETURN-VALUE) + ":" FORMAT "X(8)" AT 145 SKIP.
+        END. 
+    end.
+   
+    if {2}[5] > 0 or {2}[6] > 0 then do:
+       run pi-verifica-linhas in h-esof0540e (line-counter,1,c-localiz).
+        put "ST":U                             at  61
+            {2}[5]  format ">>>>>>,>>>,>>9.99" at  63
+            {2}[6]  format ">>>>>>,>>>,>>9.99" at  87 skip.
+    end.
+
+    if {4} = 7 then do:
+        find first w-auxi where w-auxi.cfop = tt-tab-ocor.c-campo[4] no-error.
+        if avail w-auxi then
+            put "("                                at 145
+                w-auxi.valor format ">>>>>,>>9.99"
+                ")"                                       skip.
+    end.
+
+    if {4} = 8 then do:
+        for each w-auxi where substr(w-auxi.cfop,1,1) =
+            substr(tt-tab-ocor.c-campo[4],1,1):
+            accumulate w-auxi.valor (total).
+        end.
+        if (accum total w-auxi.valor) > 0 then
+            put "("                                at 145
+                accum total w-auxi.valor format ">>>>>,>>9.99"
+                ")"                                       skip.
+    end.
+
+    if {4} = 9 then do:
+        for each w-auxi:
+            accumulate w-auxi.valor (total).
+        end.
+        if (accum total w-auxi.valor) > 0 then
+            put "("                                at 145
+                accum total w-auxi.valor format ">>>>>,>>9.99"
+                ")"                                       skip.
+    end.
+    
+    if (c-estado = "MG":U
+    or c-estado = "PE":U) and {2}[12] > 0 then do:
+        run pi-verifica-linhas in h-esof0540e (line-counter,3,c-localiz).
+        /* Inicio -- Projeto Internacional */
+        {utp/ut-liter.i "OBS" *}
+        put TRIM(RETURN-VALUE) FORMAT "X(3)"   at 106
+            {2}[12] format ">>>>>>,>>>,>>9.99" at 109
+            0       format ">>>>>>,>>>,>>9.99" at 127 skip.
+    end.   
+end.
+/*
+else do:
+    put "ICMS"                                at 61
+        "1"                                   at 66
+        {2}[1]  format ">>>>>>>,>>>,>>9.99"   at 69.
+    if  {3} = 1 then
+        IF  dec(tt-tab-ocor.c-campo[5]) = 100 
+                THEN put dec(tt-tab-ocor.c-campo[5]) format ">>9" at 88      
+            ELSE 
+             put dec(tt-tab-ocor.c-campo[5]) format ">9.99" at 88.
+    put {2}[2]  format ">>>>>>>,>>>,>>9.99"    at 93
+        {2}[5]  format ">>>>>>>,>>>,>>9.99"    at 111
+        {2}[6]  format ">>>>>>>,>>>,>>9.99"    at 131.
+    if  {2}[11] > 0 then
+        put "Dif.Aliq.ICMS="                  at 154 skip.
+    put "2"                                   at 66
+        {2}[3]  format ">>>>>>>,>>>,>>9.99"   at 69
+        0       format ">>>>>>>,>>>,>>9.99"   at 93.
+    if  {2}[11] > 0 then
+        put "("                               at 154
+            {2}[11]  format ">>>>>,>>9.99"
+            ")"                                     skip.
+    put "3"                                   at 66
+        {2}[4]  format ">>>>>>>,>>>,>>9.99"   at 69
+        0       format ">>>>>>>,>>>,>>9.99"   at 93 skip.
+    run pi-verifica-linhas in h-esof0540e (line-counter,3,c-localiz).
+    put "IPI"                                 at 61
+        "1"                                   at 66
+        {2}[7]  format ">>>>>>>,>>>,>>9.99"   at 69
+        {2}[8]  format ">>>>>>>,>>>,>>9.99"   at 93 skip
+        "2"                                   at 66
+        {2}[9]  format ">>>>>>>,>>>,>>9.99"   at 69
+        0       format ">>>>>>>,>>>,>>9.99"   at 93 skip
+        "3"                                   at 66
+        {2}[10] format ">>>>>>>,>>>,>>9.99"   at 69
+        0       format ">>>>>>>,>>>,>>9.99"   at 93 skip.
+    if (c-estado = "MG"
+    or c-estado = "PE") and {2}[12] > 0 then do:
+        run pi-verifica-linhas in h-esof0540e (line-counter,3,c-localiz).
+        put "OBS"                               at 61
+            {2}[12] format ">>>>>>>,>>>,>>9.99" at 69
+            0       format ">>>>>>>,>>>,>>9.99" at 93 skip.
+    end.
+end.
+  */
+/* fim include esof0540.i4. */

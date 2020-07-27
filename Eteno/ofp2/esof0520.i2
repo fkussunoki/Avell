@@ -1,0 +1,28 @@
+/******************************************************************************
+**  Include...: esof0520F.I2
+**  Objetivo..:  
+******************************************************************************/
+
+assign c-obs-total = c-linha-branco.
+
+if  l-imp-for then do:
+    if  i-status = 0 then do:
+        overlay(c-obs-total,2) = c-nome-emit.
+        assign i-status = 1.
+    end.
+    else 
+        if  i-status = 1 then do: 
+            
+            if  l-imp-cnpj then do:
+                RUN pi-edita-cgc(INPUT doc-fiscal.cgc, OUTPUT c-cgc-e).
+                overlay(c-obs-total,2) = "CNPJ.: " + c-cgc-e.
+            end.
+                
+            if  l-imp-ins then
+                 overlay(c-obs-total,30) = "Insc.Est.: " +
+                 doc-fiscal.ins-estadual.
+                 
+            assign i-status = 2.
+        end.
+end.
+/* esof0520f.i2 */ 
