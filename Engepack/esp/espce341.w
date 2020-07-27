@@ -51,6 +51,7 @@ def temp-table tt-digita
     field vlr-total        as dec format "->>>,>>>,>>>,>>9.99"
     field rw-nec        as rowid
     field l-criado      as logical initial no
+    field concatena     as char
     index codigo marca
                  cod-estabel
                  it-codigo
@@ -98,6 +99,9 @@ define buffer bf3-oc for it-requisicao.
 DEF NEW GLOBAL SHARED VAR v_cod_usuar_corren AS CHAR NO-UNDO.
 DEF VAR h-acomp AS HANDLE.
 def var v-cta-fixa as char. //conta fixada conforme email enviado por Marta 16.07.2020
+
+def var v-init as datetime.
+def var v-fim as datetime.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
@@ -397,37 +401,59 @@ procedure pi-executar:
   ASSIGN i-seq = 1.
   assign i-itens = 0.
 
+  assign v-init = now.
+  run utp\ut-acomp.p persistent set h-acomp.
+
+  run pi-inicializar in h-acomp(input "Gerando Solicitacoes").
+  
+  gera_itens:
+
 
   for each tt-digita where tt-digita.marca = "*" 
                      and   tt-digita.l-criado = no
-                    break by tt-digita.cod-estabel:
+                    break by tt-digita.concatena:
 
-
-    if first-of(tt-digita.cod-estabel) then do:
+//alteracao conforme solicitacao de email 22.07
+   if first-of(tt-digita.concatena) then do:
       ASSIGN i-seq = 1.
       assign i-itens = 0.
     
       assign v_cod_estab = tt-digita.cod-estabel.
 
+      find first it-requisicao where   it-requisicao.it-codigo = tt-digita.it-codigo
+                                 and   it-requisicao.cod-estabel = tt-digita.cod-estabel
+                                 and   it-requisicao.situacao  <> 2
+                                 no-error.
+
+                                 if  avail it-requisicao then do:
+                                  assign tt-digita.l-criado = no
+                                         tt-digita.marca    = "".
+                                  NEXT gera_itens.
+                                 end.
+
+
 
     RUN pi-nr-solicita(OUTPUT nr-req).
 
+
     assign v_nr_req = nr-req.
-    
-    run pi-cria-lote(input v_cod_estab,
+
+  
+    run pi-cria-lote(input tt-digita.it-codigo,
+                     input v_cod_estab,
                      input v_nr_req).
-    end.
 
-    IF LAST-OF(tt-digita.cod-estabel) THEN DO:
 
-        FIND LAST it-requisicao NO-LOCK WHERE it-requisicao.nr-requisicao = nr-req 
-                                        AND   it-requisicao.cod-estabel   = v_cod_estab NO-ERROR.
+
         run pi-cria-mla(input rowid(it-requisicao)).
-        run pi-apaga-query.
 
-    END.
+        
+
+   END.
   end.
+RUN pi-finalizar IN h-acomp.
 
+run pi-apaga-query.
 end procedure.
 
 procedure pi-apaga-query:
@@ -451,28 +477,22 @@ procedure pi-apaga-query:
     end.
   end. 
 
-RUN pi-finalizar IN h-acomp.
 end procedure.
 
 procedure pi-cria-lote:
-
+    def input param p-it-codigo as char no-undo.
     def input param p-estab as char no-undo.
     def input param p-req   as integer no-undo.
     def var h_api_ccusto as handle no-undo.
     def var v_log_utz_ccusto as logical no-undo.
     def var v_ccusto as char no-undo.
-    def buffer b-it-requisicao for it-requisicao.
     RUN prgint/utb/utb742za.py PERSISTENT SET h_api_ccusto.
 
-  
-
-  find last tt-digita where tt-digita.marca = "*" 
-                      and   tt-digita.cod-estabel = p-estab no-error.
 
   ASSIGN tt-digita.numero-ordem = p-req.
 
+  run pi-acompanhar in h-acomp(input "Estab " + tt-digita.cod-estabel + " Item " + tt-digita.it-codigo + " Seq " + string(i-seq) + " SC " + string(tt-digita.numero-ordem)).
 
-  if avail tt-digita then do:
   create requisicao.
   assign requisicao.cod-estabel         = tt-digita.cod-estabel
          requisicao.dt-atend            = ?
@@ -485,29 +505,18 @@ procedure pi-cria-lote:
          requisicao.situacao            = 1
          requisicao.tp-requis           = 2.
 
-         run utp\ut-acomp.p persistent set h-acomp.
-
-         run pi-inicializar in h-acomp(input "Gerando Solicitacoes").
        
-    for each tt-digita         where tt-digita.marca = "*"
-                               and   tt-digita.cod-estabel = p-estab
-                               and   tt-digita.l-criado    = no
-                               break by tt-digita.cod-estabel:
+//    for each tt-digita         where tt-digita.marca = "*"
+//                               and   tt-digita.cod-estabel = p-estab
+//                               and   tt-digita.l-criado    = no
+//                               break by tt-digita.cod-estabel:
 
 
 
-    find first b-it-requisicao where b-it-requisicao.it-codigo = tt-digita.it-codigo
-                               and   b-it-requisicao.cod-estabel = tt-digita.cod-estabel
-                               and   b-it-requisicao.situacao  <> 4
-                               and   b-it-requisicao.situacao  <> 2
-                               no-error.
-
-                               if avail b-it-requisicao then next.
 
     assign tt-digita.numero-ordem = p-req
            tt-digita.l-criado     = yes.
 
-           run pi-acompanhar in h-acomp(input "Estab " + tt-digita.cod-estabel + " Item " + tt-digita.it-codigo + " Seq " + string(i-seq) + " SC " + string(tt-digita.numero-ordem)).
 
       find first item no-lock where item.it-codigo = TT-DIGITA.it-codigo no-error.
 
@@ -580,17 +589,11 @@ procedure pi-cria-lote:
         run pi-apaga-query.
         run pi-executar.
       end.
-  END. //for each
-
-end. //tt-digita
+  //END. //for each
 
 
 
-  FIND FIRST tt-digita where tt-digita.marca = "*" 
-                      and    tt-digita.cod-estabel = p-estab 
-                      and    tt-digita.l-criado    = no NO-ERROR .
 
-  if avail tt-digita then do:
     FIND FIRST requisicao NO-LOCK WHERE requisicao.nr-requisicao = tt-digita.numero-ordem NO-ERROR.
 
                 run cdp/cdapi173.p (input  1, //Solicitacao por item 2, total 1
@@ -604,20 +607,17 @@ end. //tt-digita
 
         run pi-cria-mla(input rowid(it-requisicao)).
     end.
-  end.
-
   delete procedure h_api_ccusto.
 
 end procedure.
 
 procedure pi-cria-mla:
-
   define input param p-rowid-requisicao as rowid no-undo.
   run cdp/cdapi171.p (INPUT 1,
                       INPUT 1,
                       p-rowid-requisicao).
-  run piMensagemAprEletr(input p-rowid-requisicao).
-
+  //alteracao enviada por email pela Marta.
+  //run piMensagemAprEletr(input p-rowid-requisicao).
 
 end procedure.
 
@@ -1098,7 +1098,8 @@ DEFINE VAR l-lo AS LOGICAL.
                        tt-digita.estoque-dispo = necessidade-oc.estoque-dispo
                        tt-digita.marca         = "*"
                        tt-digita.rw-nec        = rowid(necessidade-oc)
-                       tt-digita.l-criado       = no.
+                       tt-digita.l-criado       = no
+                       tt-digita.concatena      = necessidade-oc.cod-estabel + " " + necessidade-oc.it-codigo.
                end.
             end.
         end.
