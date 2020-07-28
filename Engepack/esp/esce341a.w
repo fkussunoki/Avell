@@ -69,14 +69,13 @@ DEFINE OUTPUT PARAMETER p-acao AS CHARACTER INITIAL "" NO-UNDO.
 &Scoped-define FRAME-NAME f-cad
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rt-button RECT-22 IMAGE-5 RECT-26 IMAGE-6 ~
-IMAGE-7 IMAGE-8 IMAGE-9 IMAGE-10 IMAGE-11 IMAGE-12 IMAGE-13 IMAGE-14 ~
-IMAGE-15 IMAGE-16 c-estabelec-ini c-estabelec-fim i-ge-ini i-ge-fim ~
-c-familia-ini c-familia-fim c-item-ini c-item-fim da-data-ini da-data-fim ~
-l-pto-enc l-periodico bt-ok bt-cancela 
-&Scoped-Define DISPLAYED-OBJECTS c-estabelec-ini c-estabelec-fim i-ge-ini ~
-i-ge-fim c-familia-ini c-familia-fim c-item-ini c-item-fim da-data-ini ~
-da-data-fim l-pto-enc l-periodico 
+&Scoped-Define ENABLED-OBJECTS rt-button RECT-22 RECT-26 IMAGE-9 IMAGE-10 ~
+IMAGE-11 IMAGE-12 IMAGE-13 IMAGE-14 c-estabelec-ini i-ge-ini c-familia-ini ~
+c-familia-fim c-item-ini c-item-fim da-data-ini da-data-fim l-pto-enc ~
+l-periodico bt-ok bt-cancela 
+&Scoped-Define DISPLAYED-OBJECTS c-estabelec-ini i-ge-ini c-familia-ini ~
+c-familia-fim c-item-ini c-item-fim da-data-ini da-data-fim l-pto-enc ~
+l-periodico 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -119,10 +118,6 @@ DEFINE BUTTON bt-ok
      LABEL "Ok" 
      SIZE 15 BY 1.13.
 
-DEFINE VARIABLE c-estabelec-fim AS CHARACTER FORMAT "x(5)" INITIAL "zzzzz" 
-     VIEW-AS FILL-IN 
-     SIZE 7.14 BY .88 NO-UNDO.
-
 DEFINE VARIABLE c-estabelec-ini AS CHARACTER FORMAT "x(5)" 
      LABEL "Estab":R7 
      VIEW-AS FILL-IN 
@@ -155,10 +150,6 @@ DEFINE VARIABLE da-data-ini AS DATE FORMAT "99/99/9999":U
      VIEW-AS FILL-IN 
      SIZE 14 BY .88 NO-UNDO.
 
-DEFINE VARIABLE i-ge-fim AS INTEGER FORMAT "99":U INITIAL 99 
-     VIEW-AS FILL-IN 
-     SIZE 4 BY .88 NO-UNDO.
-
 DEFINE VARIABLE i-ge-ini AS INTEGER FORMAT "99":U INITIAL 0 
      LABEL "Grupo Estoque" 
      VIEW-AS FILL-IN 
@@ -184,30 +175,6 @@ DEFINE IMAGE IMAGE-14
      FILENAME "image\im-las":U
      SIZE 3 BY .88.
 
-DEFINE IMAGE IMAGE-15
-     FILENAME "image\im-fir":U
-     SIZE 3 BY .88.
-
-DEFINE IMAGE IMAGE-16
-     FILENAME "image\im-las":U
-     SIZE 3 BY .88.
-
-DEFINE IMAGE IMAGE-5
-     FILENAME "image\im-fir":U
-     SIZE 3 BY .88.
-
-DEFINE IMAGE IMAGE-6
-     FILENAME "image\im-las":U
-     SIZE 3 BY .88.
-
-DEFINE IMAGE IMAGE-7
-     FILENAME "image\im-fir":U
-     SIZE 3 BY .88.
-
-DEFINE IMAGE IMAGE-8
-     FILENAME "image\im-las":U
-     SIZE 3 BY .88.
-
 DEFINE IMAGE IMAGE-9
      FILENAME "image\im-fir":U
      SIZE 3 BY .88.
@@ -226,7 +193,7 @@ DEFINE RECTANGLE rt-button
      SIZE 89.72 BY 1.46
      BGCOLOR 7 .
 
-DEFINE VARIABLE l-periodico AS LOGICAL INITIAL yes
+DEFINE VARIABLE l-periodico AS LOGICAL INITIAL yes 
      LABEL "Periodico" 
      VIEW-AS TOGGLE-BOX
      SIZE 11.57 BY .83 NO-UNDO.
@@ -241,9 +208,7 @@ DEFINE VARIABLE l-pto-enc AS LOGICAL INITIAL no
 
 DEFINE FRAME f-cad
      c-estabelec-ini AT ROW 3.5 COL 14.14 COLON-ALIGNED WIDGET-ID 116
-     c-estabelec-fim AT ROW 3.5 COL 44.72 COLON-ALIGNED NO-LABEL WIDGET-ID 114
      i-ge-ini AT ROW 4.5 COL 14.14 COLON-ALIGNED WIDGET-ID 132
-     i-ge-fim AT ROW 4.5 COL 44.72 COLON-ALIGNED NO-LABEL WIDGET-ID 130
      c-familia-ini AT ROW 5.5 COL 14.14 COLON-ALIGNED WIDGET-ID 120
      c-familia-fim AT ROW 5.5 COL 44.72 COLON-ALIGNED NO-LABEL WIDGET-ID 118
      c-item-ini AT ROW 6.5 COL 14.14 COLON-ALIGNED WIDGET-ID 124
@@ -256,19 +221,13 @@ DEFINE FRAME f-cad
      bt-cancela AT ROW 16 COL 19.29 WIDGET-ID 112
      rt-button AT ROW 1 COL 1
      RECT-22 AT ROW 2.67 COL 1.29 WIDGET-ID 2
-     IMAGE-5 AT ROW 3.5 COL 38.43 WIDGET-ID 6
      RECT-26 AT ROW 15.58 COL 1.72 WIDGET-ID 108
-     IMAGE-6 AT ROW 3.5 COL 43.29 WIDGET-ID 8
-     IMAGE-7 AT ROW 3.5 COL 38.43 WIDGET-ID 134
-     IMAGE-8 AT ROW 3.5 COL 43.29 WIDGET-ID 136
      IMAGE-9 AT ROW 7.58 COL 38.29 WIDGET-ID 138
      IMAGE-10 AT ROW 7.58 COL 43.14 WIDGET-ID 140
      IMAGE-11 AT ROW 6.58 COL 38.29 WIDGET-ID 142
      IMAGE-12 AT ROW 6.58 COL 43.14 WIDGET-ID 144
      IMAGE-13 AT ROW 5.58 COL 38.43 WIDGET-ID 146
      IMAGE-14 AT ROW 5.58 COL 43.29 WIDGET-ID 148
-     IMAGE-15 AT ROW 4.58 COL 38.43 WIDGET-ID 150
-     IMAGE-16 AT ROW 4.58 COL 43.29 WIDGET-ID 152
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
@@ -560,15 +519,13 @@ PROCEDURE enable_UI :
                These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY c-estabelec-ini c-estabelec-fim i-ge-ini i-ge-fim c-familia-ini 
-          c-familia-fim c-item-ini c-item-fim da-data-ini da-data-fim l-pto-enc 
-          l-periodico 
+  DISPLAY c-estabelec-ini i-ge-ini c-familia-ini c-familia-fim c-item-ini 
+          c-item-fim da-data-ini da-data-fim l-pto-enc l-periodico 
       WITH FRAME f-cad IN WINDOW w-livre.
-  ENABLE rt-button RECT-22 IMAGE-5 RECT-26 IMAGE-6 IMAGE-7 IMAGE-8 IMAGE-9 
-         IMAGE-10 IMAGE-11 IMAGE-12 IMAGE-13 IMAGE-14 IMAGE-15 IMAGE-16 
-         c-estabelec-ini c-estabelec-fim i-ge-ini i-ge-fim c-familia-ini 
-         c-familia-fim c-item-ini c-item-fim da-data-ini da-data-fim l-pto-enc 
-         l-periodico bt-ok bt-cancela 
+  ENABLE rt-button RECT-22 RECT-26 IMAGE-9 IMAGE-10 IMAGE-11 IMAGE-12 IMAGE-13 
+         IMAGE-14 c-estabelec-ini i-ge-ini c-familia-ini c-familia-fim 
+         c-item-ini c-item-fim da-data-ini da-data-fim l-pto-enc l-periodico 
+         bt-ok bt-cancela 
       WITH FRAME f-cad IN WINDOW w-livre.
   {&OPEN-BROWSERS-IN-QUERY-f-cad}
   VIEW w-livre.
@@ -655,9 +612,7 @@ IF NOT AVAIL tt-filtro THEN
 
 
     ASSIGN tt-filtro.ttv-estab-ini      = input frame f-cad  c-estabelec-ini
-           tt-filtro.ttv-estab-fim      = input frame f-cad  c-estabelec-fim
            tt-filtro.ttv-ge-ini         = input frame f-cad  i-ge-ini
-           tt-filtro.ttv-ge-fim         = input frame f-cad  i-ge-fim
            tt-filtro.ttv-fam-ini        = input frame f-cad  c-familia-ini
            tt-filtro.ttv-fam-fim        = input frame f-cad  c-familia-fim
            tt-filtro.ttv-it-ini         = input frame f-cad  c-item-ini

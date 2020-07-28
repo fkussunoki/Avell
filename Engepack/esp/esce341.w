@@ -1111,8 +1111,7 @@ PROCEDURE pi-carrega-tabela :
 DEFINE VAR l-lo AS LOGICAL.
     find first tt-filtro no-error.
     for each estabelec fields (cod-estabel) where
-        estabelec.cod-estabel >= tt-filtro.ttv-estab-ini and
-        estabelec.cod-estabel <= tt-filtro.ttv-estab-fim no-lock:
+        estabelec.cod-estabel = tt-filtro.ttv-estab-ini no-lock:
 
 
         for each necessidade-oc where
@@ -1125,14 +1124,10 @@ DEFINE VAR l-lo AS LOGICAL.
 
             for first item fields (it-codigo fm-codigo ge-codigo) where
                  item.it-codigo = necessidade-oc.it-codigo no-lock: 
-            if item.ge-codigo > tt-filtro.ttv-ge-fim or
-               item.ge-codigo < tt-filtro.ttv-ge-ini then
+            if item.ge-codigo <> tt-filtro.ttv-ge-ini then
                 next.
             if item.fm-codigo > tt-filtro.ttv-fam-fim or
                item.fm-codigo < tt-filtro.ttv-fam-ini then
-                next.
-            if not (item.ge-codigo >= tt-filtro.ttv-ge-ini and
-                    item.ge-codigo <= tt-filtro.ttv-ge-fim) then
                 next.
 
 
