@@ -54,10 +54,10 @@ def temp-table tt-digita
     field concatena     as char
     FIELD c-erro        AS INTEGER INITIAL 0
     FIELD c-alerta      AS CHAR
-    index codigo marca
-                 cod-estabel
-                 it-codigo
-                 data-geracao.
+    index codigo  cod-estabel
+                  it-codigo
+                  marca
+                  data-geracao.
 
 DEFINE TEMP-TABLE tt-filtro
     FIELD ttv-estab-ini AS CHAR
@@ -450,7 +450,7 @@ procedure pi-executar:
   def var v_nr_req    as integer no-undo.
   DEF VAR i AS INTEGER NO-UNDO.
   ASSIGN i-seq = 1.
-  assign i-itens = 0.
+  assign i-itens = 1.
   ASSIGN i = 0.
 
   assign v-init = now.
@@ -473,7 +473,7 @@ procedure pi-executar:
 
       find first it-requisicao where   it-requisicao.it-codigo = tt-digita.it-codigo
                                  and   it-requisicao.cod-estabel = tt-digita.cod-estabel
-                                 and   it-requisicao.situacao  <> 2
+                                 and   it-requisicao.situacao  = 1
                                  and   it-requisicao.tp-requis = 2
                                  no-error.
 
@@ -557,7 +557,7 @@ procedure pi-cria-lote:
   assign requisicao.cod-estabel         = tt-digita.cod-estabel
          requisicao.dt-atend            = ?
          requisicao.dt-devol            = ?
-         requisicao.dt-requisicao       = tt-digita.data-geracao
+         requisicao.dt-requisicao       = today //tt-digita.data-geracao
          requisicao.estado              = 2
          requisicao.impressa            = 2
          requisicao.nome-abrev          = v_cod_usuar_corren
