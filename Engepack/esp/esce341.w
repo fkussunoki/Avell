@@ -450,7 +450,7 @@ procedure pi-executar:
   def var v_nr_req    as integer no-undo.
   DEF VAR i AS INTEGER NO-UNDO.
   ASSIGN i-seq = 1.
-  assign i-itens = 1.
+  assign i-itens = 0.
   ASSIGN i = 0.
 
   assign v-init = now.
@@ -464,6 +464,8 @@ procedure pi-executar:
   for each tt-digita where tt-digita.marca = "*" 
                      and   tt-digita.l-criado = no
                     break by tt-digita.concatena:
+
+      ASSIGN i-itens = i-itens + 1.
 
 //alteracao conforme solicitacao de email 22.07
    if first-of(tt-digita.concatena) then do:
@@ -487,7 +489,6 @@ procedure pi-executar:
                                  end.
 
 
-                                 ASSIGN i-itens = i-itens + 1.
 
     RUN pi-nr-solicita(OUTPUT nr-req).
 
@@ -629,8 +630,6 @@ procedure pi-cria-lote:
              it-requisicao.dt-entrega     = tt-digita.data-entrega
              .
 
-      ASSIGN i-seq = i-seq + 1.
-      assign i-itens = i-itens + 1.
 
       if i-seq > 999 then do:
         FIND FIRST requisicao NO-LOCK WHERE requisicao.nr-requisicao = p-req NO-ERROR.
