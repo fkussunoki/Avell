@@ -218,18 +218,18 @@ DEFINE QUERY br-digita FOR
 DEFINE BROWSE br-digita
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _DISPLAY-FIELDS br-digita w-livre _FREEFORM
   QUERY br-digita DISPLAY
-      tt-digita.marca
-      tt-digita.it-codigo     
-      tt-digita.cod-estabel 
-      tt-digita.c-geracao  
-      tt-digita.data-geracao
-      tt-digita.data-entrega
-      tt-digita.qt-ordem
-      tt-digita.qt-orig             
-      tt-digita.qt-pendente   
-      tt-digita.estoque-dispo
-      tt-digita.vlr-un
-      tt-digita.vlr-total
+      tt-digita.marca         column-label "Selec" 
+      tt-digita.it-codigo     column-label "Item"   
+      tt-digita.cod-estabel   column-label "Est Pad" 
+      tt-digita.c-geracao     column-label "Motivo" format "x(20)" 
+      tt-digita.data-geracao  column-label "Dt.Nec"
+      tt-digita.data-entrega  column-label "Dt.Entrega"
+      tt-digita.qt-ordem      column-label "Qtd.Ordem"
+      tt-digita.qt-orig       column-label "Qtd.Orig"    
+      tt-digita.qt-pendente   column-label "Qtd.Pend"
+      tt-digita.estoque-dispo column-label "Est.Disp"
+      tt-digita.vlr-un        column-label "Vlr.Unit"
+      tt-digita.vlr-total     column-label "Vlr.Total"
       tt-digita.c-alerta COLUMN-LABEL "Alerta" FORMAT "x(120)"
 ENABLE
       tt-digita.qt-ordem
