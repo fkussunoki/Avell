@@ -55,7 +55,7 @@ field ttv-cta-pat-para              as char
 field ttv-bem-de                    as char
 field ttv-inc-de                    as char
 field ttv-foto                      as char
-field ttv-desmembrar                as char
+field ttv-desmembrar                as LOGICAL
 field ttv-bem-para                  as char
 field ttv-inc-para                  as char
 field ttv-cc-de                     as char
@@ -85,7 +85,7 @@ FIELD ttv-concatena-para            AS CHAR
 FIELD ttv-score                     AS INTEGER
 FIELD ttv-cod-empresa               AS CHAR
 FIELD ttv-motivo                    AS CHAR
-FIELD ttv-selected                  AS LOGICAL
+FIELD ttv-selected                  AS CHAR FORMAT "x(1)"
 FIELD ttv-status-original           AS CHAR.
 
 DEF TEMP-TABLE tt-score //regua definida atraves de analise combinatoria
@@ -142,6 +142,7 @@ def temp-table tt_desmemb_novos_bem_pat_api no-undo
 
 
 
+
 /* Local Variable Definitions ---                                       */
 def var ch-excel As Com-handle No-undo.
 def var ch-book  As Com-handle No-undo.
@@ -160,7 +161,31 @@ def var c-arquivo-conv  as char no-undo.
 DEF VAR l-ok            AS LOGICAL NO-UNDO.
 DEF VAR v-num-linha     AS INTEGER NO-UNDO.
 def var v_hdl_api_bem_pat_desmbrto as handle no-undo.
+def var v_controle      as integer no-undo.
 def new shared stream s_1.
+DEF NEW GLOBAL SHARED VAR v_ind_message_output AS CHAR NO-UNDO.
+
+def NEW SHARED temp-table tt_desmembrto_bem_pat  NO-UNDO      
+    field tta_num_id_bem_pat               as integer format ">>,>>>,>>9" initial 0 label "Identifica»’o Bem" column-label "Identifica»’o Bem"
+    field tta_cod_empresa                  as character format "x(3)" label "Empresa" column-label "Empresa"
+    field tta_cod_cta_pat                  as character format "x(18)" label "Conta Patrimonial" column-label "Conta Patrimonial"
+    field tta_num_bem_pat                  as integer format ">>>>>>>>9" initial 0 label "Bem Patrimonial" column-label "Bem"
+    field tta_num_seq_bem_pat              as integer format ">>>>9" initial 0 label "Sequ¼ncia Bem" column-label "Sequ¼ncia"
+    field tta_des_bem_pat                  as character format "x(40)" label "Descri»’o Bem Pat" column-label "Descri»’o Bem Pat"
+    field tta_val_original                 as decimal format "->>>>>,>>>,>>9.99" decimals 4 initial 0 label "Valor Original" column-label "Valor Original"
+    field tta_val_perc_movto_bem_pat       as decimal format "->>>>,>>>,>>9.9999999" decimals 7 initial 0 label "Percentual Movimento" column-label "Percentual Movimento"
+    field tta_qtd_bem_pat_represen         as decimal format ">>>>>>>>9" initial 1 label "Quantidade Bens Representados" column-label "Bem Represen"
+    field tta_cod_estab                    as character format "x(3)" label "Estabelecimento" column-label "Estab"
+    field tta_cod_plano_ccusto             as character format "x(8)" label "Plano Centros Custo" column-label "Plano Centros Custo"
+    field tta_cod_ccusto_respons           as Character format "x(11)" label "CCusto Responsab" column-label "CCusto Responsab"
+    field tta_cod_unid_negoc               as character format "x(3)" label "Unid Neg½cio" column-label "Un Neg"
+    field ttv_log_busca_orig               as logical format "Sim/N’o" initial no label "Busca da Origem" column-label "Busca da Origem"
+    index tt_desmembrto_bem_pat_id         is primary unique
+          tta_cod_empresa                  ascending
+          tta_cod_cta_pat                  ascending
+          tta_num_bem_pat                  ascending
+          tta_num_seq_bem_pat              ascending
+    .
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -184,12 +209,10 @@ def new shared stream s_1.
 
 /* Definitions for BROWSE BROWSE-2                                      */
 &Scoped-define FIELDS-IN-QUERY-BROWSE-2 tt-planilha.ttv-selected tt-planilha.ttv-tratamento tt-planilha.ttv-localizacao-de tt-planilha.ttv-localizacao-para tt-planilha.ttv-cta-pat tt-planilha.ttv-descricao tt-planilha.ttv-cta-pat-para tt-planilha.ttv-bem-de tt-planilha.ttv-inc-de tt-planilha.ttv-desmembrar tt-planilha.ttv-bem-para tt-planilha.ttv-inc-para tt-planilha.ttv-cc-de tt-planilha.ttv-cc-para tt-planilha.ttv-dt-aquisicao tt-planilha.ttv-descricao1 tt-planilha.ttv-descricao-de tt-planilha.ttv-descricao-para tt-planilha.ttv-local-de tt-planilha.ttv-local-para tt-planilha.ttv-ps tt-planilha.ttv-cod-especie tt-planilha.ttv-des-especie tt-planilha.ttv-taxa-conta tt-planilha.ttv-vlr-original tt-planilha.ttv-vlr-original-corr tt-planilha.ttv-depreciacao tt-planilha.ttv-situacao tt-planilha.ttv-nf tt-planilha.ttv-fornecedor tt-planilha.ttv-dt-base-arquivo tt-planilha.ttv-taxa-societaria tt-planilha.ttv-residual   
-&Scoped-define ENABLED-FIELDS-IN-QUERY-BROWSE-2 tt-planilha.ttv-cc-de   tt-planilha.ttv-selected   
-&Scoped-define ENABLED-TABLES-IN-QUERY-BROWSE-2 tt-planilha
-&Scoped-define FIRST-ENABLED-TABLE-IN-QUERY-BROWSE-2 tt-planilha
+&Scoped-define ENABLED-FIELDS-IN-QUERY-BROWSE-2   
 &Scoped-define SELF-NAME BROWSE-2
-&Scoped-define QUERY-STRING-BROWSE-2 FOR EACH tt-planilha WHERE tt-planilha.ttv-selected = TRUE              INDEXED-REPOSITION
-&Scoped-define OPEN-QUERY-BROWSE-2 OPEN QUERY {&SELF-NAME} FOR EACH tt-planilha WHERE tt-planilha.ttv-selected = TRUE              INDEXED-REPOSITION.
+&Scoped-define QUERY-STRING-BROWSE-2 FOR EACH tt-planilha WHERE tt-planilha.ttv-selected = "*"              INDEXED-REPOSITION
+&Scoped-define OPEN-QUERY-BROWSE-2 OPEN QUERY {&SELF-NAME} FOR EACH tt-planilha WHERE tt-planilha.ttv-selected = "*"              INDEXED-REPOSITION.
 &Scoped-define TABLES-IN-QUERY-BROWSE-2 tt-planilha
 &Scoped-define FIRST-TABLE-IN-QUERY-BROWSE-2 tt-planilha
 
@@ -200,9 +223,10 @@ def new shared stream s_1.
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS rt-button RECT-13 BUTTON-11 bt-executar ~
-bt-importar c-planilha bt-dir-entrada BROWSE-2 c-motivo c-status 
-&Scoped-Define DISPLAYED-OBJECTS c-planilha c-motivo c-status FILL-IN-4 ~
-FILL-IN-5 FILL-IN-6 
+bt-importar c-planilha bt-dir-entrada l-desmembra BROWSE-2 c-motivo ~
+c-status 
+&Scoped-Define DISPLAYED-OBJECTS c-planilha l-desmembra c-motivo c-status ~
+FILL-IN-4 FILL-IN-5 FILL-IN-6 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -293,6 +317,11 @@ DEFINE RECTANGLE rt-button
      SIZE 126 BY 1.46
      BGCOLOR 7 .
 
+DEFINE VARIABLE l-desmembra AS LOGICAL INITIAL no 
+     LABEL "Desmembramento" 
+     VIEW-AS TOGGLE-BOX
+     SIZE 20 BY .83 NO-UNDO.
+
 /* Query definitions                                                    */
 &ANALYZE-SUSPEND
 DEFINE QUERY BROWSE-2 FOR 
@@ -303,7 +332,7 @@ DEFINE QUERY BROWSE-2 FOR
 DEFINE BROWSE BROWSE-2
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _DISPLAY-FIELDS BROWSE-2 w-livre _FREEFORM
   QUERY BROWSE-2 DISPLAY
-      tt-planilha.ttv-selected             COLUMN-LABEL "Sel" VIEW-AS TOGGLE-BOX
+      tt-planilha.ttv-selected             COLUMN-LABEL "Sel"
 tt-planilha.ttv-tratamento           column-label "Acao"  FORMAT "x(40)"
 tt-planilha.ttv-localizacao-de       column-label "Local DE"
 tt-planilha.ttv-localizacao-para     column-label "Local PARA"
@@ -336,9 +365,6 @@ tt-planilha.ttv-fornecedor           column-label "Fornecedor"
 tt-planilha.ttv-dt-base-arquivo      column-label "Dt-Base"
 tt-planilha.ttv-taxa-societaria      column-label "Tx.Societaria"
 tt-planilha.ttv-residual             column-label "Residual"
-
-    ENABLE tt-planilha.ttv-cc-de
-    tt-planilha.ttv-selected
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
     WITH NO-ROW-MARKERS SEPARATORS MULTIPLE SIZE 123.43 BY 12 FIT-LAST-COLUMN.
@@ -353,6 +379,7 @@ DEFINE FRAME f-cad
      c-planilha AT ROW 1.25 COL 42.72 COLON-ALIGNED WIDGET-ID 8
      bt-dir-entrada AT ROW 1.25 COL 86.14 HELP
           "Escolha do nome do arquivo" WIDGET-ID 24
+     l-desmembra AT ROW 2.75 COL 5 WIDGET-ID 66
      BROWSE-2 AT ROW 4.29 COL 2.43 WIDGET-ID 200
      c-motivo AT ROW 19.75 COL 21.57 NO-LABEL WIDGET-ID 26
      c-status AT ROW 19.79 COL 1.29 COLON-ALIGNED NO-LABEL WIDGET-ID 28
@@ -428,7 +455,7 @@ ASSIGN {&WINDOW-NAME}:MENUBAR    = MENU m-livre:HANDLE.
   VISIBLE,,RUN-PERSISTENT                                               */
 /* SETTINGS FOR FRAME f-cad
    FRAME-NAME L-To-R                                                    */
-/* BROWSE-TAB BROWSE-2 bt-dir-entrada f-cad */
+/* BROWSE-TAB BROWSE-2 l-desmembra f-cad */
 /* SETTINGS FOR FILL-IN c-motivo IN FRAME f-cad
    ALIGN-L                                                              */
 /* SETTINGS FOR FILL-IN FILL-IN-4 IN FRAME f-cad
@@ -449,7 +476,7 @@ THEN w-livre:HIDDEN = yes.
 &ANALYZE-SUSPEND _QUERY-BLOCK BROWSE BROWSE-2
 /* Query rebuild information for BROWSE BROWSE-2
      _START_FREEFORM
-OPEN QUERY {&SELF-NAME} FOR EACH tt-planilha WHERE tt-planilha.ttv-selected = TRUE
+OPEN QUERY {&SELF-NAME} FOR EACH tt-planilha WHERE tt-planilha.ttv-selected = "*"
              INDEXED-REPOSITION
      _END_FREEFORM
      _Query            is OPENED
@@ -496,6 +523,34 @@ ON MOUSE-SELECT-CLICK OF BROWSE-2 IN FRAME f-cad
 DO:
   ASSIGN c-motivo:SCREEN-VALUE = tt-planilha.ttv-motivo
          c-status:SCREEN-VALUE = tt-planilha.ttv-status.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL BROWSE-2 w-livre
+ON MOUSE-SELECT-DBLCLICK OF BROWSE-2 IN FRAME f-cad
+DO:
+    IF INPUT FRAME {&FRAME-NAME} l-desmembra THEN DO:
+        IF tt-planilha.ttv-selected = "*" THEN
+            ASSIGN tt-planilha.ttv-selected = '*':r.
+        ELSE
+            ASSIGN tt-planilha.ttv-selected = '*':r.
+
+    END.
+
+    IF INPUT FRAME {&FRAME-NAME} l-desmembra = NO THEN DO:
+        IF tt-planilha.ttv-selected = "*" THEN
+            ASSIGN tt-planilha.ttv-selected = '':r.
+        ELSE
+            ASSIGN tt-planilha.ttv-selected = '*':r.
+
+    END.
+
+      DISP tt-planilha.ttv-selected WITH BROWSE browse-2.
+
+      
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -660,8 +715,10 @@ END.
 ON CHOOSE OF bt-executar IN FRAME f-cad /* Executar */
 DO:
 
+    IF INPUT FRAME {&FRAME-NAME} l-desmembra = NO THEN DO:
+        {&OPEN-QUERY-browse-2}
 
-    {&OPEN-QUERY-browse-2}
+
         ASSIGN i-cont = 300.
 
 
@@ -684,7 +741,7 @@ DO:
     END.
 
 
-    FOR EACH TT-PLANILHA NO-LOCK WHERE TT-PLANILHA.TTV-SELECTED = YES:
+    FOR EACH TT-PLANILHA NO-LOCK WHERE TT-PLANILHA.TTV-SELECTED = "*":
             
 //      do i-cont = 1 to browse-2:NUM-SELECTED-ROWS IN FRAME {&FRAME-NAME}:
           //          if  browse-2:fetch-selected-row (i-cont) then do:
@@ -819,24 +876,19 @@ DO:
                             END.
                 END.
 
-                when 'Desmembrar' then do:
-                  run pi-desmbembrar (input tt-planilha.ttv-cta-pat,
-                                      input tt-planilha.ttv-bem-de,
-                                      input tt-planilha.ttv-inc-de,
-                                      input tt-planilha.ttv-dt-base-arquivo,
-                                      input 'Por Valor',
-                                      input 'Real',
-                                      input 'Fiscal',
-                                      input tt-planilha.ttv-cta-pat-para,
-                                      input tt-planilha.ttv-bem-para,
-                                      input tt-planilha.ttv-inc-para,
-                                      input tt-planilha.ttv-descricao-de,
-                                      input tt-planilha.ttv-vlr-original).
-                  end.                                      
-                OTHERWISE NEXT.
             END.
       END.
+
+    END.
       {&OPEN-QUERY-browse-2}
+
+
+          IF INPUT FRAME {&FRAME-NAME} l-desmembra = YES THEN DO:
+              {&OPEN-QUERY-browse-2}
+                  RUN pi-desmembrar.
+              {&OPEN-QUERY-browse-2}
+          END.
+
 
 END.
 
@@ -1065,10 +1117,10 @@ PROCEDURE enable_UI :
                These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY c-planilha c-motivo c-status FILL-IN-4 FILL-IN-5 FILL-IN-6 
+  DISPLAY c-planilha l-desmembra c-motivo c-status FILL-IN-4 FILL-IN-5 FILL-IN-6 
       WITH FRAME f-cad IN WINDOW w-livre.
   ENABLE rt-button RECT-13 BUTTON-11 bt-executar bt-importar c-planilha 
-         bt-dir-entrada BROWSE-2 c-motivo c-status 
+         bt-dir-entrada l-desmembra BROWSE-2 c-motivo c-status 
       WITH FRAME f-cad IN WINDOW w-livre.
   {&OPEN-BROWSERS-IN-QUERY-f-cad}
   VIEW w-livre.
@@ -1123,7 +1175,6 @@ DEFINE VARIABLE h-prog        AS HANDLE                           NO-UNDO.
               tt-planilha.ttv-bem-de               = chWorkSheet:cells(i-linha, 7):Text
               tt-planilha.ttv-inc-de               = chWorkSheet:cells(i-linha, 8):Text 
               tt-planilha.ttv-foto                 = chWorkSheet:cells(i-linha, 9):Text
-              tt-planilha.ttv-desmembrar           = chWorkSheet:cells(i-linha, 10):Text
               tt-planilha.ttv-bem-para             = chWorkSheet:cells(i-linha, 11):Text
               tt-planilha.ttv-inc-para             = chWorkSheet:cells(i-linha, 12):Text
               tt-planilha.ttv-cc-de                = chWorkSheet:cells(i-linha, 13):Text
@@ -1144,11 +1195,20 @@ DEFINE VARIABLE h-prog        AS HANDLE                           NO-UNDO.
               tt-planilha.ttv-situacao             = chWorkSheet:cells(i-linha, 28):text
               tt-planilha.ttv-nf                   = chWorkSheet:cells(i-linha, 29):text
               tt-planilha.ttv-fornecedor           = chWorkSheet:cells(i-linha, 30):text
-              tt-planilha.ttv-dt-base-arquivo      = date(chWorkSheet:cells(i-linha, 31):text)
               tt-planilha.ttv-taxa-societaria      = chWorkSheet:cells(i-linha, 32):text
               tt-planilha.ttv-residual             = chWorkSheet:cells(i-linha, 33):TEXT
-              tt-planilha.ttv-selected             = TRUE
+              tt-planilha.ttv-selected             = "*"
               tt-planilha.ttv-status-origInal       = chWorkSheet:cells(i-linha, 1):Text.
+             IF date(chWorkSheet:cells(i-linha, 31):text) = ? THEN
+                 ASSIGN tt-planilha.ttv-dt-base-arquivo      = TODAY.
+             ELSE 
+                 ASSIGN tt-planilha.ttv-dt-base-arquivo      = date(chWorkSheet:cells(i-linha, 31):text).
+
+          IF chWorkSheet:cells(i-linha, 10):Text   <> "" THEN
+              ASSIGN        tt-planilha.ttv-desmembrar           = YES.
+          ELSE 
+              ASSIGN        tt-planilha.ttv-desmembrar           = NO.
+
               
 
    END.
@@ -1231,9 +1291,47 @@ FOR EACH tt-planilha WHERE tt-planilha.ttv-score > 0:
 
 END.
 
-for each tt-planilha where tt-planilha.ttv-desmembrar = "SIM":
-  assign tt-planilha.ttv-tratamento = "Desmembrar".
-end.
+    IF INPUT FRAME {&FRAME-NAME} l-desmembra = YES THEN DO:
+        for each tt-planilha:
+
+                CASE tt-planilha.ttv-desmembrar:
+                WHEN YES THEN DO:
+                    ASSIGN tt-planilha.ttv-tratamento = "Desmembra".
+                    find first bem_pat no-lock where bem_pat.cod_cta_pat      = tt-planilha.ttv-cta-pat
+                                                     and   bem_pat.num_bem_pat      = int(tt-planilha.ttv-bem-de)
+                                                     and   bem_pat.num_seq_bem_pat  = int(tt-planilha.ttv-inc-de) no-error.
+
+                          IF NOT AVAIL bem_pat THEN
+                              ASSIGN tt-planilha.ttv-tratamento = "Inexistente no Ativo"
+                                     tt-planilha.ttv-status     = 'erro'.
+
+
+                END.
+                OTHERWISE DO:
+                    DELETE tt-planilha.
+                END.
+            END CASE.
+
+      
+        end.
+    END.
+        
+        IF INPUT FRAME {&FRAME-NAME} l-desmembra = NO THEN DO:
+            for each tt-planilha:
+                CASE tt-planilha.ttv-desmembrar:
+
+                    WHEN YES THEN DO:
+                        DELETE tt-planilha.
+                    END.
+                END CASE.
+
+            end.
+      
+
+        END.
+
+
+
 
 
 END PROCEDURE.
@@ -1379,25 +1477,51 @@ FOR EACH tt-planilha:
 
     CASE tt-planilha.ttv-tratamento:
         WHEN 'Transferencia' THEN DO:
-            ASSIGN tt-planilha.ttv-selected = tt-filtro.ttv-transf.
+            IF tt-filtro.ttv-trans THEN
+
+            ASSIGN tt-planilha.ttv-selected = "*".
+            ELSE
+            ASSIGN tt-planilha.ttv-selected = "".
         END.
         WHEN 'Reclassifica‡Æo' THEN DO:
-            ASSIGN tt-planilha.ttv-selected = tt-filtro.ttv-reclassificao.
+            IF tt-filtro.ttv-reclassificao THEN
+            ASSIGN tt-planilha.ttv-selected = "*".
+            ELSE
+            ASSIGN tt-planilha.ttv-selected = "".
         END.
         WHEN 'Reclassifica‡Æo,Transferencia' THEN DO:
-            ASSIGN tt-planilha.ttv-selected = tt-filtro.ttv-reclas-transf.
+            IF tt-filtro.ttv-reclas-transf THEN
+                ASSIGN tt-planilha.ttv-selected = "*".
+                ELSE
+                ASSIGN tt-planilha.ttv-selected = "".
         END.
         WHEN 'Altera‡Æo' THEN DO:
-            ASSIGN tt-planilha.ttv-selected = tt-filtro.ttv-alteracao.
+            IF tt-filtro.ttv-alteracao THEN
+                ASSIGN tt-planilha.ttv-selected = "*".
+                ELSE
+                ASSIGN tt-planilha.ttv-selected = "".
+
         END.
         WHEN 'Altera‡Æo, Transferencia' THEN DO:
-            ASSIGN tt-planilha.ttv-selected = tt-filtro.ttv-alt-transf.
+            IF tt-filtro.ttv-alt-transf THEN
+                ASSIGN tt-planilha.ttv-selected = "*".
+                ELSE
+                ASSIGN tt-planilha.ttv-selected = "".
+
         END.
         WHEN 'Altera‡Æo, Reclassifica‡Æo' THEN DO:
-            ASSIGN tt-planilha.ttv-selected = tt-filtro.ttv-alt-reclas.
+            IF tt-filtro.ttv-alt-reclas THEN
+                ASSIGN tt-planilha.ttv-selected = "*".
+                ELSE
+                ASSIGN tt-planilha.ttv-selected = "".
+
         END.
         WHEN 'Altera‡Æo, Reclassifica‡Æo, Transferencia' THEN DO:
-            ASSIGN tt-planilha.ttv-selected = tt-filtro.ttv-alt-reclas-transf.
+            IF tt-filtro.ttv-alt-reclas-trans THEN
+                ASSIGN tt-planilha.ttv-selected = "*".
+                ELSE
+                ASSIGN tt-planilha.ttv-selected = "".
+
         END.
         
     END CASE.
@@ -1410,6 +1534,84 @@ END.
 
 
 END PROCEDURE.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE pi-desmembrar w-livre 
+PROCEDURE pi-desmembrar :
+/*------------------------------------------------------------------------------
+    Purpose:     
+    Parameters:  <none>
+    Notes:       
+  ------------------------------------------------------------------------------*/
+
+  empty temp-table tt_desmemb_novos_bem_pat_api.
+  empty temp-table tt_desmembramento_bem_pat_api.
+for each tt-planilha where tt-planilha.ttv-selected = "*" 
+                     AND   tt-planilha.ttv-status   <> "erro" break by tt-planilha.ttv-concatena-de:
+
+  find first plano_ccusto no-lock where plano_ccusto.dat_fim_valid >= today
+                                  and   plano_ccusto.cod_empresa   = v_cod_empres_usuar no-error.
+
+  if first-of(tt-planilha.ttv-concatena-de) then do:
+
+    assign v_controle = v_controle + 1.
+    create tt_desmembramento_bem_pat_api.
+    assign tt_desmembramento_bem_pat_api.ttv_num_id_tt_desmbrto         = v_controle
+           tt_desmembramento_bem_pat_api.tta_cod_empresa                = tt-planilha.ttv-cod-empresa
+           tt_desmembramento_bem_pat_api.tta_cod_cta_pat                = tt-planilha.ttv-cta-pat
+           tt_desmembramento_bem_pat_api.tta_num_bem_pat                = int(tt-planilha.ttv-bem-de)
+           tt_desmembramento_bem_pat_api.tta_num_seq_bem_pat            = int(tt-planilha.ttv-inc-de)
+           tt_desmembramento_bem_pat_api.ttv_dat_desmbrto               = tt-planilha.ttv-dt-base-arquivo
+           tt_desmembramento_bem_pat_api.ttv_ind_tip_desmbrto_bem_pat   = 'Por valor'
+           tt_desmembramento_bem_pat_api.ttv_cod_indic_econ             = 'real'
+           tt_desmembramento_bem_pat_api.ttv_cod_cenar_ctbl             = 'fiscal'
+           tt_desmembramento_bem_pat_api.ttv_rec_id_temp_table          = recid(tt_desmembramento_bem_pat_api).
+  end.
+
+  create tt_desmemb_novos_bem_pat_api.
+  assign tt_desmemb_novos_bem_pat_api.tta_cod_cta_pat                = tt-planilha.ttv-cta-pat-para
+         tt_desmemb_novos_bem_pat_api.tta_num_bem_pat                = int(tt-planilha.ttv-bem-para)
+         tt_desmemb_novos_bem_pat_api.tta_num_seq_bem_pat            = int(tt-planilha.ttv-inc-para)
+         tt_desmemb_novos_bem_pat_api.tta_des_bem_pat                = tt-planilha.ttv-descricao-de
+         tt_desmemb_novos_bem_pat_api.tta_cod_plano_ccusto           = plano_ccusto.cod_plano_ccusto
+         tt_desmemb_novos_bem_pat_api.tta_cod_ccusto_respons         = tt-planilha.ttv-cc-para
+         tt_desmemb_novos_bem_pat_api.tta_cod_estab                  = tt-planilha.ttv-estabel
+         tt_desmemb_novos_bem_pat_api.tta_cod_unid_negoc             = 'DOC'
+         tt_desmemb_novos_bem_pat_api.ttv_val_origin_movto_bem_pat   = dec(tt-planilha.ttv-vlr-original)
+         tt_desmemb_novos_bem_pat_api.ttv_num_id_tt_desmbrto         = v_controle
+         tt_desmemb_novos_bem_pat_api.ttv_rec_id_temp_table          = recid(tt_desmemb_novos_bem_pat_api).
+
+
+end.
+  run dop/dcoapi002.p persistent set v_hdl_api_bem_pat_desmbrto (input 1).
+
+  run pi_efetiva_desmemb_bens in v_hdl_api_bem_pat_desmbrto (input-output table tt_desmembramento_bem_pat_api,
+                                                             input-output table tt_desmemb_novos_bem_pat_api).
+
+
+delete procedure v_hdl_api_bem_pat_desmbrto.
+
+
+for each tt-planilha:
+  find first tt_desmembramento_bem_pat_api where tt_desmembramento_bem_pat_api.tta_cod_cta_pat         = tt-planilha.ttv-cta-pat      
+                                          and   tt_desmembramento_bem_pat_api.tta_num_bem_pat         = int(tt-planilha.ttv-bem-de)     
+                                          and   tt_desmembramento_bem_pat_api.tta_num_seq_bem_pat     = int(tt-planilha.ttv-inc-de)       no-error.
+
+                                          if tt_desmembramento_bem_pat_api.ttv_des_erro_api_movto_bem_pat <> "" then do:
+                                            assign tt-planilha.ttv-motivo = tt_desmembramento_bem_pat_api.ttv_des_erro_api_movto_bem_pat
+                                                  tt-planilha.ttv-status = 'Erro'.
+
+                                          end.
+
+                                          ELSE
+                                              ASSIGN tt-planilha.ttv-status = 'Concluido'.
+                                        end.
+
+
+
+end procedure.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -1503,35 +1705,6 @@ find first cta_pat no-lock where cta_pat.cod_cta_pat = tt-planilha.ttv-cta-pat-p
 
 
 END PROCEDURE.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE pi-desmembrar w-livre 
-PROCEDURE pi-desmembrar :
-  /*------------------------------------------------------------------------------
-    Purpose:     
-    Parameters:  <none>
-    Notes:       
-  ------------------------------------------------------------------------------*/
-define input param p-cta-pat-origem as char no-undo.
-define input param p-bem-origem     as integer no-undo.
-define input param p-inc-origem     as integer no-undo.
-define input param p-dt-arquivo     as date no-undo.
-define input param p-tp-desmemb     as char no-undo.
-define input param p-moeda          as char no-undo.
-define input param p-cenario        as char no-undo.
-define input param p-cta-pat-destino as char no-undo.
-define input param p-bem-destino    as integer no-undo.
-define input param p-inc-destino    as integer no-undo.
-define input param p-descricao      as char no-undo.
-define input param p-vlr-original   as dec no-undo.
-
-
-
-
-end procedure.
-
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
