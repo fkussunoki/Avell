@@ -1523,6 +1523,21 @@ FOR EACH tt-planilha:
                 ASSIGN tt-planilha.ttv-selected = "".
 
         END.
+        WHEN 'BAixa' THEN DO:
+            IF tt-filtro.ttv-baixa THEN
+                ASSIGN tt-planilha.ttv-selected = "*".
+                ELSE
+                ASSIGN tt-planilha.ttv-selected = "".
+
+        END.
+        WHEN 'INEXISTENTE NO ATIVO' THEN DO:
+            IF tt-filtro.ttv-inexistente THEN
+                ASSIGN tt-planilha.ttv-selected = "*".
+                ELSE
+                ASSIGN tt-planilha.ttv-selected = "".
+
+        END.
+
         
     END CASE.
 

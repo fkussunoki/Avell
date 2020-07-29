@@ -559,7 +559,11 @@ PROCEDURE local-initialize :
              l-alteracao:SCREEN-VALUE IN FRAME {&FRAME-NAME}           = string(tt-filtro.ttv-alteracao)              
              l-alt-transf:SCREEN-VALUE IN FRAME {&FRAME-NAME}          = string(tt-filtro.ttv-alt-transf)             
              l-alt-reclass:SCREEN-VALUE IN FRAME {&FRAME-NAME}         = string(tt-filtro.ttv-alt-reclas)             
-             l-alt-reclass-transf:SCREEN-VALUE IN FRAME {&FRAME-NAME}  = string(tt-filtro.ttv-alt-reclas-transf).      
+             l-alt-reclass-transf:SCREEN-VALUE IN FRAME {&FRAME-NAME}  = string(tt-filtro.ttv-alt-reclas-transf)
+             l-baixa:SCREEN-VALUE IN FRAME {&FRAME-NAME} = STRING(tt-filtro.ttv-baixa)
+             l-inexistente:SCREEN-VALUE IN FRAME {&FRAME-NAME} = STRING(tt-filtro.ttv-inexistente).
+
+             
       
           
 
