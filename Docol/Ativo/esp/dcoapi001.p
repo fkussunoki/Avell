@@ -69,7 +69,7 @@ def temp-table tt_baixa_seq_incorp_bem_pat no-undo
           tta_cod_finalid_econ             ascending
     .
 
-def shared temp-table tt_desmembrto_bem_pat        
+def  temp-table tt_desmembrto_bem_pat        
     field tta_num_id_bem_pat               as integer format ">>,>>>,>>9" initial 0 label "Identifica‡Æo Bem" column-label "Identifica‡Æo Bem"
     field tta_cod_empresa                  as character format "x(3)" label "Empresa" column-label "Empresa"
     field tta_cod_cta_pat                  as character format "x(18)" label "Conta Patrimonial" column-label "Conta Patrimonial"

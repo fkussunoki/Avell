@@ -792,9 +792,9 @@ def temp-table tt_trans_bem_aux no-undo
     assign v_log_funcao_reduc_sdo = yes.
 &ELSE
     &if '{&emsuni_version}' >= '5.04' &then
-        if  can-find (first emsuni.histor_exec_especial no-lock
-             where emsuni.histor_exec_especial.cod_modul_dtsul = "UFN" /*l_ufn*/ 
-             and   emsuni.histor_exec_especial.cod_prog_dtsul  = 'spp_metod_reduc_sdo':U)
+        if  can-find (first emsbas.histor_exec_especial no-lock
+             where emsbas.histor_exec_especial.cod_modul_dtsul = "UFN" /*l_ufn*/ 
+             and   emsbas.histor_exec_especial.cod_prog_dtsul  = 'spp_metod_reduc_sdo':U)
         then do:
             assign v_log_funcao_reduc_sdo = yes.
         end /* if */.
@@ -824,9 +824,9 @@ def temp-table tt_trans_bem_aux no-undo
 assign v_log_param_calc_incorp = no.
 
 &if '{&emsbas_version}' >= '5.04' &then
-    if  can-find (first emsuni.histor_exec_especial
-        where emsuni.histor_exec_especial.cod_modul_dtsul = "UFN" /*l_ufn*/ 
-        and   emsuni.histor_exec_especial.cod_prog_dtsul  = 'SPP_PARAM_CALC_INCORP') then
+    if  can-find (first emsbas.histor_exec_especial
+        where emsbas.histor_exec_especial.cod_modul_dtsul = "UFN" /*l_ufn*/ 
+        and   emsbas.histor_exec_especial.cod_prog_dtsul  = 'SPP_PARAM_CALC_INCORP') then
         assign v_log_param_calc_incorp = yes.
 
         /* Begin_Include: i_funcao_extract */
@@ -851,8 +851,8 @@ assign v_log_param_calc_incorp = no.
 /* End_Include: i_funcao_extract */
 
 
-if  can-find(first emsuni.histor_exec_especial
-    where emsuni.histor_exec_especial.cod_prog_dtsul = 'spp_cong_cenar_ctbl') then do:
+if  can-find(first emsbas.histor_exec_especial
+    where emsbas.histor_exec_especial.cod_prog_dtsul = 'spp_cong_cenar_ctbl') then do:
     assign v_log_congel_cenar_ctbl = yes.
 end.
 
@@ -879,9 +879,9 @@ FUNCTION GetDefinedFunction RETURNS LOGICAL (INPUT SPP AS CHARACTER):
 
     DEF VAR v_log_retorno AS LOGICAL INITIAL NO NO-UNDO.
 
-    IF CAN-FIND (FIRST emsuni.histor_exec_especial NO-LOCK
-         WHERE emsuni.histor_exec_especial.cod_modul_dtsul = "UFN" /* l_ufn*/ 
-           AND emsuni.histor_exec_especial.cod_prog_dtsul  = SPP) THEN
+    IF CAN-FIND (FIRST emsbas.histor_exec_especial NO-LOCK
+         WHERE emsbas.histor_exec_especial.cod_modul_dtsul = "UFN" /* l_ufn*/ 
+           AND emsbas.histor_exec_especial.cod_prog_dtsul  = SPP) THEN
         ASSIGN v_log_retorno = YES.
 
 
@@ -1617,7 +1617,7 @@ PROCEDURE pi_validar_estab:
 
     /************************* Parameter Definition End *************************/
 
-    find emscad.unid_organ no-lock
+    find emsuni.unid_organ no-lock
          where unid_organ.cod_unid_organ = p_cod_estab /*cl_estab of unid_organ*/ no-error.
     if  avail unid_organ
     then do:
@@ -1644,7 +1644,7 @@ PROCEDURE pi_validar_estab:
             return.
         end /* if */.
     end /* if */.
-    if  can-find(emscad.segur_unid_organ
+    if  can-find(emsuni.segur_unid_organ
             where segur_unid_organ.cod_unid_organ = p_cod_estab
               and segur_unid_organ.cod_grp_usuar = '*' /*cl_valid_estab_todos_usuarios of segur_unid_organ*/)
             then do:
@@ -1660,7 +1660,7 @@ PROCEDURE pi_validar_estab:
        use-index srgrpsr_usuario
     &endif
         /*cl_grupos_do_usuario of usuar_grp_usuar*/:
-       find first emscad.segur_unid_organ no-lock
+       find first emsuni.segur_unid_organ no-lock
             where segur_unid_organ.cod_unid_organ = p_cod_estab
               and segur_unid_organ.cod_grp_usuar = usuar_grp_usuar.cod_grp_usuar /*cl_valida_estab of segur_unid_organ*/ no-error.
        if  avail segur_unid_organ
@@ -1820,7 +1820,7 @@ PROCEDURE pi_validar_ccusto:
     /************************* Parameter Definition End *************************/
 
     p_log_return = no.
-    find first emsbas.ccusto no-lock
+    find first emsuni.ccusto no-lock
          where ccusto.cod_empresa      = p_cod_empresa
            and ccusto.cod_plano_ccusto = p_cod_plano_ccusto
            and ccusto.cod_ccusto       = p_cod_ccusto no-error.
@@ -2638,7 +2638,7 @@ PROCEDURE pi_validar_novos_bens_api:
         end.
     end.
 
-    find first emscad.unid_negoc
+    find first emsuni.unid_negoc
         where unid_negoc.cod_unid_negoc = tt_desmemb_novos_bem_pat_api.tta_cod_unid_negoc no-lock no-error.
     if avail unid_negoc then do:
         run pi_verifica_segur_unid_negoc (input unid_negoc.cod_unid_negoc,
@@ -3267,7 +3267,7 @@ PROCEDURE pi_retornar_dat_inic_valid_unid_organ:
 
     /************************* Parameter Definition End *************************/
 
-    find first emscad.unid_organ no-lock
+    find first emsuni.unid_organ no-lock
          where unid_organ.cod_unid_organ = p_cod_unid_organ
            and unid_organ.dat_inic_valid <= p_dat_transacao
            and unid_organ.dat_fim_valid > p_dat_transacao
@@ -5676,9 +5676,9 @@ PROCEDURE pi_rotina_integr_manuf_API:
     &if defined(BF_FIN_BXA_BEM_MANUF) &then
         assign v_log_bxa_bem = yes. 
     &else
-        if can-find(first emsuni.histor_exec_especial  
-           where emsuni.histor_exec_especial.cod_modul_dtsul = "UFN" /*l_ufn*/     
-           and emsuni.histor_exec_especial.cod_prog_dtsul = 'spp_bxa_bem_manuf':U) then  
+        if can-find(first emsbas.histor_exec_especial  
+           where emsbas.histor_exec_especial.cod_modul_dtsul = "UFN" /*l_ufn*/     
+           and emsbas.histor_exec_especial.cod_prog_dtsul = 'spp_bxa_bem_manuf':U) then  
                assign v_log_bxa_bem = yes. 
     &endif
 
