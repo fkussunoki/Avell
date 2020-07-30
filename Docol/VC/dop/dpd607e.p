@@ -349,6 +349,12 @@ def var v_cod_empresa_aux
     label "Empresa"
     column-label "Empresa"
     no-undo.
+def new global shared var v_rec_aprop_ctbl_pend_ap
+    as recid
+    format ">>>>>>9":U
+    initial ?
+    no-undo.
+
 def var v_cod_empres_ems_2
     as character
     format "x(3)":U
@@ -2160,6 +2166,9 @@ DO:
     bloco:
     do on error undo, return no-apply:
        run pi_bt_rat_val_antecip_pef_pend /*pi_bt_rat_val_antecip_pef_pend*/.   
+        find first aprop_ctbl_pend_ap where recid(aprop_ctbl_pend_ap) = v_rec_aprop_ctbl_pend_ap no-error.
+        assign aprop_ctbl_pend_ap.cod_tip_fluxo_financ = '2.4.10'.
+
     end.
 
     /* Begin_Include: i_executa_pi_epc_fin */
@@ -3786,7 +3795,9 @@ repeat while v_log_repeat:
                fornecedor.nom_abrev:screen-value       in frame f_adp_02_antecip_pef_pend = p-nom-abrev
                v_cod_fornec_infor:SCREEN-VALUE IN FRAME f_adp_02_antecip_pef_pend = STRING(p-emitente)
                antecip_pef_pend.cod_espec_docto:SCREEN-VALUE IN FRAME f_adp_02_antecip_pef_pend = "VC"
-               antecip_pef_pend.cod_espec_docto:SENSITIVE IN FRAME f_adp_02_antecip_pef_pend = FALSE.
+               antecip_pef_pend.cod_espec_docto:SENSITIVE IN FRAME f_adp_02_antecip_pef_pend = FALSE
+               antecip_pef_pend.val_tit_ap:screen-value in frame f_adp_02_antecip_pef_pend = string(p-vlr)
+               antecip_pef_pend.val_tit_ap:sensitive in frame f_adp_02_antecip_pef_pend = false.
 
         display antecip_pef_pend.cod_estab
                 antecip_pef_pend.cod_refer
@@ -3795,7 +3806,6 @@ repeat while v_log_repeat:
                 antecip_pef_pend.cod_portador
                 antecip_pef_pend.cod_indic_econ
                 antecip_pef_pend.cod_parcela
-                antecip_pef_pend.val_tit_ap
                 v_ind_modo_pagto
                 antecip_pef_pend.ind_favorec_cheq
                 antecip_pef_pend.num_cheque
@@ -3865,7 +3875,7 @@ repeat while v_log_repeat:
            antecip_pef_pend.cod_portador
            antecip_pef_pend.cod_indic_econ
            antecip_pef_pend.cod_parcela
-           antecip_pef_pend.val_tit_ap
+  //          antecip_pef_pend.val_tit_ap
            v_ind_modo_pagto
            antecip_pef_pend.ind_favorec_cheq
            antecip_pef_pend.num_cheque
@@ -14743,27 +14753,6 @@ PROCEDURE pi_mostra_imagem_cta_corren:
     find b_cta_corren no-lock
          where b_cta_corren.cod_cta_corren = p_cod_cta_corren
          no-error.
-    if  avail b_cta_corren then do:
-        find imagem
-            where imagem.cod_imagem = b_cta_corren.cod_imagem
-            no-lock no-error.
-        if  avail imagem then do:
-            find catal_img
-                where catal_img.cod_catal_img = imagem.cod_catal_img no-lock no-error.
-            assign im_cta_corren:visible in frame f_adp_02_antecip_pef_pend = yes.
-            assign v_img_image_file = catal_img.cod_path_catal + "~\" + imagem.img_imagem.
-            if search(v_img_image_file) <> ? then
-                assign v_log_method = im_cta_corren:load-image(v_img_image_file) in frame f_adp_02_antecip_pef_pend no-error.
-            else
-                assign im_cta_corren:visible in frame f_adp_02_antecip_pef_pend = no.        
-        end.
-        else do:
-            assign im_cta_corren:visible in frame f_adp_02_antecip_pef_pend = no.
-        end.
-    end.
-    else do:
-        assign im_cta_corren:visible in frame f_adp_02_antecip_pef_pend = no.
-    end.
 END PROCEDURE. /* pi_mostra_imagem_cta_corren */
 /*****************************************************************************
 ** Procedure Interna.....: pi_verifica_impto_vincul_refer_informado
