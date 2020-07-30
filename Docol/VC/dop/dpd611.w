@@ -659,9 +659,9 @@ run pi-after-initialize.
 
 //desabilitados botoes para inclusao - FKIS Consultoria - 15.07.2020
 
-run enable-inclui   in h_p-cadpai (input no).
-run enable-elimina  in h_p-cadpai (input no).
-run enable-copia    in h_p-cadpai (input no).
+//run enable-inclui   in h_p-cadpai (input no).
+//run enable-elimina  in h_p-cadpai (input no).
+//run enable-copia    in h_p-cadpai (input no).
 // fim da modificacao nos botoes - FKIS Consultoria - 15.07.2020
 
 

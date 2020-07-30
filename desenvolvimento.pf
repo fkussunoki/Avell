@@ -168,9 +168,9 @@
 -H localhost
 -N tcp
 
-#-db emsdocol
-#-ld emsdocol
-#-S 23655
-#-H localhost
-#-N tcp
+-db emsdocol
+-ld emsdocol
+-S 23655
+-H localhost
+-N tcp
 

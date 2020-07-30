@@ -690,7 +690,7 @@ run pi_retorna_sugestao_referencia (Input "T" /*l_l*/,
   
       assign v_cod_empresa        =  param-global.empresa-prin //funciona apenas para docol.
              v_cod_funcao         = "Estorna" 
-             v_orig_movto         = "90".
+             v_orig_movto         = "91".
       
       create tt_xml_input_1.
       assign tt_xml_input_1.ttv_cod_label    = "Empresa" /*l_empresa*/ 
@@ -736,7 +736,7 @@ run pi_retorna_sugestao_referencia (Input "T" /*l_l*/,
              tt_xml_input_1.ttv_num_seq_1    = p-num-seq.
       create tt_xml_input_1.
       assign tt_xml_input_1.ttv_cod_label    = "ID Movimento"
-             tt_xml_input_1.ttv_des_conteudo = "Processo " + string(p-cod-id) + " Utilizado no titulo " + p-espec-docto + "|" + p-serie + "|" + p-cod-titulo +
+             tt_xml_input_1.ttv_des_conteudo = "Processo " + string(p-cod-id) + " (Bonificacao) Utilizado no titulo " + p-espec-docto + "|" + p-serie + "|" + p-cod-titulo +
                                                 "|" + p-cod-parcela + "| Estabelec " + p-cod-estab-titulo
              tt_xml_input_1.ttv_num_seq_1    = p-num-seq.
 

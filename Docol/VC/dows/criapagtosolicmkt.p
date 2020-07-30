@@ -355,13 +355,12 @@ procedure pi-execucao-orcamentaria:
                v_cod_ccusto         = dc-regiao.cod-ccusto
                v_cod_estab          = "9" //esta fixo porque, ate a data de 20.09.2019 existe orcamento apenas para este estabelecimento
                v_cod_unid_negoc     = "DOC" 
-               v_dat_transacao      = 06/30/2019
                v_cod_finalid_econ   = "0" /*REFERENTE AO C…DIGO DA FINALIDADE ECONOMICA REAL*/
                v_val_aprop_ctbl     = p-valor
                v_num_seq            = 1
                v_cod_funcao         = "verifica" 
                v_cod_id             = "Solicitacao DPD607 (Pagto)" + string(p-numero) //nao h  descricao, pois o empenho nao ‚ realizado, apenas ‚ feito check
-               v_orig_movto         = "90".
+               v_orig_movto         = "91".
         
         create tt_xml_input_1.
         assign tt_xml_input_1.ttv_cod_label    = "Empresa" /*l_empresa*/ 
