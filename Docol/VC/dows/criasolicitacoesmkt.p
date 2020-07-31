@@ -532,6 +532,23 @@ DEF VAR i-controle           AS INTEGER.
         END.
 
 
+    if amkt-solicitacao.cd-forma-pagto = 1 then do: //Bonificacao
+        assign v_cod_empresa        =  param-global.empresa-prin
+        v_cod_cta_ctbl       = "435362"
+        v_cod_ccusto         = dc-regiao.cod-ccusto
+        v_cod_estab          = "9" //esta fixo porque, ate a data de 20.09.2019 existe orcamento apenas para este estabelecimento
+        v_cod_unid_negoc     = "DOC" 
+        v_dat_transacao      = da-valid-orcto
+        v_cod_finalid_econ   = "0" /*REFERENTE AO C…DIGO DA FINALIDADE ECONOMICA REAL*/
+        v_val_aprop_ctbl     = p-vl-solicitacao * 0.50 //definido 50% do valor da verba relativa ao valor de custo do produto.
+        v_num_seq            = 1
+        v_cod_funcao         = "Verifica" 
+        v_cod_id             = string(i-controle) + " Bonificacao" //nao h  descricao, pois o empenho nao ‚ realizado, apenas ‚ feito check
+        v_orig_movto         = "90".
+    end.
+
+
+    else do:
     assign v_cod_empresa        =  param-global.empresa-prin
            v_cod_cta_ctbl       = "435362"
            v_cod_ccusto         = dc-regiao.cod-ccusto
@@ -544,7 +561,7 @@ DEF VAR i-controle           AS INTEGER.
            v_cod_funcao         = "Verifica" 
            v_cod_id             = string(i-controle) //nao h  descricao, pois o empenho nao ‚ realizado, apenas ‚ feito check
            v_orig_movto         = "90".
-    
+    end. 
     create tt_xml_input_1.
     assign tt_xml_input_1.ttv_cod_label    = "Empresa" /*l_empresa*/ 
            tt_xml_input_1.ttv_des_conteudo = v_cod_empresa

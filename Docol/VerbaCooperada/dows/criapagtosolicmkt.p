@@ -283,6 +283,23 @@ procedure pi-execucao-orcamentaria:
         assign v_dat_transacao = amkt-solicitacao.dt-validade-final.
     
     
+        if amkt-forma-pagto.cd-forma-pagto = 1 then do: //bonificao
+
+        assign v_cod_empresa        =  param-global.empresa-prin
+               v_cod_cta_ctbl       = "435362"
+               v_cod_ccusto         = dc-regiao.cod-ccusto
+               v_cod_estab          = "9" //esta fixo porque, ate a data de 20.09.2019 existe orcamento apenas para este estabelecimento
+               v_cod_unid_negoc     = "DOC" 
+               v_cod_finalid_econ   = "0" /*REFERENTE AO C…DIGO DA FINALIDADE ECONOMICA REAL*/
+               v_val_aprop_ctbl     = p-valor * 0.50 //relativo ao valor de custo da mercadoria
+               v_num_seq            = 1
+               v_cod_funcao         = "estorna" 
+               v_cod_id             = "Solicitacao DPD607 " + string(p-numero) + " Bonificacao" //nao h  descricao, pois o empenho nao ‚ realizado, apenas ‚ feito check
+               v_orig_movto         = "90".
+
+        end. 
+        
+        else do:
         assign v_cod_empresa        =  param-global.empresa-prin
                v_cod_cta_ctbl       = "435362"
                v_cod_ccusto         = dc-regiao.cod-ccusto
@@ -294,7 +311,9 @@ procedure pi-execucao-orcamentaria:
                v_cod_funcao         = "estorna" 
                v_cod_id             = "Solicitacao DPD607 " + string(p-numero) //nao h  descricao, pois o empenho nao ‚ realizado, apenas ‚ feito check
                v_orig_movto         = "90".
-        
+
+        end.
+
         create tt_xml_input_1.
         assign tt_xml_input_1.ttv_cod_label    = "Empresa" /*l_empresa*/ 
                tt_xml_input_1.ttv_des_conteudo = v_cod_empresa
