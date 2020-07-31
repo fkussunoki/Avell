@@ -309,6 +309,11 @@ DO:
                        "Ser  solicitado um Motivo para o cancelamento.").
     IF RETURN-VALUE <> "YES" THEN RETURN NO-APPLY.
 
+    run piOrcamentoACR( INPUT i-numero,
+    output table tt_log_erros).
+
+    run piOrcamento(output table tt_log_erros).           
+
     ASSIGN h-aux = w-conrelaciona:HANDLE.
     ASSIGN h-aux:SENSITIVE = NO.
     RUN dop/dpd607a.w(OUTPUT c-motivo-cancela, OUTPUT l-ok).
@@ -319,7 +324,6 @@ DO:
     // Finaliza VC
     FIND FIRST amkt-solicitacao EXCLUSIVE-LOCK WHERE
                amkt-solicitacao.numero = i-numero NO-ERROR.
-    run piOrcamento(output table tt_log_erros).           
 
 
     ASSIGN amkt-solicitacao.cod-situacao     = "Solicita‡Æo Cancelada"
@@ -359,8 +363,6 @@ DO:
              amkt-solic-vl-bonific.vl-liberado    > amkt-solic-vl-bonific.vl-realizado:
         find first amkt-solic-vl-bonific-tit-acr no-lock where amkt-solic-vl-bonific-tit-acr.sequencia = amkt-solic-vl-bonific.sequencia no-error.
         if avail amkt-solic-vl-bonific-tit-acr then
-        run piOrcamentoACR( INPUT i-numero,
-                            output table tt_log_erros).           
 
 
         CREATE amkt-solic-vl-bonific-tit-acr.
@@ -391,7 +393,7 @@ END.
 
 &Scoped-define SELF-NAME bt-cancela-2
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL bt-cancela-2 w-conrelaciona
-ON CHOOSE OF bt-cancela-2 IN FRAME f-cad /* Cancelar Solicita‡Æo */
+ON CHOOSE OF bt-cancela-2 IN FRAME f-cad /* Gera adiantamento no APB */
 DO:
     DEFINE VARIABLE i-numero         AS INTEGER     NO-UNDO.
 
@@ -464,7 +466,7 @@ END.
 
 &Scoped-define SELF-NAME bt-cancela-3
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL bt-cancela-3 w-conrelaciona
-ON CHOOSE OF bt-cancela-3 IN FRAME f-cad /* Cancelar Solicita‡Æo */
+ON CHOOSE OF bt-cancela-3 IN FRAME f-cad /* Gera AVA no APB */
 DO:
     DEFINE VARIABLE i-numero         AS INTEGER     NO-UNDO.
 
