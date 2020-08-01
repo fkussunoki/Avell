@@ -277,12 +277,13 @@ procedure pi-execucao-orcamentaria:
 
         find first amkt-forma-pagto no-lock where amkt-forma-pagto.cd-forma-pagto = amkt-solicitacao.cd-forma-pagto no-error.
 
-        if amkt-forma-pagto.cd-forma-pagto = 3 then
+        if amkt-forma-pagto.tipo-pagto = 3 then
         assign v_dat_transacao = amkt-solicitacao.dt-validade-inicial.
         else 
         assign v_dat_transacao = amkt-solicitacao.dt-validade-final.
     
-    
+
+        if amkt-forma-pagto.tipo-pagto <> 1 then do:    
         assign v_cod_empresa        =  param-global.empresa-prin
                v_cod_cta_ctbl       = "435362"
                v_cod_ccusto         = dc-regiao.cod-ccusto
@@ -294,7 +295,8 @@ procedure pi-execucao-orcamentaria:
                v_cod_funcao         = "estorna" 
                v_cod_id             = "Solicitacao DPD607 " + string(p-numero) //nao h  descricao, pois o empenho nao ‚ realizado, apenas ‚ feito check
                v_orig_movto         = "90".
-        
+
+
         create tt_xml_input_1.
         assign tt_xml_input_1.ttv_cod_label    = "Empresa" /*l_empresa*/ 
                tt_xml_input_1.ttv_des_conteudo = v_cod_empresa
@@ -423,22 +425,10 @@ procedure pi-execucao-orcamentaria:
                                 input table tt_xml_input_1,
                                 output table tt_log_erros) .  
     RETURN 'ok'.    
-    END.
-
-        OUTPUT TO c:\desenv\novot.txt.
-
-        FOR EACH tt_xml_input_1:
-            EXPORT tt_xml_input_1.
         END.
-        OUTPUT CLOSE.
+    end.
 
-        OUTPUT TO c:\desenv\baba.txt.
-        FOR EACH tt_log_erros:
-            EXPORT tt_log_erros.
-        END.
-
-        OUTPUT CLOSE.
-        
+       
 
 end procedure.
 

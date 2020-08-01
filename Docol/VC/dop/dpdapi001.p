@@ -152,9 +152,10 @@ assign v_cod_cta_ctbl = "435362". //por ora, nao definido local para informar co
                      tt_xml_input_1.ttv_num_seq_1    = p-num-seq.
               create tt_xml_input_1.
               assign tt_xml_input_1.ttv_cod_label    = "ID Movimento"
-                     tt_xml_input_1.ttv_des_conteudo = "Processo " + string(p-cod-id) + " (Bonificacao) Utilizado no titulo " + p-espec-docto + "|" + p-serie + "|" + p-cod-titulo +
+                     tt_xml_input_1.ttv_des_conteudo = "Processo " + string(p-cod-id) + " Utilizado no titulo " + p-espec-docto + "|" + p-serie + "|" + p-cod-titulo +
                                                         "|" + p-cod-parcela + "| Estabelec " + p-cod-estab-titulo
                      tt_xml_input_1.ttv_num_seq_1    = p-num-seq.
+
 
               run prgfin/bgc/bgc700za.py (Input 1,
                                          input table tt_xml_input_1,

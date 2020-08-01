@@ -263,6 +263,8 @@ DO:
     DEFINE VARIABLE l-ok             AS LOGICAL     NO-UNDO.
     DEFINE VARIABLE l-erro           AS LOGICAL     NO-UNDO.
     DEFINE VARIABLE h-aux            AS HANDLE      NO-UNDO.
+    DEFINE VARIABLE v-dt-ref         AS DATE        NO-UNDO.
+    DEFINE VARIABLE v_cod_return    AS CHAR         NO-UNDO.
 
     RUN send-key IN h_q01dpd607("numero", OUTPUT i-numero).
     IF i-numero = 0 OR i-numero = ? THEN RETURN NO-APPLY.
@@ -305,14 +307,29 @@ DO:
         RETURN NO-APPLY.
     END.
 
+    FIND FIRST amkt-solic-vl-bonific EXCLUSIVE-LOCK WHERE
+             amkt-solic-vl-bonific.tipo-documento = 2 /* amkt-solicitacao */ AND
+             amkt-solic-vl-bonific.documento      = STRING(i-numero)         NO-ERROR.
+
+    IF AVAIL amkt-solic-vl-bonific THEN DO:
+    
+
+        RUN pi_retornar_sit_movimen_modul(INPUT "acr",
+                                          INPUT "DOC",
+                                          INPUT DATE(AMKT-SOLIC-VL-BONIFIC.DATA-HORA-LIB),
+                                          INPUT 'Habilitado',
+                                          OUTPUT v_cod_return).
+        IF v_cod_return <> 'Habilitado' THEN DO:
+            RUN dop/MESSAGE.p("Periodo nao habilitado", "Verifique se o periodo " + STRING(v-dt-ref) + " esta habilitado").
+            RETURN NO-APPLY.
+        END.
+
+    END.
+
     RUN dop/message4.p("Confirma cancelamento da Solicitaá∆o?",
                        "Ser† solicitado um Motivo para o cancelamento.").
     IF RETURN-VALUE <> "YES" THEN RETURN NO-APPLY.
 
-    run piOrcamentoACR( INPUT i-numero,
-    output table tt_log_erros).
-
-    run piOrcamento(output table tt_log_erros).           
 
     ASSIGN h-aux = w-conrelaciona:HANDLE.
     ASSIGN h-aux:SENSITIVE = NO.
@@ -324,6 +341,7 @@ DO:
     // Finaliza VC
     FIND FIRST amkt-solicitacao EXCLUSIVE-LOCK WHERE
                amkt-solicitacao.numero = i-numero NO-ERROR.
+    run piOrcamento(output table tt_log_erros).           
 
 
     ASSIGN amkt-solicitacao.cod-situacao     = "Solicitaá∆o Cancelada"
@@ -363,6 +381,8 @@ DO:
              amkt-solic-vl-bonific.vl-liberado    > amkt-solic-vl-bonific.vl-realizado:
         find first amkt-solic-vl-bonific-tit-acr no-lock where amkt-solic-vl-bonific-tit-acr.sequencia = amkt-solic-vl-bonific.sequencia no-error.
         if avail amkt-solic-vl-bonific-tit-acr then
+        run piOrcamentoACR( INPUT i-numero,
+                            output table tt_log_erros).           
 
 
         CREATE amkt-solic-vl-bonific-tit-acr.
@@ -393,7 +413,7 @@ END.
 
 &Scoped-define SELF-NAME bt-cancela-2
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL bt-cancela-2 w-conrelaciona
-ON CHOOSE OF bt-cancela-2 IN FRAME f-cad /* Gera adiantamento no APB */
+ON CHOOSE OF bt-cancela-2 IN FRAME f-cad /* Cancelar Solicitaá∆o */
 DO:
     DEFINE VARIABLE i-numero         AS INTEGER     NO-UNDO.
 
@@ -466,7 +486,7 @@ END.
 
 &Scoped-define SELF-NAME bt-cancela-3
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL bt-cancela-3 w-conrelaciona
-ON CHOOSE OF bt-cancela-3 IN FRAME f-cad /* Gera AVA no APB */
+ON CHOOSE OF bt-cancela-3 IN FRAME f-cad /* Cancelar Solicitaá∆o */
 DO:
     DEFINE VARIABLE i-numero         AS INTEGER     NO-UNDO.
 
@@ -1147,7 +1167,7 @@ FIND FIRST dc-regiao NO-LOCK WHERE
 
 find first amkt-forma-pagto no-lock where amkt-forma-pagto.cd-forma-pagto = amkt-solicitacao.cd-forma-pagto no-error.
     IF amkt-forma-pagto.tipo-pagto = 3 /* Adiantamento */ THEN
-    ASSIGN da-valid-orcto = amkt-solicitacao.dt-validade-final.
+    ASSIGN da-valid-orcto = amkt-solicitacao.dt-validade-inicial.
 ELSE // 1 - Bonificado, 2 - Abatimento
     ASSIGN da-valid-orcto = amkt-solicitacao.dt-validade-final.
 
@@ -1163,7 +1183,7 @@ ELSE // 1 - Bonificado, 2 - Abatimento
              v_num_seq            = 1
              v_cod_funcao         = "Estorna" 
              v_cod_id             = string(i-controle) //nao h† descricao, pois o empenho nao Ç realizado, apenas Ç feito check
-             v_orig_movto         = "90".
+             v_orig_movto         = "91".
 
              find first amkt-solic-pagto NO-LOCK where amkt-solic-pagto.numero = amkt-solicitacao.numero
                                                   and   amkt-solic-pagto.situacao-pagto = 2 no-error.
@@ -1172,6 +1192,12 @@ ELSE // 1 - Bonificado, 2 - Abatimento
              assign v_situacao_docto = "Solicitacao DPD607 (Pagto)" + string(v_cod_id).
              else
              assign v_situacao_docto = "Solicitacao DPD607 " + string(v_cod_id). 
+
+             find first amkt-forma-pagto no-lock where amkt-forma-pagto.cd-forma-pagto = amkt-solicitacao.cd-forma-pagto no-error.
+
+             IF amkt-forma-pagto.tipo-pagto = 1 THEN
+                 ASSIGN v_situacao_docto = "Solicitacao DPD607 " + string(v_cod_id) + " Bonificacao".
+
            
       create tt_xml_input_1.
       assign tt_xml_input_1.ttv_cod_label    = "Empresa" /*l_empresa*/ 
@@ -1291,7 +1317,7 @@ FIND FIRST dc-regiao NO-LOCK WHERE
 
 find first amkt-forma-pagto no-lock where amkt-forma-pagto.cd-forma-pagto = amkt-solicitacao.cd-forma-pagto no-error.
     IF amkt-forma-pagto.tipo-pagto = 3 /* Adiantamento */ THEN
-    ASSIGN da-valid-orcto = amkt-solicitacao.dt-validade-final.
+    ASSIGN da-valid-orcto = amkt-solicitacao.dt-validade-inicial.
 ELSE // 1 - Bonificado, 2 - Abatimento
     ASSIGN da-valid-orcto = amkt-solicitacao.dt-validade-final.
 
@@ -1307,7 +1333,7 @@ ELSE // 1 - Bonificado, 2 - Abatimento
              v_num_seq            = 1
              v_cod_funcao         = "Estorna" 
              v_cod_id             = string(i-controle) //nao h† descricao, pois o empenho nao Ç realizado, apenas Ç feito check
-             v_orig_movto         = "90".
+             v_orig_movto         = "91".
     
 for each amkt-solic-vl-bonific-tit-acr no-lock where amkt-solic-vl-bonific-tit-acr.sequencia = amkt-solic-vl-bonific.sequencia:
 //rotina de estorno: variaveis da API padr∆o:
@@ -1326,13 +1352,13 @@ run pi_retorna_sugestao_referencia (Input "T" /*l_l*/,
 
             if avail tit_acr then do:
 
-            find first histor_movto_tit_acr no-lock where histor_movto_tit_acr.cod_estab = tit_acr.cod_estab
+            find LAST histor_movto_tit_acr no-lock where histor_movto_tit_acr.cod_estab = tit_acr.cod_estab
                                                     and   histor_movto_tit_acr.num_id_tit_acr = tit_acr.num_id_tit_acr
                                                     and   entry(1, histor_movto_tit_acr.des_text_histor, "|") = v_cod_id no-error.
 
                       if avail histor_movto_tit_acr then do:
 
-                        find first movto_tit_acr no-lock where movto_tit_acr.cod_estab = histor_movto_tit_acr.cod_estab
+                        find LAST movto_tit_acr no-lock where movto_tit_acr.cod_estab = histor_movto_tit_acr.cod_estab
                                                           and   movto_tit_acr.num_id_tit_acr = histor_movto_tit_acr.num_id_tit_acr
                                                           and   movto_tit_acr.num_id_movto_tit_acr = histor_movto_tit_acr.num_id_movto_tit_acr
                                                           and   movto_tit_acr.cod_refer = entry(4, histor_movto_tit_acr.des_text_histor, "|") no-error.
@@ -1422,7 +1448,7 @@ run pi_retorna_sugestao_referencia (Input "T" /*l_l*/,
                     tt_xml_input_1.ttv_num_seq_1    = v_num_seq.
              create tt_xml_input_1.
              assign tt_xml_input_1.ttv_cod_label    = "Data Movimentaá∆o" /*l_data_movimentacao*/ 
-                    tt_xml_input_1.ttv_des_conteudo = string(v_dat_transacao)
+                    tt_xml_input_1.ttv_des_conteudo = string(DATE(amkt-solic-vl-bonific.data-hora-lib))
                     tt_xml_input_1.ttv_num_seq_1    = v_num_seq.
              create tt_xml_input_1.
              assign tt_xml_input_1.ttv_cod_label    = "Finalidade Econìmica" /*l_finalidade_economica*/ 
@@ -1446,6 +1472,7 @@ run pi_retorna_sugestao_referencia (Input "T" /*l_l*/,
                     amkt-solic-vl-bonific-tit-acr.cod_ser_docto + "|" + amkt-solic-vl-bonific-tit-acr.cod_tit_acr +
                                                        "|" + amkt-solic-vl-bonific-tit-acr.cod_parcela + "| Estabelec " + amkt-solic-vl-bonific-tit-acr.cod_estab
                     tt_xml_input_1.ttv_num_seq_1    = v_num_seq.
+
 
       RUN prgfin/bgc/bgc700za.py (input 1,
       input table tt_xml_input_1,
@@ -1564,3 +1591,52 @@ END FUNCTION.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE pi_retornar_sit_movimen_modul w-conrelaciona 
+
+PROCEDURE pi_retornar_sit_movimen_modul:
+
+    /************************ Parameter Definition Begin ************************/
+
+    def Input param p_cod_modul_dtsul
+        as character
+        format "x(3)"
+        no-undo.
+    def Input param p_cod_unid_organ
+        as character
+        format "x(5)"
+        no-undo.
+    def Input param p_dat_refer_sit
+        as date
+        format "99/99/9999"
+        no-undo.
+    def Input param p_des_sit_movimen_ent
+        as character
+        format "x(40)"
+        no-undo.
+    def output param p_des_sit_movimen_mod
+        as character
+        format "x(40)"
+        no-undo.
+
+
+    /************************* Parameter Definition End *************************/
+
+    assign p_des_sit_movimen_mod = "".
+    situacao:
+    for each sit_movimen_modul no-lock
+     where sit_movimen_modul.cod_modul_dtsul = p_cod_modul_dtsul
+       and sit_movimen_modul.cod_unid_organ = p_cod_unid_organ
+       and sit_movimen_modul.dat_inic_sit_movimen <= p_dat_refer_sit
+       and sit_movimen_modul.dat_fim_sit_movimen >= p_dat_refer_sit /*cl_retornar_sit_movimen_modul of sit_movimen_modul*/:
+        if  p_des_sit_movimen_mod = ""
+        then do:
+            assign p_des_sit_movimen_mod = sit_movimen_modul.ind_sit_movimen.
+        end /* if */.
+        else do:
+            assign p_des_sit_movimen_mod = p_des_sit_movimen_mod + "," + sit_movimen_modul.ind_sit_movimen.
+        end /* else */.
+    end /* for situacao */.
+
+END PROCEDURE. /* pi_retornar_sit_movimen_modul */
+
+&ANALYZE-RESUME

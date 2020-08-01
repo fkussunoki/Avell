@@ -608,16 +608,16 @@ run pi_retorna_sugestao_referencia (Input "T" /*l_l*/,
 
             if avail tit_acr then do:
 
-            find first histor_movto_tit_acr no-lock where histor_movto_tit_acr.cod_estab = tit_acr.cod_estab
+            find LAST histor_movto_tit_acr no-lock where histor_movto_tit_acr.cod_estab = tit_acr.cod_estab
                                                     and   histor_movto_tit_acr.num_id_tit_acr = tit_acr.num_id_tit_acr
                                                     and   entry(1, histor_movto_tit_acr.des_text_histor, "|") = p-cod-id no-error.
 
                       if avail histor_movto_tit_acr then do:
 
-                        find first movto_tit_acr no-lock where movto_tit_acr.cod_estab = histor_movto_tit_acr.cod_estab
+                        find LAST movto_tit_acr no-lock where movto_tit_acr.cod_estab = histor_movto_tit_acr.cod_estab
                                                           and   movto_tit_acr.num_id_tit_acr = histor_movto_tit_acr.num_id_tit_acr
-                                                          and   movto_tit_acr.num_id_movto_tit_acr = histor_movto_tit_acr.num_id_movto_tit_acr
-                                                          and   movto_tit_acr.cod_refer = entry(4, histor_movto_tit_acr.des_text_histor, "|") no-error.
+                                                          and   movto_tit_acr.cod_refer = entry(4, histor_movto_tit_acr.des_text_histor, "|")
+                                                          AND   movto_tit_acr.ind_trans_acr = "Acerto Valor a Menor" no-error.
 
                                                           if avail movto_tit_acr then do:
                                           
@@ -736,7 +736,7 @@ run pi_retorna_sugestao_referencia (Input "T" /*l_l*/,
              tt_xml_input_1.ttv_num_seq_1    = p-num-seq.
       create tt_xml_input_1.
       assign tt_xml_input_1.ttv_cod_label    = "ID Movimento"
-             tt_xml_input_1.ttv_des_conteudo = "Processo " + string(p-cod-id) + " (Bonificacao) Utilizado no titulo " + p-espec-docto + "|" + p-serie + "|" + p-cod-titulo +
+             tt_xml_input_1.ttv_des_conteudo = "Processo " + string(p-cod-id) + " Utilizado no titulo " + p-espec-docto + "|" + p-serie + "|" + p-cod-titulo +
                                                 "|" + p-cod-parcela + "| Estabelec " + p-cod-estab-titulo
              tt_xml_input_1.ttv_num_seq_1    = p-num-seq.
 

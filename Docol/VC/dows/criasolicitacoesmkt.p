@@ -531,8 +531,11 @@ DEF VAR i-controle           AS INTEGER.
          ASSIGN i-controle = i-solicitacao.
         END.
 
+    find first amkt-forma-pagto no-lock where amkt-forma-pagto.cd-forma-pagto = p-cd-forma-pagto no-error.
+    
 
-    if amkt-solicitacao.cd-forma-pagto = 1 then do: //Bonificacao
+    if amkt-forma-pagto.tipo-pagto = 1 then do: //Bonificacao
+
         assign v_cod_empresa        =  param-global.empresa-prin
         v_cod_cta_ctbl       = "435362"
         v_cod_ccusto         = dc-regiao.cod-ccusto
@@ -544,7 +547,7 @@ DEF VAR i-controle           AS INTEGER.
         v_num_seq            = 1
         v_cod_funcao         = "Verifica" 
         v_cod_id             = string(i-controle) + " Bonificacao" //nao h  descricao, pois o empenho nao ‚ realizado, apenas ‚ feito check
-        v_orig_movto         = "90".
+        v_orig_movto         = "91".
     end.
 
 

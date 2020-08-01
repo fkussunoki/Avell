@@ -825,7 +825,7 @@ DEFINE VARIABLE h-prog        AS HANDLE                           NO-UNDO.
         i-linha = i-linha + 1.
     
         RUN pi-acompanhar IN h-prog(INPUT "Linha :" + STRING(i-linha)).
-       IF chWorkSheet:cells(i-linha, 1):Text = ""  Then Leave.
+       IF chWorkSheet:cells(i-linha, 1):Text = ""  Then Leave. //inserir coluna I
 
        create tt-planilha.
        assign tt-planilha.ttv-tp-venda            = chWorkSheet:cells(i-linha, 1):Text

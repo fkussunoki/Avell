@@ -920,7 +920,6 @@ PROCEDURE pi_criar_tt_realiz:
                 ASSIGN tt_realiz.des_contdo_movto = tt_orig_movto_empenh_aux.tta_des_contdo_movto
                        tt_realiz.narrativa        = fn-narrativa(tt_realiz.des_contdo_movto).
 
-                MESSAGE tt_orig_movto_empenh_aux.tta_num_orig_movto_empenh VIEW-AS ALERT-BOX.
                 case tt_orig_movto_empenh_aux.tta_num_orig_movto_empenh:
                     
                     when 1 /* T¡tulo APB Pendente */ then do:
@@ -1000,7 +999,16 @@ PROCEDURE pi_criar_tt_realiz:
                     when 38 /* Movto Cta Corrente 5.0 */ then do:
                         ASSIGN tt_realiz.ind_tip_movto   = "Realizado".
                         ASSIGN tt_realiz.cod_modul_dtsul = "CMG".
-                    end.  
+                    end. 
+                    WHEN 90 THEN DO:
+                        ASSIGN tt_realiz.ind_tip_movto   = "Empenhado".
+
+                    END.
+                    WHEN 91 THEN DO:
+                        ASSIGN tt_realiz.ind_tip_movto   = "Realizado".
+
+                    END.
+
                    
                 END.
             END.            
@@ -1260,6 +1268,15 @@ PROCEDURE pi_criar_tt_realiz_obz:
                         ASSIGN tt_realiz.ind_tip_movto   = "Realizado".
                         ASSIGN tt_realiz.cod_modul_dtsul = "CMG".
                     end.    
+                    WHEN 90 THEN DO:
+                        ASSIGN tt_realiz.ind_tip_movto   = "Empenhado".
+
+                    END.
+                    WHEN 91 THEN DO:
+                        ASSIGN tt_realiz.ind_tip_movto   = "Realizado".
+
+                    END.
+
                 END.
             END.            
         END.
